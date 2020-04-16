@@ -1,0 +1,537 @@
+{
+    "replies":[
+        {
+            "key": "JOINUPDATES_SUCCESS",
+            "he": [
+                "מעולה 😀 רשמתי לעצמי להוסיף אותך לרשימת התפוצה במייל ואעדכן אותך כשזה קרה",
+                "אתה מוזמן להצטרף גם לקבוצת הפייסבוק שלנו https://facebook.com/groups/tiulimg"
+            ],
+            "en": [
+                "Great 😀 I noted myself to add you to the mailing list and I will update you when it happened",
+                "Your'e invited to join our Facebook group also https://facebook.com/groups/tiulimg"
+            ]
+        },
+        {
+            "key": "HIKER_NOT_REGISTERED",
+            "he": "נכון ל-_VAR0_ אתה לא רשום לטיול הקרוב עם הטלפון הזה. אם חבר אחר רשם אותך אז נסה עם הטלפון והסיסמא שלו.",
+            "en": "As of _VAR0_ you aren't registered to the near hike with that phone number. If another friend had registered you, try to use his phone number and password.",
+            "buttons_he": [ "להרשם לטיול נוסף", "התחל מחדש" ],
+            "buttons_en": [ "Join a new hike", "Start over" ]
+        },
+        {
+            "key": "PASSWORD_INCORRECT_TRYEDIT",
+            "he": "הסיסמא שהכנסת אינה נכונה. אם אינך בטוח מהי, שאל אותי בוואטסאפ או במייל tiulimg@gmail.com",
+            "en": "You've entered an incorrect password. If your'e unsure what your password is, ask me at WhatsApp or at tiulimg@gmail.com"
+        },
+        {
+            "key": "NO_HITCHHIKERS",
+            "he": [
+                "נכון ל-_VAR0_ לא סודרו לך טרמפיסטים.. כדאי לבדוק שוב שני לילות לפני הטיול",
+                "אגב מצב הטרמפים מתעדכן גם כאן:\nhttps://goo.gl/V5zbCB"
+            ],
+            "en": [
+                "As of _VAR0_ you haven't been booked with hitchhikers yet.. You can check back two nights next to the hike",
+                "By the way, the carpool status is being updated here:\nhttps://goo.gl/V5zbCB"
+            ]
+        },
+        {
+            "key": "HITCHHIKERS_BACK_FORTH",
+            "he": [
+                "נהדר! יש לך טרמפיסטים. מזכיר לך שאחריות שלהם ליצור אתך קשר ולהגיע בזמן להיכן שנוח לך לאסוף אותם משם, והם צריכים גם להשתתף בדלק כמובן.",
+                " בהלוך וגם חזור ישמחו להצטרף אליך:\n_VAR0_"
+            ],
+            "en": [
+                "Great! You have hitchhikers. I remind you it's their responsability to contact you and be in time where you are comfortable to pick them from, and they also need to participate in fuel costs.",
+                "In the way to the hike and the way back would love to join you:\n_VAR0_"
+            ]
+        },
+        {
+            "key": "HITCHHIKERS_DIFFERENT_BACK_FORTH",
+            "he": [
+                "נהדר! יש לך טרמפיסטים. מזכיר לך שאחריות שלהם ליצור אתך קשר ולהגיע בזמן להיכן שנוח לך לאסוף אותם משם, והם צריכים גם להשתתף בדלק כמובן.",
+                " בהלוך ישמחו להצטרף אליך:\n_VAR0_",
+                " בחזור ישמחו להצטרף אליך:\n_VAR1_"
+            ],
+            "en": [
+                "Great! You have hitchhikers. I remind you it's their responsability to contact you and be in time where you are comfortable to pick them from, and they also need to participate in fuel costs.",
+                "In the way to the hike only would love to join you:\n_VAR0_",
+                "In the way back only would love to join you:\n_VAR1_"
+            ]
+        },
+        {
+            "key": "HITCHHIKERS_FORTH",
+            "he": [
+                "נהדר! יש לך טרמפיסטים. מזכיר לך שאחריות שלהם ליצור אתך קשר ולהגיע בזמן להיכן שנוח לך לאסוף אותם משם, והם צריכים גם להשתתף בדלק כמובן.",
+                " בהלוך בלבד ישמחו להצטרף אליך:\n_VAR0_"
+            ],
+            "en": [
+                "Great! You have hitchhikers. I remind you it's their responsability to contact you and be in time where you are comfortable to pick them from, and they also need to participate in fuel costs.",
+                "In the way to the hike only would love to join you:\n_VAR0_"
+            ]
+        },
+        {
+            "key": "HITCHHIKERS_BACK",
+            "he": [
+                "נהדר! יש לך טרמפיסטים. מזכיר לך שאחריות שלהם ליצור אתך קשר ולהגיע בזמן להיכן שנוח לך לאסוף אותם משם, והם צריכים גם להשתתף בדלק כמובן.",
+                " בחזור בלבד ישמחו להצטרף אליך:\n_VAR0_"
+            ],
+            "en": [
+                "Great! You have hitchhikers. I remind you it's their responsability to contact you and be in time where you are comfortable to pick them from, and they also need to participate in fuel costs.",
+                "In the way back only would love to join you:\n_VAR0_"
+            ]
+        },
+        {
+            "key": "NO_RIDE",
+            "he": [
+                "נכון ל-_VAR0_ לא סודר לך טרמפ.. כדאי לבדוק שוב שני לילות לפני הטיול",
+                "אגב מצב הטרמפים מתעדכן גם כאן:\nhttps://goo.gl/V5zbCB"
+            ],
+            "en": [
+                "As of _VAR0_ you haven't been booked with a ride yet.. It's worth checking back two nights next to the hike",
+                "By the way, the carpool status is being updated here:\nhttps://goo.gl/V5zbCB"
+            ]
+        },
+        {
+            "key": "RIDE_BACK_FORTH",
+            "he": [
+                "נהדר! אתה יכול לבוא ולחזור עם _VAR0_ _VAR1_. הוא מגיע מ_VAR2_ וחוזר ל_VAR3_",
+                "מזכיר לך שאחריות שלך ליצור איתו קשר ולהגיע בזמן להיכן שנוח לו לאסוף אותך משם, ואתה צריך גם להשתתף בדלק לפי העלות שהוא מחשב לנסיעה.\n זה חשוב מאוד שתעדכן אותי שקבעת איתו, בסדר?"
+            ],
+            "en": [
+                "Great! You can come and return with _VAR0_ _VAR1_. He comes from _VAR2_ and returns to _VAR3_",
+                "I remind you that it's your responsability to contact him and be in time at the location that is comfortable for him to pick you from. You should also participate in fuel costs according to his calculation.\nIt's very important that you'll update me when you've set with him, OK?"
+            ]
+        },
+        {
+            "key": "RIDE_DIFFERENT_BACK_FORTH",
+            "he": [
+                "נהדר! אתה יכול לבוא בהלוך עם _VAR0_ _VAR1_. הוא מגיע מ_VAR2_ וחוזר ל_VAR3_",
+                "אתה יכול לחזור עם _VAR4_ _VAR5_. הוא מגיע מ_VAR6_ וחוזר ל_VAR7_",
+                "מזכיר לך שאחריות שלך ליצור איתם קשר ולהגיע בזמן להיכן שנוח ל_VAR8_ לאסוף אותך משם, ואתה צריך גם להשתתף בדלק לפי העלות שהם מחשבים לנסיעה.\n זה חשוב מאוד שתעדכן אותי שקבעת איתם, בסדר?"
+            ],
+            "en": [
+                "Great! You can come with _VAR0_ _VAR1_. He comes from _VAR2_ and returns to _VAR3_",
+                "You can return with _VAR4_ _VAR5_. He comes from _VAR6_ and returns to _VAR7_",
+                "I remind you that it's your responsability to contact them and be in time at the location that is comfortable for _VAR8_ to pick you from. You should also participate in fuel costs according to their calculation.\nIt's very important that you'll update me when you've set with them, OK?"
+            ]
+        },
+        {
+            "key": "RIDE_FORTH",
+            "he": [
+                "נהדר! אתה יכול לבוא בהלוך בלבד עם _VAR0_ _VAR1_. הוא מגיע מ_VAR2_ וחוזר ל_VAR3_",
+                "מזכיר לך שאחריות שלך ליצור איתו קשר ולהגיע בזמן להיכן שנוח לו לאסוף אותך משם, ואתה צריך גם להשתתף בדלק לפי העלות שהוא מחשב לנסיעה.\n זה חשוב מאוד שתעדכן אותי שקבעת איתו, בסדר?"
+            ],
+            "en": [
+                "Great! You can come with _VAR0_ _VAR1_. He comes from _VAR2_ and returns to _VAR3_",
+                "I remind you that it's your responsability to contact him and be in time at the location that is comfortable for him to pick you from. You should also participate in fuel costs according to his calculation.\nIt's very important that you'll update me when you've set with him, OK?"
+            ]
+        },
+        {
+            "key": "RIDE_BACK",
+            "he": [
+                "נהדר! אתה יכול לחזור בלבד עם _VAR0_ _VAR1_. הוא מגיע מ_VAR2_ וחוזר ל_VAR3_",
+                "מזכיר לך שאחריות שלך ליצור איתו קשר כדי ששניכם תהיו מסונכרנים על זה שאתה חוזר איתו. כמובן שאם יש בעיה כלשהי, כדאי שתשאל אותי בטיול. נפגש ונהנה בע\"ה :)"
+            ],
+            "en": [
+                "Great! You can return with _VAR0_ _VAR1_. He comes from _VAR2_ and returns to _VAR3_",
+                "I remind you that it's your responsibility to contact him in order that you both will be in sync about that your'e returning with him. Of course, if there any problem - ask me at the hike. We'll meet soon :)"
+            ]
+        },
+        {
+            "key": "SOMETHING_UNEXPECTED",
+            "he": "אממ קרה כאן משהו לא צפוי, אתך הסליחה",
+            "en": "Something unexpected occured, I'm sorry.."
+        },
+        {
+            "key": "GREAT_FOR_UPDATE",
+            "he": "מעולה, תודה על העדכון!",
+            "en": "Great, thanks for the update!"
+        },
+        {
+            "key": "REGISTER_TO_HIKES_SUCCESS",
+            "he": [
+                "מגניב, אני בטוח שיהיה טיול מדהים :). אני זמין במספר TPHONE (*אני בארון, נא לא להעביר את המספר*). נהיה בקשר יומיים לפני הטיול בנוגע לטרמפים.",
+                "לסיורי תרבות והיסטוריה יונתן מארגן טרמפים וזמין לשאלות YPHONE.",
+                "הציעו לחברים גייז לכתוב לי במייל tiulimg@gmail.com או בפייסבוק https://facebook.com/tiulimg כדי להצטרף, או להצטרף לקבוצת הפייסבוק https://facebook.com/groups/tiulimg"
+            ],
+            "en": [
+                "It's gonna be a cool hike :). I'm available at TPHONE (*I'm closted, do not transfer*), we would be in touch two days next to the hike regarding the carpool.",
+                "At tours Yonatan is responsible for the carpool and would answer questions YPHONE.",
+                "Suggest gay friends to write to me in email tiulimg@gmail.com or Facebook https://facebook.com/tiulimg to join updates, or to join our Facebook group https://facebook.com/groups/tiulimg"
+            ]
+        },
+        {
+            "key": "NO_ANSWER",
+            "he": [],
+            "en": []
+        },
+        {
+            "key": "WHICH_HIKE_REGISTER",
+            "he": "לאילו טיולים אתה רוצה להרשם?\nבחר מהאפשרויות שאני מציע או כתוב לי תאריך טיול",
+            "en": "Which hikes do you want to register to?\nSelect from the options I suggest or enter an hike date"
+        },
+        {
+            "key": "HIKES_SELECTED",
+            "he": "לא סיימנו! בחרת להרשם לטיולים:\n_VAR0_",
+            "en": "We hadn't finished! Youv'e selected to register to the hikes:\n_VAR0_"
+        },
+        {
+            "key": "SELECT_MORE_HIKES",
+            "he": "בחר טיול מהאפשרויות שאני מציע, כתוב לי תאריך טיול או 'סיים' כדי להתקדם. הכנס תאריך טיול שבחרת כדי להסיר אותו מרשימת הטיולים שאתה מבקש להרשם אליהם",
+            "en": "Select from the options I suggest, enter an hike date or end to progress. Enter selected hike's date to unselect it"
+        },
+        {
+            "key": "REGISTER_TO_HIKES_ADD_FRIEND",
+            "he": [
+                "נרשמים אתך לטיול:\n_VAR0_",
+                "כתוב 'סיים' כדי לסיים, או שם של חבר נוסף שמצטרף. ציין מספר סידורי של חבר כדי למחוק אותו.\nלמשל: שם החבר מושיקו"
+            ],
+            "en": [
+                "Joining the hike with you:\n_VAR0_",
+                "Enter 'end' to end, or a name of an additional friend who joins. Mention the line number of a friend to remove him.\nE.g. Friend's name is Moshiko"
+            ]
+        },
+        {
+            "key": "REGISTER_TO_HIKES_DETAILS",
+            "he": [
+                "פרטי הרישום לטיול:\n_VAR0_"
+            ],
+            "en": [
+                "Hike registration details:\n_VAR0_"
+            ]
+        },
+        {
+            "key": "REGISTER_TO_HIKES_MODIFY",
+            "he": "עוד לא שמרתי את הרישום! האם יש פרט כלשהו שאתה רוצה לתקן? הכנס את מספרו כדי לתקן, כתוב 'סיים' כדי לסיים",
+            "en": "I didn't save the registration yet! Do you want to fix any detail? Enter it's number to fix it or write 'End' to end"
+        },
+        {
+            "key": "CHOOSE_HIKE_TO_EDIT",
+            "he": "בחר טיול:",
+            "en": "Select a hike:"
+        },
+        {
+            "key": "REGISTER_TO_HIKES_UPDATED",
+            "he": "מגניב, עדכנתי את הרישום שלך :)",
+            "en": "Great, I've updated your registration :)"
+        },
+        {
+            "key": "GETRIDEDETAILS_ENTERPHONE",
+            "he": "מה מספר הטלפון שלך?",
+            "en": "What is your phone number?"
+        },
+        {
+            "key": "GETRIDEDETAILS_ENTERPASSWORD",
+            "he": "עם איזו סיסמא נרשמת פעם אחרונה לטיול?\nלמשל: סיסמא Aa123456",
+            "en": "With which password did you register for the last hike?\nE.g. Password Aa123456"
+        },
+        {
+            "key": "RIDES_ARENT_SETUPED",
+            "he": [
+                "עוד לא סודרו טרמפים. נסה שני לילות לפני הטיול",
+                "אגב מצב הטרמפים מתעדכן גם כאן:\nhttps://goo.gl/V5zbCB",
+                "*אי אפשר לקבל טרמפ לטיול אם אתה לא רשום אליו*. בקש ״להרשם לטיול נוסף״ כדי לשריין מקום בטרמפ, אם אתה עדיין לא רשום לטיול"
+            ],
+            "en": [
+                "Carpool isn't arranged yet. Try two nights before of the hike",
+                "By the way, the carpool status is being updated here:\nhttps://goo.gl/V5zbCB",
+                "Try to join a new hike to save a ride in the carpool for the hike, if you're not yet registered to it"
+            ],
+            "buttons_he": [ "להרשם לטיול נוסף", "התחל מחדש" ],
+            "buttons_en": [ "Join a new hike", "Start over" ]
+        },
+        {
+            "key": "NO_DRIVERS",
+            "he": [
+                "לא הצטרפו עדיין חבר'ה עם רכב. נסה סמוך יותר לטיול",
+                "אגב מצב הטרמפים מתעדכן גם כאן:\nhttps://goo.gl/V5zbCB",
+                "*אי אפשר לקבל טרמפ לטיול אם אתה לא רשום אליו*. בקש ״להרשם לטיול נוסף״ כדי לשריין מקום בטרמפ, אם אתה עדיין לא רשום לטיול"
+            ],
+            "en": [
+                "There aren't guys with a car yet. Try closer to the hike",
+                "By the way, the carpool status is being updated here:\nhttps://goo.gl/V5zbCB",
+                "Try to join a new hike to save a ride in the carpool for the hike, if you're not yet registered to it"
+            ],
+            "buttons_he": [ "להרשם לטיול נוסף", "התחל מחדש" ],
+            "buttons_en": [ "Join a new hike", "Start over" ]
+        },
+        {
+            "key": "HIKER_NOT_REGISTERED_SPECIFIC_HIKE",
+            "he": "נכון ל-_VAR0_ אתה לא רשום לטיול ב-_VAR1_ עם הטלפון הזה. אם חבר אחר רשם אותך אז נסה עם הטלפון והסיסמא שלו.",
+            "en": "As of _VAR0_ you aren't registered to the hike at _VAR1_ with that phone number. If another friend had registered you, try to use his phone number and password.",
+            "buttons_he": [ "להרשם לטיול נוסף", "התחל מחדש" ],
+            "buttons_en": [ "Join a new hike", "Start over" ]
+        },
+        {
+            "key": "RIDES_NOT_ARRANGED",
+            "he": "נכון ל-_VAR0_ לא סודר לך טרמפ לאף טיול שאתה רשום אליו. אם חבר אחר רשם אותך אז נסה עם הטלפון והסיסמא שלו, או נסה שני לילות לפני הטיול. אתה רשום לטיולים ב-\n_VAR1_",
+            "en": "As of _VAR0_ you aren't arranged with a ride for any hike you're registered for. If another friend had registered you, try to use his phone number and password. You can check 2 nights before of the hike. Your'e currently registered to:\n_VAR1_",
+            "buttons_he": [ "להרשם לטיול נוסף", "התחל מחדש" ],
+            "buttons_en": [ "Join a new hike", "Start over" ]
+        },
+        {
+            "key": "AFFECTED_HIKES",
+            "he": [
+                "יחד עם הטיול ל-_VAR0_ נרשמת גם לטיולים ב:\n_VAR1_\nשים לב, הם גם יושפעו מהשינוי שתעשה. תוכל לבטל או לעדכן את השינויים גם בהמשך."
+            ],
+            "en": [
+                "With the hike to _VAR0_ you've registered also to:\n_VAR1_\nPlease notice that they will be affected of your change either. You can always cancel the change or make other changes later."
+            ]
+        },
+        {
+            "key": "DIDNT_RECOGNIZE_THE_REQUESTED_HIKE",
+            "he": [
+                "זה מביך, לא הצלחתי להבין לאיזה טיול אתה רוצה להצטרף. מה התאריך הלועזי שלו? נסה אולי לבחור טיול מהכפתורים שאני מציע לך?",
+                "בחרת להרשם לטיולים:\n_VAR0_"
+            ],
+            "en": [
+                "It's embarrassing, I didn't recognize the hike you've requested to join to. In what date does it take place? Try to select a hike from the list I'm suggesting you maybe?",
+                "Youv'e selected to register to hikes:\n_VAR0_"
+            ]
+        },
+        {
+            "key": "REGISTER_TO_HIKES_CANCEL",
+            "he": "תחסר לנו 🌹, אני מקווה שנראה אותך בקרוב. התחל מחדש כדי לבחור טיול חדש להצטרף אליו",
+            "en": "You we be missing to us 🌹, I hope we will see you soon. Start over to select other hikes to join",
+            "buttons_he": [ "להרשם לטיול נוסף", "התחל מחדש" ],
+            "buttons_en": [ "Join a new hike", "Start over" ]
+        },
+        {
+            "key": "CHOOSED_INCORRECT_OPTION",
+            "he": "אממ, בחר מספר מהרשימה מעלה..",
+            "en": "You should select a number of the list above.."
+        },
+        {
+            "key": "NO_HIKES_PLANNED",
+            "he": "לצערי אנחנו לא עורכים טיולים בקיץ, ואין בתוכנית כרגע סיור או מפגש אחר. אם אתה לא יודע מתי יש טיולים, אתה יכול לבקש להצטרף לעדכונים",
+            "en": "Unfortunately, we do not hike at summer, and there is no plan of tours or other meetings at the moment. If you do not know when there are hikes, you can ask me to join updates",
+            "buttons_he": [ "להצטרף לעדכונים", "התחל מחדש" ],
+            "buttons_en": [ "Join updates", "Start over" ]
+        },
+        {
+            "key": "GET_PHONE_EMAIL",
+            "he": "מה מספר הטלפון שלך?",
+            "en": "What is your phone number?"
+        },
+        {
+            "key": "REGISTERED_NO_HIKE",
+            "he": "אתה לא רשום לאף טיול כרגע. אתה יכול לבקש \"להרשם לטיול נוסף\"",
+            "en": "Your'e not registered to any hike right now. You can request to join a new hike",
+            "buttons_he": [ "להרשם לטיול נוסף", "התחל מחדש" ],
+            "buttons_en": [ "Join a new hike", "Start over" ]
+        },
+        {
+            "key": "CHOOSE_ADRIVER",
+            "he": [
+                "בחרת להצטרף בהלוך אל:\n_VAR0_",
+                "ובחזור אל:\n_VAR1_",
+                "בחר כיוון וחבר עם רכב להצטרף אליו או הכנס כיוון ואת המספר לפניו שוב כדי לבטל:\n_VAR2_",
+                "למשל: \"הלוך 1\" או \"חזור 10\"",
+                "אם לא משנה לך עם מי לבוא אתה יכול להשאיר ריק, בכל מקרה נהיה בקשר בוואטסאפ יומיים לפני הטיול"
+            ],
+            "en": [
+                "Youv'e selected to join on the way to the hike to:\n_VAR0_",
+                "and on the way back to:\n_VAR1_",
+                "Select a friend with a car to join or enter the number before him again to cancel:\n_VAR2_",
+                "For instance: \"To the hike 1\" או \"The way back 10\"",
+                "If you don't care who you come with, you can leave empty, in any case we'll be in touch with WhatsApp two days before the hike"
+            ]
+        },
+        {
+            "key": "ROBOT_CONFUSED_EDITHIKE_NOT_SELECTED_HIKE",
+            "he": "חשבתי שרצית לערוך או לבטל רישום לטיול אבל לא בחרת טיול לערוך אז היתה לי שגיאה. נסה להתחיל מחדש",
+            "en": "I thought you wanted to edit or cancel a hike registration but you didn't select a hike to edit so I had an error. Try starting over",
+            "buttons_he": [ "התחל מחדש" ],
+            "buttons_en": [ "Start over" ]
+        },
+        {
+            "key": "ROBOT_CONFUSED_EDITHIKE_NOT_REGISTERED_TO_HIKES",
+            "he": "חשבתי שרצית לערוך או לבטל רישום לטיול אבל אני לא רואה שאתה רשום לאף טיול כרגע, אז אני אציע לך להרשם לטיול נוסף:",
+            "en": "I thought you wanted to edit or cancel a hike registration but I don't see that you're registered to any hike now, so I'll suggest you to join a new hike:"
+        },
+        {
+            "key": "REGISTERED_TO_ALL_HIKES_CHOSEN",
+            "he": "בתכל'ס אתה כבר רשום לכל הטיולים שבקשת להרשם אליהם :) אז פשוט נתראה שם 😅",
+            "en": "Your'e already registered to all hikes you've chosed :) so we will meet there 😅"
+        },
+        {
+            "key": "REGISTERTOHIKES_NAME",
+            "he": [
+                "אוקיי, אני לא רואה שטיילת איתנו בעבר. \nאני צריך כמה פרטים ממך, נשתדל לעשות את זה מהר",
+                "מה שמך? אפשר גם שם בדוי\nלמשל: אני שגיא"
+            ],
+            "en": [
+                "Okay, I do not see that you hiked with us in the past.\nI need a few details from you, we'll try to do it quickly",
+                "What is your name? Can be a fictive name also\nE.g. I'm Sagi"
+            ]
+        },
+        {
+            "key": "REGISTERTOHIKES_ISGAY",
+            "he": "אתה גיי נכון? (ולא נשוי לאישה)",
+            "en": "Your'e gay, right? (and not married to a women)"
+        },
+        {
+            "key": "REGISTERTOHIKES_EMAIL",
+            "he": "מה המייל שלך?",
+            "en": "What is your email?"
+        },
+        {
+            "key": "REGISTERTOHIKES_COMEFROM",
+            "he": [
+                "מהיכן אתה מגיע לטיול?",
+                "מקום בעדיפות ראשונה ניתן לציין עם קו נטוי למשל \"אני מגיע מרמת גן/חיפה\", איזור בתוך העיר ניתן לציין בסוגרים למשל \"אני מגיע מחיפה (עיר תחתית)\"",
+                "אין לציין מהיכן אתה מעוניין לקבל טרמפ אלא מהיכן אתה יוצא בבוקר הטיול וצריך טרמפ.\n\nלמשל, אם אתה מבת ים ותכתוב לי שאתה צריך טרמפ מתל אביב, יש סיכוי שאסדר לך טרמפ מפתח תקווה אם לא יהיה מקום פנוי מתל אביב (אבל כן יהיה מראשלצ)."
+            ],
+            "en": [
+                "Where from are you coming to the hike?",
+                "A place in the first priority can be noted with a slash such as \"I come from Ramat Gan / Haifa\", an area within the city can be noted in brackets such as \"I come from Haifa (Lower City)\"",
+                "Don't write where you want to get a ride from but where do you come from on the morning of the hike and need a ride from.\n\nFor example, if you are from Bat Yam and write to me that you need a ride from Tel Aviv, there is a chance that I will give you a ride of Petach Tikva, if there is no free space from Tel Aviv (but there's from Rishon Letzion)."
+            ]
+        },
+        {
+            "key": "REGISTERTOHIKES_RETURNTO",
+            "he": "להיכן אתה חוזר אחרי הטיול?\nלמשל, אני חוזר לנתניה",
+            "en": "Where do you return to after the hike?\nFor instance: I return to Netanya"
+        },
+        {
+            "key": "REGISTERTOHIKES_COMEWITHCAR",
+            "he": [
+                "כללי טרמפים:\nאם אתה מגיע ברכב, נדרש שתאפשר לטרמפיסטים להצטרף אליך לטיול.",
+                "1. אחריות של הטרמפיסט ליצור קשר עם בעל הרכב ולהגיע בזמן למקום שקבע עם בעל הרכב שיאסוף אותו. בעל הרכב לא צריך לחכות במקרה של איחור.",
+                "2. בעל הרכב *אינו צריך להאריך את נסיעתו* כדי לאסוף טרמפיסטים לטיול, נדרש שהם יגיעו להיכן שנוח לו לאסוף אותם על הדרך או מביתו",
+                "3. הטרמפיסטים צריכים להשתתף בעלות הדלק, אם ישנה, לפי החישוב של בעל הרכב.",
+                "4. אם יש לבעל הרכב בעיה עם נהיגה ארוכה, טרמפיסט יכול להציע לנהוג במקומו.",
+                "5. יש להתנהג בצורה נעימה ומכבדת בנסיעה ובטיול, וכן לשמור על המרחב הבטוח של החברים בנסיעה ובטיול (אם זה לא ברור מאליו)",
+                "האם אתה צריך טרמפ או מגיע ברכב?",
+                "אם לאחד החברים שמצטרף אליך יש רכב, אנא סמן שיש לך רכב. אפשרות נוספת - להרשם בנפרד."
+            ],
+            "en": [
+                "Carpool rules:\nIf you arrive by car, you will need to allow hitchhikers to join you to the hike.",
+                "2. The owner of the car *does not need to extend his way* in order to pick up hitchhikers for a hike, they are required to go to a place where he is comfortable to take them up on the way or from his home.",
+                "3. Hitchhikers should participate in the cost of fuel, if there is, according to the calculation of the owner of the vehicle.",
+                "4. If the vehicle owner has a problem with long driving, an hitchhiker can offer him to drive instead of him.",
+                "5. Please behave in a pleasant and respectful way and save the safe space of the participants (if it is not obvious).",
+                "Do you need a ride or come with a car?",
+                "If one of your friends coming with you has a car, please indicate that you have a car. Another option - registering separately."
+            ],
+            "buttons_he": [ "אני מגיע ברכב", "אני צריך טרמפ", "אני צריך טרמפ (אבל יש לי רכב)", 
+                "קבעתי כבר עם חבר אחר שאני מצטרף אליו (אפרט בהמשך הטופס מי זה)", 
+                "אני מגיע באוטובוס או אופנוע, אחר", "אשכור רכב אם יהיו טרמפיסטים" ],
+            "buttons_en": [ "I come in my car", "I need a ride", "I need a ride but I do have a car", 
+                "I already setuped with a friend I'm joining (I will write who it is in the form)", 
+                "I come in bus, a motorcycle or other", "I will rent a car if there will be hitchhikers" ]
+        },
+        {
+            "key": "REGISTERTOHIKES_AVAILABLEPLACES",
+            "he": [
+                "כמה מקומות פנויים יש לך?",
+                "נא השב גם אם אתה מעדיף להגיע בטרמפ עם חבר אחר"
+            ],
+            "en": [
+                "How many available space do you have?",
+                "Please fill even if you prefer to get a ride with another friend"
+            ]
+        },
+        {
+            "key": "REGISTERTOHIKES_SAVEDTHEDATE",
+            "he": [
+                "האם שריינת את התאריך לטיול?", 
+                "מי שלא בטוח שיוכל לבוא לטיול - לא שומר מקום בטרמפ"
+            ],
+            "en": [
+                "Have you saved the date of the hike?",
+                "Anyone who is not sure that he can come on a hike - does not save a place in the carpool"
+            ],
+            "buttons_he": [ "כן", "אולי אוכל לבוא לטיול, לא בטוח שאני פנוי", "אני שומר את התאריך הזה פנוי, אבל יש לי חששות לבוא לטיול" ],
+            "buttons_en": [ "Yes", "I could maybe join the hike", "I save the date but I do have concerns" ]
+        },
+        {
+            "key": "REGISTERTOHIKES_FEAROF",
+            "he": [
+                "ממה אתה חושש?\nייתכן שיש מה לעשות ולהקל על חלק מהחששות. אשמח לעזור :)",
+                "למשל:\nאני חושש שאאלץ לבטל מסיבה לא ידועה"
+            ],
+            "en": [
+                "What do you fear of?\nWe may have something to do and alleviate some of the concerns. I will be happy to help :)",
+                "For instance:\nI'm afraid I'll have to cancel for some unknown reason"
+            ]
+        },
+        {
+            "key": "REGISTERTOHIKES_SHAREAGE",
+            "he": "האם אתה רוצה לשתף בן כמה אתה (באופן אנונימי)?",
+            "en": "Would you like to share your age (anonymously)?",
+            "buttons_he": [ "כן", "לא" ],
+            "buttons_en": [ "Yes", "No" ]
+        },
+        {
+            "key": "REGISTERTOHIKES_AGE",
+            "he": "בן כמה אתה?",
+            "en": "How old are you?"
+        },
+        {
+            "key": "REGISTERTOHIKES_DOFRIENDSJOIN",
+            "he": "האם מצטרפים אתך לטיול חברים נוספים (גייז כמובן)?",
+            "en": "Would additional gay friends join the hike with you?",
+            "buttons_he": [ "כן", "לא" ],
+            "buttons_en": [ "Yes", "No" ]
+        },
+        {
+            "key": "REGISTERTOHIKES_FRIENDSNAME",
+            "he": "מה שם החבר? (בדוי או אמיתי)\nתוכל להוסיף עוד חברים אחריו :)\nלמשל: שם החבר מושיקו",
+            "en": "What is the friend's name? (fictive or real)\nYou can add more friends later :)\nE.g. The friend name is Moshiko"
+        },
+        {
+            "key": "REGISTERTOHIKES_FRIENDSAGE",
+            "he": "בן כמה החבר? אם הוא לא רוצה לשתף אתה יכול לכתוב 0",
+            "en": "How old is the friend? If he does not want to share you can write 0"
+        },
+        {
+            "key": "REGISTERTOHIKES_FRIENDSAVEDTHEDATE",
+            "he": "האם הוא משריין את התאריך של הטיול?",
+            "en": "Have he saved the date of the hike?",
+            "buttons_he": [ "כן", "אולי הוא יבוא" ],
+            "buttons_en": [ "Yes", "He may join" ]
+        },
+        {
+            "key": "REGISTERTOHIKES_PASSWORD",
+            "he": "בחר סיסמא להזדהות עם רובוט הטרמפים.\nלמשל: סיסמא Aa123456",
+            "en": "Choose a password to authenticate with the chatbot.\nFor example: Password Aa123456"
+        },
+        {
+            "key": "REGISTERTOHIKES_HOWDIDIHEAR",
+            "he": "אם עוד לא היית בטיולים, איך שמעת על הקבוצה?",
+            "en": "If you didn't join us yet, how did you hear about the hiking group?"
+        },
+        {
+            "key": "REGISTERTOHIKES_PLAYSON",
+            "he": "תתנדב להביא כלי נגינה כלשהו או תנגן אם נביא? על מה?\nלמשל: אנגן על גיטרה, אביא מפוחית",
+            "en": "Will you volunteer to bring a musical instrument or play at it if we would bring it? Which?\nFor example: I will play guitar, bring a harmonica"
+        },
+        {
+            "key": "REGISTERTOHIKES_VOLUNTEER",
+            "he": [
+                "יש פעילות כלשהי שהיית רוצה להעביר או לארגן בשביל הקבוצה?",
+                "היא צריכה להתאים לסגנון הקבוצה (עבור גייז בלבד, לא בשבת, מתאים גם למי שבארון, מתאים להרבה אנשים). נשמח לעזור לארגן!",
+                "למשל: אני יכול לארגן מפגש משחקי קופסא"
+            ],
+            "en": [
+                "Any activity you would like to transfer or organize for the group?",
+                "It should match the style of the group (for gay only, not on Shabbat, suitable for those in the closet, suitable for many people). We will be happy to help organize!",
+                "For instance: I can organize a board games meeting"
+            ]
+        },
+        {
+            "key": "REGISTERTOHIKES_SELFRESPONSIBILITY",
+            "he": [
+                "אחריות אישית:",
+                "האחריות על כל מה שקורה בטיול היא עליי בלבד. מצבי הרפואי תקין, ואם ארגיש לא טוב איידע את מוביל הטיול. ייתכן שרמת הקושי של הטיול תהיה קלה או קשה יותר מהצפוי ובהתאם הזמנים עשויים להתקצר או להתארך. אני יודע מה אני צריך להביא לטיול ומבין שייתכן שלא אוכל להצטרף בלי הציוד המתאים. האחריות על הציוד שלי היא שלי בלבד."
+            ],
+            "en": [
+                "Self Responsibility:",
+                "The responsibility for everything that happens on the hike is solely mine. My medical condition is good and if I feel unwell I will let the hike guide know. The difficulty of the hike may be easier or harder than expected and according the times may be shortened or lengthened. I know what I need to bring on the hike and understand that I might not be able to join without the right equipment. The responsibility for my equipment is solely mine"
+            ],
+            "buttons_he": [ "מבין ומקבל" ],
+            "buttons_en": [ "I understand and accept" ]
+        }
+    ]
+}
