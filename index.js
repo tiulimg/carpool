@@ -3124,16 +3124,17 @@ app.patch("/api/calculaterides", function(req, res) {
                                     console.log("wheretolocation " + wheretolocation);
                                 })
                                 .catch(rejection => {
-                                    console.log("somethine went wrong: " + rejection);
+                                    console.log("something went wrong: " + rejection);
                                 }));
                                 timer++;
                             }
 
                             Promise.all(promises).then(() => {
-                                util.getDistanceMatrix(hikers);
+                                console.log("calculaterides getDistanceMatrix");
+                                return util.getDistanceMatrix(hikers);
                             })
                             .catch(rejection => {
-                                console.log("somethine went wrong: " + rejection);
+                                console.log("something went wrong: " + rejection);
                             });
                         }
                     });

@@ -266,6 +266,100 @@ function distanceLatLons(lat1,lon1,lat2,lon2) {
     return d;
 }
 
-function getDistanceMatrix() {
+function getDistanceMatrix(hikers) {
+    return new Promise((resolve, reject) => {
+        var distances = {};
+
+        distances[hikers[0].phone] = {
+            tothehike: [],
+            fromthehike: [],
+        };
+
+        for (let index = 1; index < hikers.length; index++) {
+            const hiker = hikers[index];
+
+            var distancetothehike = distanceLatLons(
+                hiker.wherefromlocation.lat, hiker.wherefromlocation.lon,
+                hikers[0].wherefromlocation.lat, hikers[0].wherefromlocation.lon);
+            var distancefromthehike = distanceLatLons(
+                hiker.wheretolocation.lat, hiker.wheretolocation.lon,
+                hikers[0].wheretolocation.lat, hikers[0].wheretolocation.lon);
+
+            distances[hikers[0].phone].tothehike.push({
+                phone: hiker.phone,
+                distance: distancetothehike
+            });
+            distances[hikers[0].phone].fromthehike.push({
+                phone: hiker.phone,
+                distance: distancefromthehike
+            });
+            
+            distances[hiker.phone] = {
+                tothehike: [],
+                fromthehike: [],
+            };
+            distances[hiker.phone].tothehike.push({
+                phone: hikers[0].phone,
+                distance: distancetothehike
+            });
+            distances[hiker.phone].fromthehike.push({
+                phone: hikers[0].phone,
+                distance: distancefromthehike
+            });
+        }
+
+        for (let index = 1; index < hikers.length; index++) {
+            const hiker = hikers[index];
+            for (let indexpartner = index; indexpartner < hikers.length; indexpartner++) {
+                const partner = array[indexpartner];
+
+                var distancetothehike = distanceLatLons(
+                    hiker.wherefromlocation.lat, hiker.wherefromlocation.lon,
+                    partner.wherefromlocation.lat, partner.wherefromlocation.lon);
+                var distancefromthehike = distanceLatLons(
+                    hiker.wheretolocation.lat, hiker.wheretolocation.lon,
+                    partner.wheretolocation.lat, partner.wheretolocation.lon);
     
+                distances[hiker.phone].tothehike.push({
+                    phone: partner.phone,
+                    distance: distancetothehike
+                });
+                distances[hiker.phone].fromthehike.push({
+                    phone: partner.phone,
+                    distance: distancefromthehike
+                });
+
+                distances[partner.phone].tothehike.push({
+                    phone: hiker.phone,
+                    distance: distancetothehike
+                });
+                distances[partner.phone].fromthehike.push({
+                    phone: hiker.phone,
+                    distance: distancefromthehike
+                });
+            }
+        }
+
+        // Sort distances for each hiker
+        for (let index = 0; index < hikers.length; index++) {
+            const hiker = hikers[index];
+            
+            distances[hiker.phone].tothehike.sort(function(b,a){
+                a = a.distance;
+                b = b.distance;
+                result = a>b ? -1 : a<b ? 1 : 0;
+                return result;
+            });
+            distances[hiker.phone].fromthehike.sort(function(b,a){
+                a = a.distance;
+                b = b.distance;
+                result = a>b ? -1 : a<b ? 1 : 0;
+                return result;
+            });
+
+        }
+        console.log(distances + JSON.stringify(distances));
+
+        return resolve(distances);
+    });
 }
