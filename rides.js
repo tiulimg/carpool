@@ -1,16 +1,16 @@
 var Promise = require('promise');
 var request = require('request');
+var util = require("./util");
 
 module.exports = {
     patchridedetails: patchridedetails,
     patchridedetailsv2: patchridedetailsv2,
     translateaddresstolocation: translateaddresstolocation,
+    calculateroute: calculateroute,
 };
 
-const CARPOOLWORLD_BASE = 'https://www.carpoolworld.com';
-const CARPOOLWORLD_PARTNER_NAME = 'tiulimg';
-const CARPOOLWORLD_PARTNER_KEY = process.env.CARPOOLWORLD_PARTNER_KEY;
 const LOCATIONIQ_TOKEN = process.env.LOCATIONIQ_TOKEN;
+const HERE_APPID = process.env.HERE_APPID;
 
 function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST_REGISTER_COLLECTION, replies, register, handleError)
 {
@@ -902,6 +902,34 @@ function translateaddresstolocation(address) {
                 }
                 //console.log("translateaddresstolocation locationiq location " + JSON.stringify(location));
                 return resolve(location);
+            }
+        });
+    });
+}
+
+function calculateroute(startlat,startlon,endlat,endlon,mode) { // mode = car | publicTransport
+    return new Promise((resolve, reject) => {
+        var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID+
+            "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon+"&mode=fastest%3B"+mode+"&combineChange=true";
+        console.log("calculatecarroute here (startlat,startlon) (endlat,endlon): mode " + mode + "(" + 
+            startlat+","+startlon+") ("+endlat+","+endlon + ")");
+        request({
+            url: url,
+            method: "GET",
+        }, function (error, response, body){
+            if (error) {
+                var rejection = "calculatecarroute Promise reject: " + error;
+                console.log(rejection);
+                return reject(rejection);
+            }
+            else
+            {
+                //console.log("translateaddresstolocation locationiq response " + JSON.stringify(response));
+                var responsebodyjson = JSON.parse(response.body);
+                console.log("calculatecarroute here responsebodyjson " + JSON.stringify(responsebodyjson));
+                
+                //console.log("translateaddresstolocation locationiq location " + JSON.stringify(location));
+                return resolve(responsebodyjson.response);
             }
         });
     });

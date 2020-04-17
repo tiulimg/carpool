@@ -3090,7 +3090,7 @@ app.patch("/api/calculaterides", function(req, res) {
                 var nearhikes = [];
                 hikes.forEach(hike => {
                     var hikestarttime = new Date(hike.starttime);
-                    var dateOffset = (24*60*60*1000) * 7; //2 days
+                    var dateOffset = (24*60*60*1000) * 365; //2 days
                     if (hikestarttime.getTime() - dateOffset < now.getTime()) {
                         nearhikes.push(hike);
                     }
@@ -3098,7 +3098,7 @@ app.patch("/api/calculaterides", function(req, res) {
                 console.log("nearhikes " + JSON.stringify(nearhikes));
 
                 var timer = 0;
-                const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+                var promises = [];
 
                 for (let hikeindex = 0; hikeindex < nearhikes.length; hikeindex++) {
                     const hike = nearhikes[hikeindex];
@@ -3112,20 +3112,29 @@ app.patch("/api/calculaterides", function(req, res) {
                                 const hiker = hikers[hikerindex];
 
                                 console.log("start calculation ");
-                                wait(1000*timer)
+                                promises.push(util.wait(1000*timer)
                                 .then(() => ridesmodules.translateaddresstolocation(hiker.wherefromdetailed))
                                 .then(wherefromlocation => {
                                     console.log("wherefromlocation " + wherefromlocation);
+                                    hiker.wherefromlocation = wherefromlocation;
                                     return ridesmodules.translateaddresstolocation(hiker.wheretodetailed)
                                 })
                                 .then(wheretolocation => {
+                                    hiker.wheretolocation = wheretolocation;
                                     console.log("wheretolocation " + wheretolocation);
                                 })
                                 .catch(rejection => {
                                     console.log("somethine went wrong: " + rejection);
-                                });
+                                }));
                                 timer++;
                             }
+
+                            Promise.all(promises).then(() => {
+                                util.getDistanceMatrix(hikers);
+                            })
+                            .catch(rejection => {
+                                console.log("somethine went wrong: " + rejection);
+                            });
                         }
                     });
                 }

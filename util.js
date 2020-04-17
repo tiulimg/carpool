@@ -1,4 +1,7 @@
+var Promise = require('promise');
+
 module.exports = {
+    wait: wait,
     normalize_phonenumber: normalize_phonenumber,
     remove_past_hikes: remove_past_hikes,
     remove_hikes_notinlist: remove_hikes_notinlist,
@@ -6,7 +9,15 @@ module.exports = {
     sort_hikes: sort_hikes,
     set_language: set_language,
     friendstext_from_friendsdetails: friendstext_from_friendsdetails,
+    toRadians: toRadians,
+    distanceLatLons: distanceLatLons,
+    getDistanceMatrix: getDistanceMatrix,
 };  
+
+function wait(ms)
+{
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 function normalize_phonenumber(phonenumber) {
     if (phonenumber.indexOf("@") == -1) {
@@ -231,4 +242,30 @@ function friendstext_from_friendsdetails(friendsdetails) {
     }
     friends = friends.trim();
     return(friends);
+}
+
+function toRadians(degrees) {
+    return degrees * Math.PI / 180;
+}
+
+function distanceLatLons(lat1,lon1,lat2,lon2) {
+    var d = 0;
+
+    var R = 6371e3; // metres
+    var φ1 = lat1.toRadians();
+    var φ2 = lat2.toRadians();
+    var Δφ = (lat2-lat1).toRadians();
+    var Δλ = (lon2-lon1).toRadians();
+
+    var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    d = R * c;
+    return d;
+}
+
+function getDistanceMatrix() {
+    
 }
