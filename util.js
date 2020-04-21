@@ -12,6 +12,7 @@ module.exports = {
     toRadians: toRadians,
     distanceLatLons: distanceLatLons,
     getDistanceMatrix: getDistanceMatrix,
+    getHikerAreas: getHikerAreas,
 };  
 
 function wait(ms)
@@ -267,99 +268,183 @@ function distanceLatLons(lat1,lon1,lat2,lon2) {
 }
 
 function getDistanceMatrix(hikers) {
-    return new Promise((resolve, reject) => {
-        var distances = {};
+    var distances = {};
 
-        distances[hikers[0].phone] = {
+    distances[hikers[0].phone] = {
+        tothehike: [],
+        fromthehike: [],
+        link: hikers[0],
+    };
+
+    for (let index = 1; index < hikers.length; index++) {
+        const hiker = hikers[index];
+
+        var distancetothehike = distanceLatLons(
+            hiker.wherefromlocation.lat, hiker.wherefromlocation.lon,
+            hikers[0].wherefromlocation.lat, hikers[0].wherefromlocation.lon);
+        var distancefromthehike = distanceLatLons(
+            hiker.wheretolocation.lat, hiker.wheretolocation.lon,
+            hikers[0].wheretolocation.lat, hikers[0].wheretolocation.lon);
+
+        distances[hikers[0].phone].tothehike.push({
+            phone: hiker.phone,
+            distance: distancetothehike,
+            link: hiker,
+        });
+        distances[hikers[0].phone].fromthehike.push({
+            phone: hiker.phone,
+            distance: distancefromthehike,
+            link: hiker,
+        });
+        
+        distances[hiker.phone] = {
             tothehike: [],
             fromthehike: [],
+            link: hiker,
         };
+        distances[hiker.phone].tothehike.push({
+            phone: hikers[0].phone,
+            distance: distancetothehike,
+            link: hikers[0],
+        });
+        distances[hiker.phone].fromthehike.push({
+            phone: hikers[0].phone,
+            distance: distancefromthehike,
+            link: hikers[0],
+        });
+    }
 
-        for (let index = 1; index < hikers.length; index++) {
-            const hiker = hikers[index];
+    for (let index = 1; index < hikers.length; index++) {
+        const hiker = hikers[index];
+        for (let indexpartner = index; indexpartner < hikers.length; indexpartner++) {
+            const partner = array[indexpartner];
 
             var distancetothehike = distanceLatLons(
                 hiker.wherefromlocation.lat, hiker.wherefromlocation.lon,
-                hikers[0].wherefromlocation.lat, hikers[0].wherefromlocation.lon);
+                partner.wherefromlocation.lat, partner.wherefromlocation.lon);
             var distancefromthehike = distanceLatLons(
                 hiker.wheretolocation.lat, hiker.wheretolocation.lon,
-                hikers[0].wheretolocation.lat, hikers[0].wheretolocation.lon);
+                partner.wheretolocation.lat, partner.wheretolocation.lon);
 
-            distances[hikers[0].phone].tothehike.push({
-                phone: hiker.phone,
-                distance: distancetothehike
-            });
-            distances[hikers[0].phone].fromthehike.push({
-                phone: hiker.phone,
-                distance: distancefromthehike
-            });
-            
-            distances[hiker.phone] = {
-                tothehike: [],
-                fromthehike: [],
-            };
             distances[hiker.phone].tothehike.push({
-                phone: hikers[0].phone,
-                distance: distancetothehike
+                phone: partner.phone,
+                distance: distancetothehike,
+                link: hiker,
             });
             distances[hiker.phone].fromthehike.push({
-                phone: hikers[0].phone,
-                distance: distancefromthehike
-            });
-        }
-
-        for (let index = 1; index < hikers.length; index++) {
-            const hiker = hikers[index];
-            for (let indexpartner = index; indexpartner < hikers.length; indexpartner++) {
-                const partner = array[indexpartner];
-
-                var distancetothehike = distanceLatLons(
-                    hiker.wherefromlocation.lat, hiker.wherefromlocation.lon,
-                    partner.wherefromlocation.lat, partner.wherefromlocation.lon);
-                var distancefromthehike = distanceLatLons(
-                    hiker.wheretolocation.lat, hiker.wheretolocation.lon,
-                    partner.wheretolocation.lat, partner.wheretolocation.lon);
-    
-                distances[hiker.phone].tothehike.push({
-                    phone: partner.phone,
-                    distance: distancetothehike
-                });
-                distances[hiker.phone].fromthehike.push({
-                    phone: partner.phone,
-                    distance: distancefromthehike
-                });
-
-                distances[partner.phone].tothehike.push({
-                    phone: hiker.phone,
-                    distance: distancetothehike
-                });
-                distances[partner.phone].fromthehike.push({
-                    phone: hiker.phone,
-                    distance: distancefromthehike
-                });
-            }
-        }
-
-        // Sort distances for each hiker
-        for (let index = 0; index < hikers.length; index++) {
-            const hiker = hikers[index];
-            
-            distances[hiker.phone].tothehike.sort(function(b,a){
-                a = a.distance;
-                b = b.distance;
-                result = a>b ? -1 : a<b ? 1 : 0;
-                return result;
-            });
-            distances[hiker.phone].fromthehike.sort(function(b,a){
-                a = a.distance;
-                b = b.distance;
-                result = a>b ? -1 : a<b ? 1 : 0;
-                return result;
+                phone: partner.phone,
+                distance: distancefromthehike,
+                link: hiker,
             });
 
+            distances[partner.phone].tothehike.push({
+                phone: hiker.phone,
+                distance: distancetothehike,
+                link: partner,
+            });
+            distances[partner.phone].fromthehike.push({
+                phone: hiker.phone,
+                distance: distancefromthehike,
+                link: partner,
+            });
         }
-        console.log(distances + JSON.stringify(distances));
+    }
 
-        return resolve(distances);
-    });
+    // Sort distances for each hiker
+    for (let index = 0; index < hikers.length; index++) {
+        const hiker = hikers[index];
+        
+        distances[hiker.phone].tothehike.sort(function(b,a){
+            a = a.distance;
+            b = b.distance;
+            result = a>b ? -1 : a<b ? 1 : 0;
+            return result;
+        });
+        distances[hiker.phone].fromthehike.sort(function(b,a){
+            a = a.distance;
+            b = b.distance;
+            result = a>b ? -1 : a<b ? 1 : 0;
+            return result;
+        });
+
+    }
+    console.log("distances " + JSON.stringify(distances));
+
+    return distances;
+}
+
+function getHikerAreas(hikers) {
+    var areas = {
+        driverswheretoareas: {
+            "דרום": [],
+            "צפון": [],
+            "ירושלים": [],
+            "חיפה": [],
+            "מרכז": [],
+        },
+        driverswherefromareas: {
+            "דרום": [],
+            "צפון": [],
+            "ירושלים": [],
+            "חיפה": [],
+            "מרכז": [],
+        },
+        hitchhikerswheretoareas: {
+            "דרום": [],
+            "צפון": [],
+            "ירושלים": [],
+            "חיפה": [],
+            "מרכז": [],
+        },
+        hitchhikerswherefromareas: {
+            "דרום": [],
+            "צפון": [],
+            "ירושלים": [],
+            "חיפה": [],
+            "מרכז": [],
+        },
+        sumtoareas: {
+            "דרום": 0,
+            "צפון": 0,
+            "ירושלים": 0,
+            "חיפה": 0,
+            "מרכז": 0,
+            "all": 0,
+        },
+        sumfromareas: {
+            "דרום": 0,
+            "צפון": 0,
+            "ירושלים": 0,
+            "חיפה": 0,
+            "מרכז": 0,
+            "all": 0,
+        },
+    };
+
+    for (let index = 0; index < hikers.length; index++) {
+        const hiker = hikers[index];
+        if (hiker.amidriver) {
+            areas.sumtoareas[hiker.wheretoarea] += hiker.availableplaces;
+            areas.sumtoareas.all += hiker.availableplaces;
+            areas.sumfromareas[hiker.wherefromarea] += hiker.availableplaces;
+            areas.sumfromareas.all += hiker.availableplaces;
+            areas.driverswheretoareas[hiker.wheretoarea].push(hiker);
+            areas.driverswherefromareas[hiker.wherefromarea].push(hiker);
+            hiker.availableplacestothehike = hiker.availableplaces;
+            hiker.availableplacesfromthehike = hiker.availableplaces;
+        }
+        else {
+            areas.sumtoareas[hiker.wheretoarea] -= hiker.seatsrequired;
+            areas.sumtoareas.all -= hiker.seatsrequired;
+            areas.sumfromareas[hiker.wherefromarea] -= hiker.seatsrequired;
+            areas.sumfromareas.all -= hiker.seatsrequired;
+            areas.hitchhikerswheretoareas[hiker.wheretoarea].push(hiker);
+            areas.hitchhikerswherefromareas[hiker.wherefromarea].push(hiker);
+            hiker.seatsrequiredtothehike = hiker.seatsrequired;
+            hiker.seatsrequiredfromthehike = hiker.seatsrequired;
+        }
+    }
+    console.log("areas " + JSON.stringify(areas));
+
+    return areas;
 }
