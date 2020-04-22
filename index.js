@@ -3311,7 +3311,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                     if (err) {
                                         handleError(res, err.message, "Failed to delete hikers of " + hike.hikedate);
                                     } else {
-                                        db.collection(HIKERS_COLLECTION).insertMany(newHikersList.hikers, function(err, docs) {
+                                        db.collection(HIKERS_COLLECTION).insertMany(hikers, function(err, docs) {
                                             if (err) {
                                                 handleError(res, err.message, "Failed to insert all hikers of " + hike.hikedate);
                                             }
