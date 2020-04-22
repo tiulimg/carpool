@@ -40,6 +40,7 @@ app.use((err, req, res, next) => {
 var db;
 
 // Connect to the database before starting the application server.
+mongodb.MongoClient.set('useUnifiedTopology', true);
 mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", function (err, client) {
   if (err) {
     console.log(err);
@@ -3090,7 +3091,8 @@ app.patch("/api/calculaterides", function(req, res) {
                 var nearhikes = [];
                 hikes.forEach(hike => {
                     var hikestarttime = new Date(hike.starttime);
-                    var dateOffset = (24*60*60*1000) * 365; //2 days
+                    var days = 365;
+                    var dateOffset = (24*60*60*1000) * days;
                     if (hikestarttime.getTime() - dateOffset < now.getTime()) {
                         nearhikes.push(hike);
                     }

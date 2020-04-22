@@ -371,8 +371,15 @@ function getDistanceMatrix(hikers) {
         });
 
     }
-    console.log("distances " + JSON.stringify(distances));
 
+    console.log("distances:");
+    for (var source in distances) {
+        for (var dest in source.tothehike) {
+            console.log("source " + source.link.name + " distance " + dest.distance + " dest " + dest.link.name);
+        }
+    }
+
+    var a = b;
     return distances;
 }
 
