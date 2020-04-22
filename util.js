@@ -253,10 +253,10 @@ function distanceLatLons(lat1,lon1,lat2,lon2) {
     var d = 0;
 
     var R = 6371e3; // metres
-    var φ1 = lat1.toRadians();
-    var φ2 = lat2.toRadians();
-    var Δφ = (lat2-lat1).toRadians();
-    var Δλ = (lon2-lon1).toRadians();
+    var φ1 = toRadians(lat1);
+    var φ2 = toRadians(lat2);
+    var Δφ = toRadians(lat2-lat1);
+    var Δλ = toRadians(lon2-lon1);
 
     var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
             Math.cos(φ1) * Math.cos(φ2) *
