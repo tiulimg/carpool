@@ -3091,7 +3091,7 @@ app.patch("/api/calculaterides", function(req, res) {
                 var nearhikes = [];
                 hikes.forEach(hike => {
                     var hikestarttime = new Date(hike.starttime);
-                    var days = 365;
+                    var days = 14;
                     var dateOffset = (24*60*60*1000) * days;
                     if (hikestarttime.getTime() - dateOffset < now.getTime()) {
                         nearhikes.push(hike);
@@ -3157,7 +3157,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                     for (let neardriverindex = 0; neardriverindex < distances[hiker.phone].tothehike.length; neardriverindex++) {
                                         const neardriverdistanceto = distances[hiker.phone].tothehike[neardriverindex];
                                         var neardriver = neardriverdistanceto.link;
-                                        console.log("calculaterides driver to the hike : distance " + neardriverdistanceto.distance + 
+                                        console.log("calculaterides driver to the hike: distance " + neardriverdistanceto.distance + 
                                             " name " + neardriver.name + " isdriver " + neardriver.amidriver + " seats " + 
                                             neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces);
                                         if (neardriver.amidriver && 
