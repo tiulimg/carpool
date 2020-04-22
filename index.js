@@ -3245,7 +3245,38 @@ app.patch("/api/calculaterides", function(req, res) {
                                     }
                                 }
 
-                                console.log("calculaterides carpool calculation result: " + JSON.stringify(hikers));
+                                console.log("calculaterides carpool calculation result:");
+                                for (let index = 0; index < hikers.length; index++) {
+                                    const hiker = hikers[index];
+                                    if (hiker.amidriver) {
+                                        var hitchersto = "";
+                                        var hitchersfrom = "";
+                                        for (let hitcherindex = 0; hiker.myhitchersto && hitcherindex < hiker.myhitchersto.length; 
+                                             hitcherindex++) {
+                                            const hitcher = myhitchersto[hitcherindex];
+                                            hitchersto += hitcher + " ";
+                                        }
+                                        for (let hitcherindex = 0; hiker.myhitchersfrom && hitcherindex < hiker.myhitchersfrom.length; 
+                                            hitcherindex++) {
+                                           const hitcher = myhitchersfrom[hitcherindex];
+                                           hitchersfrom += hitcher + " ";
+                                       }
+                                        console.log(hiker.hikerindex + " " + hiker.fullname + " to the hike: " + hitchersto);                                        
+                                        console.log(hiker.hikerindex + " " + hiker.fullname + " from the hike: " + hitchersfrom);                                        
+                                    }
+                                    else {
+                                        if (hiker.mydriverto && hiker.mydriverfrom) {
+                                            console.log(hiker.hikerindex + " " + hiker.fullname + 
+                                                " to the hike: " + hiker.mydriverto.name);
+                                            console.log(hiker.hikerindex + " " + hiker.fullname + 
+                                                " from the hike: " + hiker.mydriverfrom.name);
+                                        }
+                                        else
+                                        {
+                                            console.log(hiker.hikerindex + " " + hiker.fullname + " no drivers");
+                                        }
+                                    }
+                                }
                             })
                             .catch(rejection => {
                                 console.log("something went wrong:");
