@@ -3098,7 +3098,7 @@ app.patch("/api/calculaterides", function(req, res) {
                         {hikenamehebrew: { $regex : ".*"+hike.hikedate+".*" }}).sort({hikerindex: 1}).toArray(function(err, hikers) {
                         if (err) {
                             handleError(res, err.message, "Failed to get hikers for the near hikes.");
-                        } else if (!hikers || hikers.length == 0){
+                        } else if (hikers && hikers.length > 0){
                             for (let hikerindex = 0; hikerindex < hikers.length; hikerindex++) {
 
                                 const hiker = hikers[hikerindex];
