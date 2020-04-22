@@ -3251,7 +3251,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                 console.log("calculaterides carpool calculation result: " + JSON.stringify(hikers));
                             })
                             .catch(rejection => {
-                                console.log("something went wrong: " + rejection);
+                                throw rejection;
                             });
                         }
                     });
