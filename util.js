@@ -270,16 +270,13 @@ function distanceLatLons(lat1,lon1,lat2,lon2) {
 function getDistanceMatrix(hikers) {
     var distances = {};
 
-    for (var property in hikers) 
-    {
-        console.log("hikers property " + property);
+    if (hikers.length > 0) {
+        distances[hikers[0].phone] = {
+            tothehike: [],
+            fromthehike: [],
+            link: hikers[0],
+        };
     }
-    console.log("hikers.length " + hikers.length);
-    distances[hikers[0].phone] = {
-        tothehike: [],
-        fromthehike: [],
-        link: hikers[0],
-    };
 
     for (let index = 1; index < hikers.length; index++) {
         const hiker = hikers[index];

@@ -3130,7 +3130,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                     console.log("wheretolocation " + JSON.stringify(wheretolocation));
                                 })
                                 .catch(rejection => {
-                                    console.log("something went wrong:\n");
+                                    console.log("something went wrong:");
                                     console.dir(rejection.stack);    
                                 }));
                                 timer++;
@@ -3254,7 +3254,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                 console.log("calculaterides carpool calculation result: " + JSON.stringify(hikers));
                             })
                             .catch(rejection => {
-                                console.log("something went wrong:\n");
+                                console.log("something went wrong:");
                                 console.dir(rejection.stack);
                             });
                         }
