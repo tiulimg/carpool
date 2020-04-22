@@ -3092,7 +3092,7 @@ app.patch("/api/calculaterides", function(req, res) {
                 hikes = util.remove_past_hikes(hikes, false);
                 hikes.forEach(hike => {
                     var hikestarttime = new Date(hike.starttime);
-                    var days = 14;
+                    var days = 15;
                     var dateOffset = (24*60*60*1000) * days;
                     if (hikestarttime.getTime() - dateOffset < now.getTime()) {
                         nearhikes.push(hike);
