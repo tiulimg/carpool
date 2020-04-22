@@ -483,6 +483,7 @@ function getHikerAreas(hikers) {
 
     console.log("areas:");
     for (var area in areas.sumtoareas) {
+        console.log("area " + area);
         for (let index = 0; index < areas.driverstoareas[area].length; index++) {
             const hiker = areas.driverstoareas[area][index];
             console.log("driverstoarea: " + area + " " + hiker.name + + " available " + hiker.availableplaces + 
@@ -503,9 +504,9 @@ function getHikerAreas(hikers) {
             console.log("hitchhikersfromareas: " + area + " " + hiker.name + + " seatsrequired " + hiker.seatsrequired + 
                 " friends " + JSON.stringify(hiker.myfriends));
         }
-        console.log("sumtoareas: " + JSON.stringify(areas.sumtoareas));
-        console.log("sumfromareas: " + JSON.stringify(areas.sumfromareas));
     }
+    console.log("sumtoareas: " + JSON.stringify(areas.sumtoareas));
+    console.log("sumfromareas: " + JSON.stringify(areas.sumfromareas));
 
     return areas;
 }
