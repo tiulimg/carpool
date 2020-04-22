@@ -3262,7 +3262,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                             hitchersfrom += hitcher + ", ";
                                         }
                                         var myfriends = "";
-                                        console.log("hiker.myfriends " + hiker.myfriends);
+                                        console.log("hiker.myfriends " + typeof(hiker.myfriends) + " " + hiker.myfriends.length);
                                         for (let friendindex = 0; friendindex < hiker.myfriends && hiker.myfriends.length; 
                                              friendindex++) {
                                             const friend = hiker.myfriends[friendindex];
@@ -3291,7 +3291,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 friendsdriversfrom += ", " + driver;
                                             }
                                             var myfriends = "";
-                                            console.log("hiker.myfriends " + hiker.myfriends);
+                                            console.log("hiker.myfriends " + typeof(hiker.myfriends) + " " + hiker.myfriends.length);
                                             for (let friendindex = 0; friendindex < hiker.myfriends && hiker.myfriends.length; 
                                                  friendindex++) {
                                                 const friend = hiker.myfriends[friendindex];
