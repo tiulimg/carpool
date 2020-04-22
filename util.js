@@ -410,28 +410,28 @@ function getDistanceMatrix(hikers) {
 
 function getHikerAreas(hikers) {
     var areas = {
-        driverswheretoareas: {
+        driverstoareas: {
             "דרום": [],
             "צפון": [],
             "ירושלים": [],
             "חיפה": [],
             "מרכז": [],
         },
-        driverswherefromareas: {
+        driversfromareas: {
             "דרום": [],
             "צפון": [],
             "ירושלים": [],
             "חיפה": [],
             "מרכז": [],
         },
-        hitchhikerswheretoareas: {
+        hitchhikerstoareas: {
             "דרום": [],
             "צפון": [],
             "ירושלים": [],
             "חיפה": [],
             "מרכז": [],
         },
-        hitchhikerswherefromareas: {
+        hitchhikersfromareas: {
             "דרום": [],
             "צפון": [],
             "ירושלים": [],
@@ -463,8 +463,8 @@ function getHikerAreas(hikers) {
             areas.sumtoareas.all += hiker.availableplaces;
             areas.sumfromareas[hiker.wherefromarea] += hiker.availableplaces;
             areas.sumfromareas.all += hiker.availableplaces;
-            areas.driverswheretoareas[hiker.wheretoarea].push(hiker);
-            areas.driverswherefromareas[hiker.wherefromarea].push(hiker);
+            areas.driverstoareas[hiker.wheretoarea].push(hiker);
+            areas.driversfromareas[hiker.wherefromarea].push(hiker);
             hiker.availableplacestothehike = hiker.availableplaces;
             hiker.availableplacesfromthehike = hiker.availableplaces;
         }
@@ -473,13 +473,38 @@ function getHikerAreas(hikers) {
             areas.sumtoareas.all -= hiker.seatsrequired;
             areas.sumfromareas[hiker.wherefromarea] -= hiker.seatsrequired;
             areas.sumfromareas.all -= hiker.seatsrequired;
-            areas.hitchhikerswheretoareas[hiker.wheretoarea].push(hiker);
-            areas.hitchhikerswherefromareas[hiker.wherefromarea].push(hiker);
+            areas.hitchhikerstoareas[hiker.wheretoarea].push(hiker);
+            areas.hitchhikersfromareas[hiker.wherefromarea].push(hiker);
             hiker.seatsrequiredtothehike = hiker.seatsrequired;
             hiker.seatsrequiredfromthehike = hiker.seatsrequired;
         }
     }
-    console.log("areas " + JSON.stringify(areas));
+
+    console.log("areas:");
+    for (var area in areas.sumtoareas) {
+        for (let index = 0; index < areas.driverstoareas[area].length; index++) {
+            const hiker = areas.driverstoareas[area][index];
+            console.log("driverstoarea: " + area + " " + hiker.name + + " available " + hiker.availableplaces + 
+                " friends " + JSON.stringify(hiker.myfriends));
+        }
+        for (let index = 0; index < areas.driversfromareas[area].length; index++) {
+            const hiker = areas.driversfromareas[area][index];
+            console.log("driversfromareas: " + area + " " + hiker.name + + " available " + hiker.availableplaces + 
+                " friends " + JSON.stringify(hiker.myfriends));
+        }
+        for (let index = 0; index < areas.hitchhikerstoareas[area].length; index++) {
+            const hiker = areas.hitchhikerstoareas[area][index];
+            console.log("hitchhikerstoareas: " + area + " " + hiker.name + + " seatsrequired " + hiker.seatsrequired + 
+                " friends " + JSON.stringify(hiker.myfriends));
+        }
+        for (let index = 0; index < areas.hitchhikersfromareas[area].length; index++) {
+            const hiker = areas.hitchhikersfromareas[area][index];
+            console.log("hitchhikersfromareas: " + area + " " + hiker.name + + " seatsrequired " + hiker.seatsrequired + 
+                " friends " + JSON.stringify(hiker.myfriends));
+        }
+        console.log("sumtoareas: " + JSON.stringify(areas.sumtoareas));
+        console.log("sumfromareas: " + JSON.stringify(areas.sumfromareas));
+    }
 
     return areas;
 }
