@@ -3253,12 +3253,12 @@ app.patch("/api/calculaterides", function(req, res) {
                                         var hitchersfrom = "";
                                         for (let hitcherindex = 0; hiker.myhitchersto && hitcherindex < hiker.myhitchersto.length; 
                                              hitcherindex++) {
-                                            const hitcher = myhitchersto[hitcherindex];
+                                            const hitcher = hiker.myhitchersto[hitcherindex];
                                             hitchersto += hitcher + " ";
                                         }
                                         for (let hitcherindex = 0; hiker.myhitchersfrom && hitcherindex < hiker.myhitchersfrom.length; 
                                             hitcherindex++) {
-                                           const hitcher = myhitchersfrom[hitcherindex];
+                                           const hitcher = hiker.myhitchersfrom[hitcherindex];
                                            hitchersfrom += hitcher + " ";
                                        }
                                         console.log(hiker.hikerindex + " " + hiker.fullname + " to the hike: " + hitchersto);                                        
