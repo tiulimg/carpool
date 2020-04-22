@@ -40,8 +40,8 @@ app.use((err, req, res, next) => {
 var db;
 
 // Connect to the database before starting the application server.
-mongodb.MongoClient.set('useUnifiedTopology', true);
-mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", function (err, client) {
+var mongoClient = new mongodb.MongoClient(process.env.MONGODB_URI || "mongodb://localhost:27017/test",{ useUnifiedTopology: true });
+mongoClient.connect(function (err, client) {
   if (err) {
     console.log(err);
     process.exit(1);
