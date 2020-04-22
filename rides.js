@@ -895,7 +895,7 @@ function translateaddresstolocation(address) {
             {
                 //console.log("translateaddresstolocation locationiq response " + JSON.stringify(response));
                 var responsebodyjson = JSON.parse(response.body);
-                console.log("translateaddresstolocation locationiq responsebodyjson " + JSON.stringify(responsebodyjson));
+                //console.log("translateaddresstolocation locationiq responsebodyjson " + JSON.stringify(responsebodyjson));
                 location = {
                     lat: responsebodyjson[0].lat,
                     lon: responsebodyjson[0].lon,

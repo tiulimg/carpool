@@ -334,23 +334,23 @@ function getDistanceMatrix(hikers) {
             distances[hiker.phone].tothehike.push({
                 phone: partner.phone,
                 distance: distancetothehike,
-                link: hiker,
+                link: partner,
             });
             distances[hiker.phone].fromthehike.push({
                 phone: partner.phone,
                 distance: distancefromthehike,
-                link: hiker,
+                link: partner,
             });
 
             distances[partner.phone].tothehike.push({
                 phone: hiker.phone,
                 distance: distancetothehike,
-                link: partner,
+                link: hiker,
             });
             distances[partner.phone].fromthehike.push({
                 phone: hiker.phone,
                 distance: distancefromthehike,
-                link: partner,
+                link: hiker,
             });
         }
     }
@@ -388,7 +388,6 @@ function getDistanceMatrix(hikers) {
         }
     }
 
-    var a = b;
     return distances;
 }
 
