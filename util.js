@@ -119,7 +119,7 @@ function get_near_hikes(hikes) {
     hikes = remove_past_hikes(hikes, false);
     hikes.forEach(hike => {
         var hikesplit = hike.hikedate.split(".");
-        var hikestarttime = Date.parse('20' + hikesplit[2] + '/' + hikesplit[1] + '/' + hikesplit[0]);
+        var hikestarttime = new Date('20' + hikesplit[2] + '/' + hikesplit[1] + '/' + hikesplit[0]);
         var days = 15;
         var dateOffset = (24*60*60*1000) * days;
         if (hikestarttime.getTime() - dateOffset < now.getTime()) {
