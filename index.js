@@ -3253,23 +3253,51 @@ app.patch("/api/calculaterides", function(req, res) {
                                         var hitchersfrom = "";
                                         for (let hitcherindex = 0; hiker.myhitchersto && hitcherindex < hiker.myhitchersto.length; 
                                              hitcherindex++) {
-                                            const hitcher = hiker.myhitchersto[hitcherindex];
+                                            const hitcher = hiker.myhitchersto[hitcherindex].name;
                                             hitchersto += hitcher + " ";
                                         }
                                         for (let hitcherindex = 0; hiker.myhitchersfrom && hitcherindex < hiker.myhitchersfrom.length; 
-                                            hitcherindex++) {
-                                           const hitcher = hiker.myhitchersfrom[hitcherindex];
-                                           hitchersfrom += hitcher + " ";
-                                       }
-                                        console.log(hiker.hikerindex + " " + hiker.fullname + " to the hike: " + hitchersto);                                        
-                                        console.log(hiker.hikerindex + " " + hiker.fullname + " from the hike: " + hitchersfrom);                                        
+                                             hitcherindex++) {
+                                            const hitcher = hiker.myhitchersfrom[hitcherindex].name;
+                                            hitchersfrom += hitcher + " ";
+                                        }
+                                        var myfriends = "";
+                                        for (let friendindex = 0; friendindex < hiker.myfriends && hiker.myfriends.length; 
+                                             friendindex++) {
+                                            const friend = hiker.myfriends && hiker.myfriends[friendindex];
+                                            myfriends +=  "," + friend;
+                                        }
+                                        console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
+                                            " to the hike: takes " + hitchersto);                                        
+                                        console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
+                                            " from the hike: takes " + hitchersfrom);                                        
                                     }
                                     else {
                                         if (hiker.mydriverto && hiker.mydriverfrom) {
-                                            console.log(hiker.hikerindex + " " + hiker.fullname + 
-                                                " to the hike: " + hiker.mydriverto.name);
-                                            console.log(hiker.hikerindex + " " + hiker.fullname + 
-                                                " from the hike: " + hiker.mydriverfrom.name);
+                                            var friendsdriversto = "";
+                                            var friendsdriversfrom = "";
+                                            for (let driverindex = 0; 
+                                                 hiker.myfriendsdriversto && driverindex < hiker.myfriendsdriversto.length; 
+                                                 driverindex++) {
+                                                const driver = hiker.myfriendsdriversto[driverindex].name;
+                                                friendsdriversto += "," + driver;
+                                            }
+                                            for (let driverindex = 0; 
+                                                 hiker.myfriendsdriversfrom && driverindex < hiker.myfriendsdriversfrom.length; 
+                                                 driverindex++) {
+                                                const driver = hiker.myfriendsdriversfrom[driverindex].name;
+                                                friendsdriversfrom += "," + driver;
+                                           }
+                                            var myfriends = "";
+                                            for (let friendindex = 0; friendindex < hiker.myfriends && hiker.myfriends.length; 
+                                                 friendindex++) {
+                                                const friend = hiker.myfriends && hiker.myfriends[friendindex];
+                                                myfriends +=  "," + friend;
+                                            }
+                                            console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
+                                                " to the hike: joins " + hiker.mydriverto.name + friendsdriversto);
+                                            console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
+                                                " from the hike: joins " + hiker.mydriverfrom.name + friendsdriversfrom);
                                         }
                                         else
                                         {
