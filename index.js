@@ -3118,7 +3118,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                 .then(() => ridesmodules.translateaddresstolocation(hiker.wherefromdetailed))
                                 .then(wherefromlocation => {
                                     
-                                    console.log("wherefromlocation " + wherefromlocation);
+                                    console.log("wherefromlocation " + JSON.stringify(wherefromlocation));
                                     hiker.wherefromlocation = wherefromlocation;
                                     return util.wait(1000*timer);
                                 })
@@ -3127,7 +3127,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                 })
                                 .then(wheretolocation => {
                                     hiker.wheretolocation = wheretolocation;
-                                    console.log("wheretolocation " + wheretolocation);
+                                    console.log("wheretolocation " + JSON.stringify(wheretolocation));
                                 })
                                 .catch(rejection => {
                                     console.log("something went wrong:\n");
