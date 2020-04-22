@@ -3,6 +3,7 @@ var Promise = require('promise');
 module.exports = {
     wait: wait,
     normalize_phonenumber: normalize_phonenumber,
+    get_near_hikes: get_near_hikes, 
     remove_past_hikes: remove_past_hikes,
     remove_hikes_notinlist: remove_hikes_notinlist,
     only_hikes_in_lang: only_hikes_in_lang,
@@ -111,6 +112,22 @@ function only_hikes_in_lang(docs, hikelist, istext, lang) {
         }
     }
     return hikelist;
+}
+
+function get_near_hikes(hikes) {
+    var nearhikes = [];
+    hikes = remove_past_hikes(hikes, false);
+    hikes.forEach(hike => {
+        var hikesplit = hike.hikedate.split(".");
+        var hikestarttime = Date.parse('20' + hikesplit[2] + '/' + hikesplit[1] + '/' + hikesplit[0]);
+        var days = 15;
+        var dateOffset = (24*60*60*1000) * days;
+        if (hikestarttime.getTime() - dateOffset < now.getTime()) {
+            nearhikes.push(hike);
+        }
+    });
+    console.log("nearhikes " + JSON.stringify(nearhikes));
+    return nearhikes;
 }
 
 function remove_past_hikes(hikelist, istext) {
