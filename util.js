@@ -482,7 +482,7 @@ function getHikerAreas(hikers) {
     }
 
     console.log("areas:");
-    for (var area in areas.sumtoareas) {
+    for (var area in areas.driverstoareas) {
         console.log("area " + area);
         for (let index = 0; index < areas.driverstoareas[area].length; index++) {
             const hiker = areas.driverstoareas[area][index];
