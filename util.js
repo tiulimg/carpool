@@ -377,7 +377,6 @@ function getDistanceMatrix(hikers) {
     console.log("distances:");
     for (var source in distances) {
         source = distances[source];
-        console.log("source " + JSON.stringify(source));
         for (let index = 0; index < source.tothehike.length; index++) {
             const dest = source.tothehike[index];
             console.log("tothehike: source " + source.link.name + " distance " + dest.distance + " dest " + dest.link.name);
