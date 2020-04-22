@@ -317,7 +317,10 @@ function getDistanceMatrix(hikers) {
     for (let index = 1; index < hikers.length; index++) {
         const hiker = hikers[index];
         for (let indexpartner = index; indexpartner < hikers.length; indexpartner++) {
-            const partner = array[indexpartner];
+            const partner = hikers[indexpartner];
+            if (hiker == partner) {
+                continue;
+            }
 
             var distancetothehike = distanceLatLons(
                 hiker.wherefromlocation.lat, hiker.wherefromlocation.lon,
