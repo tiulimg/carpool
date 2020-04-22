@@ -3093,7 +3093,8 @@ app.patch("/api/calculaterides", function(req, res) {
                     var hikestarttime = new Date(hike.starttime);
                     var days = 14;
                     var dateOffset = (24*60*60*1000) * days;
-                    if (hikestarttime.getTime() - dateOffset < now.getTime()) {
+                    if (hikestarttime.getTime() - dateOffset < now.getTime() &&
+                        hikestarttime.getTime() > now.getTime()) {
                         nearhikes.push(hike);
                     }
                 });
@@ -3180,7 +3181,8 @@ app.patch("/api/calculaterides", function(req, res) {
 
                                                 hiker.myfriendsdriversto = [];
                                                 for (let hitchhikerfriendindex = 0; 
-                                                     hitchhikerfriendindex < hiker.myfriends.length; hitchhikerfriendindex++) {
+                                                     hiker.myfriends != null && hitchhikerfriendindex < hiker.myfriends.length; 
+                                                     hitchhikerfriendindex++) {
                                                     const hitchhikerfriend = hiker.myfriends[hitchhikerfriendindex];
                                                     hiker.myfriendsdriversto.push({
                                                         "hitchername": hitchhikerfriend,
@@ -3228,7 +3230,8 @@ app.patch("/api/calculaterides", function(req, res) {
 
                                                 hiker.myfriendsdriversfrom = [];
                                                 for (let hitchhikerfriendindex = 0; 
-                                                     hitchhikerfriendindex < hiker.myfriends.length; hitchhikerfriendindex++) {
+                                                     hiker.myfriends != null && hitchhikerfriendindex < hiker.myfriends.length; 
+                                                     hitchhikerfriendindex++) {
                                                     const hitchhikerfriend = hiker.myfriends[hitchhikerfriendindex];
                                                     hiker.myfriendsdriversfrom.push({
                                                         "hitchername": hitchhikerfriend,
