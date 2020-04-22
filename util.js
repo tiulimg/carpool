@@ -125,9 +125,9 @@ function get_near_hikes(hikes) {
         var dateOffset = (24*60*60*1000) * days;
         if (hikestarttime.getTime() - dateOffset < now.getTime()) {
             nearhikes.push(hike);
+            console.log("nearhike " + hike.hikenamehebrew);
         }
     });
-    console.log("nearhikes " + JSON.stringify(nearhikes));
     return nearhikes;
 }
 
