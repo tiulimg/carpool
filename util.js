@@ -504,9 +504,11 @@ function getHikerAreas(hikers) {
             console.log("hitchhikersfromareas: " + area + " " + hiker.name + " seatsrequired " + hiker.seatsrequired + 
                 " friends " + JSON.stringify(hiker.myfriends));
         }
+        console.log("sumtoareas: " + areas.sumtoareas[area]);
+        console.log("sumfromareas: " + areas.sumfromareas[area]);    
     }
-    console.log("sumtoareas: " + JSON.stringify(areas.sumtoareas));
-    console.log("sumfromareas: " + JSON.stringify(areas.sumfromareas));
+    console.log("sumtoareas all: " + areas.sumtoareas.all);
+    console.log("sumfromareas all: " + areas.sumfromareas.all);    
 
     return areas;
 }
