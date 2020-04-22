@@ -3089,15 +3089,12 @@ app.patch("/api/calculaterides", function(req, res) {
                 handleError(res, err.message, "Failed to get near hikes.");
             } else {
                 var nearhikes = [];
+                hikes = util.remove_past_hikes(hikes, false);
                 hikes.forEach(hike => {
                     var hikestarttime = new Date(hike.starttime);
                     var days = 14;
                     var dateOffset = (24*60*60*1000) * days;
-                    console.log("hike.starttime " + hike.starttime);
-                    console.log("hikestarttime.getTime() " + hikestarttime.getTime());
-                    console.log("now.getTime() " + now.getTime());
-                    if (hikestarttime.getTime() - dateOffset < now.getTime() &&
-                        hikestarttime.getTime() > now.getTime()) {
+                    if (hikestarttime.getTime() - dateOffset < now.getTime()) {
                         nearhikes.push(hike);
                     }
                 });
