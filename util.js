@@ -486,22 +486,22 @@ function getHikerAreas(hikers) {
         console.log("area " + area);
         for (let index = 0; index < areas.driverstoareas[area].length; index++) {
             const hiker = areas.driverstoareas[area][index];
-            console.log("driverstoarea: " + area + " " + hiker.name + + " available " + hiker.availableplaces + 
+            console.log("driverstoarea: " + area + " " + hiker.name + " available " + hiker.availableplaces + 
                 " friends " + JSON.stringify(hiker.myfriends));
         }
         for (let index = 0; index < areas.driversfromareas[area].length; index++) {
             const hiker = areas.driversfromareas[area][index];
-            console.log("driversfromareas: " + area + " " + hiker.name + + " available " + hiker.availableplaces + 
+            console.log("driversfromareas: " + area + " " + hiker.name + " available " + hiker.availableplaces + 
                 " friends " + JSON.stringify(hiker.myfriends));
         }
         for (let index = 0; index < areas.hitchhikerstoareas[area].length; index++) {
             const hiker = areas.hitchhikerstoareas[area][index];
-            console.log("hitchhikerstoareas: " + area + " " + hiker.name + + " seatsrequired " + hiker.seatsrequired + 
+            console.log("hitchhikerstoareas: " + area + " " + hiker.name + " seatsrequired " + hiker.seatsrequired + 
                 " friends " + JSON.stringify(hiker.myfriends));
         }
         for (let index = 0; index < areas.hitchhikersfromareas[area].length; index++) {
             const hiker = areas.hitchhikersfromareas[area][index];
-            console.log("hitchhikersfromareas: " + area + " " + hiker.name + + " seatsrequired " + hiker.seatsrequired + 
+            console.log("hitchhikersfromareas: " + area + " " + hiker.name + " seatsrequired " + hiker.seatsrequired + 
                 " friends " + JSON.stringify(hiker.myfriends));
         }
     }
