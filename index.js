@@ -3191,6 +3191,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hiker.seatsrequiredtothehike--;
                                                 }
                                             }
+                                            break;
                                         }
                                     }
 
@@ -3240,6 +3241,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hiker.seatsrequiredfromthehike--;
                                                 }
                                             }
+                                            break;
                                         }
                                     }
                                 }
