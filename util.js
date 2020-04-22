@@ -270,6 +270,7 @@ function distanceLatLons(lat1,lon1,lat2,lon2) {
 function getDistanceMatrix(hikers) {
     var distances = {};
 
+    console.log("hikers[0] " + JSON.stringify(hikers[0]));
     distances[hikers[0].phone] = {
         tothehike: [],
         fromthehike: [],
@@ -374,6 +375,8 @@ function getDistanceMatrix(hikers) {
 
     console.log("distances:");
     for (var source in distances) {
+        console.log("source " + JSON.stringify(source));
+
         for (let index = 0; index < source.tothehike.length; index++) {
             const dest = source.tothehike[index];
             console.log("tothehike: source " + source.link.name + " distance " + dest.distance + " dest " + dest.link.name);
