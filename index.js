@@ -3262,6 +3262,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                             hitchersfrom += hitcher + ", ";
                                         }
                                         var myfriends = "";
+                                        console.log("hiker.myfriends " + JSON.stringify(hiker.myfriends));
                                         for (let friendindex = 0; friendindex < hiker.myfriends && hiker.myfriends.length; 
                                              friendindex++) {
                                             const friend = hiker.myfriends[friendindex];
