@@ -3262,16 +3262,17 @@ app.patch("/api/calculaterides", function(req, res) {
                                             hitchersfrom += hitcher + ", ";
                                         }
                                         var myfriends = "";
-                                        console.log("hiker.myfriends " + JSON.stringify(hiker.myfriends));
                                         for (let friendindex = 0; friendindex < hiker.myfriends && hiker.myfriends.length; 
                                              friendindex++) {
                                             const friend = hiker.myfriends[friendindex];
+                                            console.log("friend " + friend);
                                             myfriends +=  ", " + friend;
                                         }
                                         console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
                                             " to the hike: takes " + hitchersto);                                        
                                         console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
                                             " from the hike: takes " + hitchersfrom);                                        
+                                        console.log("hiker.myfriends " + hiker.myfriends);
                                     }
                                     else {
                                         if (hiker.mydriverto && hiker.mydriverfrom) {
@@ -3290,16 +3291,17 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 friendsdriversfrom += ", " + driver;
                                             }
                                             var myfriends = "";
-                                            console.log("hiker.myfriends " + JSON.stringify(hiker.myfriends));
                                             for (let friendindex = 0; friendindex < hiker.myfriends && hiker.myfriends.length; 
                                                  friendindex++) {
                                                 const friend = hiker.myfriends[friendindex];
+                                                console.log("friend " + friend);
                                                 myfriends +=  ", " + friend;
                                             }
                                             console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
                                                 " to the hike: joins " + hiker.mydriverto.name + friendsdriversto);
                                             console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
                                                 " from the hike: joins " + hiker.mydriverfrom.name + friendsdriversfrom);
+                                            console.log("hiker.myfriends " + hiker.myfriends);
                                         }
                                         else
                                         {
