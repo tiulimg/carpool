@@ -3083,7 +3083,6 @@ app.patch("/api/calculaterides", function(req, res) {
     }
     else
     {
-        var now = new Date();
         db.collection(HIKE_COLLECTION).find({}).toArray(function(err, hikes) {
             if (err) {
                 handleError(res, err.message, "Failed to get near hikes.");

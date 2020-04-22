@@ -115,6 +115,7 @@ function only_hikes_in_lang(docs, hikelist, istext, lang) {
 }
 
 function get_near_hikes(hikes) {
+    var now = new Date();
     var nearhikes = [];
     hikes = remove_past_hikes(hikes, false);
     hikes.forEach(hike => {
