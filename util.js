@@ -374,8 +374,14 @@ function getDistanceMatrix(hikers) {
 
     console.log("distances:");
     for (var source in distances) {
-        for (var dest in source.tothehike) {
-            console.log("source " + source.link.name + " distance " + dest.distance + " dest " + dest.link.name);
+        for (let index = 0; index < source.tothehike.length; index++) {
+            const dest = source.tothehike[index];
+            console.log("tothehike: source " + source.link.name + " distance " + dest.distance + " dest " + dest.link.name);
+        }
+
+        for (let index = 0; index < source.fromthehike.length; index++) {
+            const dest = source.fromthehike[index];
+            console.log("fromthehike: source " + source.link.name + " distance " + dest.distance + " dest " + dest.link.name);
         }
     }
 
