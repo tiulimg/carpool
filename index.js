@@ -3262,11 +3262,9 @@ app.patch("/api/calculaterides", function(req, res) {
                                             hitchersfrom += hitcher + ", ";
                                         }
                                         var myfriends = "";
-                                        console.log("hiker.myfriends " + typeof(hiker.myfriends) + " " + hiker.myfriends.length);
                                         for (let friendindex = 0; hiker.myfriends && friendindex < hiker.myfriends.length; 
                                              friendindex++) {
                                             const friend = hiker.myfriends[friendindex];
-                                            console.log("friend " + friend);
                                             myfriends +=  ", " + friend;
                                         }
                                         console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
@@ -3291,11 +3289,9 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 friendsdriversfrom += ", " + driver;
                                             }
                                             var myfriends = "";
-                                            console.log("hiker.myfriends " + typeof(hiker.myfriends) + " " + hiker.myfriends.length);
                                             for (let friendindex = 0; hiker.myfriends && friendindex < hiker.myfriends.length; 
                                                  friendindex++) {
                                                 const friend = hiker.myfriends[friendindex];
-                                                console.log("friend " + friend);
                                                 myfriends +=  ", " + friend;
                                             }
                                             console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
@@ -3309,6 +3305,22 @@ app.patch("/api/calculaterides", function(req, res) {
                                         }
                                     }
                                 }
+
+                                db.collection(HIKERS_COLLECTION).deleteMany({hikenamehebrew: { $regex : ".*"+hike.hikedate+".*" }},
+                                        function(err, result) {
+                                    if (err) {
+                                        handleError(res, err.message, "Failed to delete hikers of " + hike.hikedate);
+                                    } else {
+                                        db.collection(HIKERS_COLLECTION).insertMany(newHikersList.hikers, function(err, docs) {
+                                            if (err) {
+                                                handleError(res, err.message, "Failed to insert all hikers of " + hike.hikedate);
+                                            }
+                                            else {
+                                                register.sendForm("1EV8BBJfZGseTFzJo-EMcgZdPHzedRC8zTZyfyRw2LoQ", "" , "", "", res, null, null, null, "");
+                                            }
+                                        });
+                                    }
+                                });
                             })
                             .catch(rejection => {
                                 console.log("something went wrong:");
