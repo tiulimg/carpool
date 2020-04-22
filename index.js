@@ -3254,17 +3254,17 @@ app.patch("/api/calculaterides", function(req, res) {
                                         for (let hitcherindex = 0; hiker.myhitchersto && hitcherindex < hiker.myhitchersto.length; 
                                              hitcherindex++) {
                                             const hitcher = hiker.myhitchersto[hitcherindex].hitchername;
-                                            hitchersto += hitcher + " ";
+                                            hitchersto += hitcher + ", ";
                                         }
                                         for (let hitcherindex = 0; hiker.myhitchersfrom && hitcherindex < hiker.myhitchersfrom.length; 
                                              hitcherindex++) {
                                             const hitcher = hiker.myhitchersfrom[hitcherindex].hitchername;
-                                            hitchersfrom += hitcher + " ";
+                                            hitchersfrom += hitcher + ", ";
                                         }
                                         var myfriends = "";
                                         for (let friendindex = 0; friendindex < hiker.myfriends && hiker.myfriends.length; 
                                              friendindex++) {
-                                            const friend = hiker.myfriends && hiker.myfriends[friendindex];
+                                            const friend = hiker.myfriends[friendindex];
                                             myfriends +=  ", " + friend;
                                         }
                                         console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
@@ -3287,11 +3287,11 @@ app.patch("/api/calculaterides", function(req, res) {
                                                  driverindex++) {
                                                 const driver = hiker.myfriendsdriversfrom[driverindex].drivername;
                                                 friendsdriversfrom += ", " + driver;
-                                           }
+                                            }
                                             var myfriends = "";
                                             for (let friendindex = 0; friendindex < hiker.myfriends && hiker.myfriends.length; 
                                                  friendindex++) {
-                                                const friend = hiker.myfriends && hiker.myfriends[friendindex];
+                                                const friend = hiker.myfriends[friendindex];
                                                 myfriends +=  ", " + friend;
                                             }
                                             console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
