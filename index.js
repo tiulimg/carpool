@@ -3263,7 +3263,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                         }
                                         var myfriends = "";
                                         console.log("hiker.myfriends " + typeof(hiker.myfriends) + " " + hiker.myfriends.length);
-                                        for (let friendindex = 0; friendindex < hiker.myfriends && hiker.myfriends.length; 
+                                        for (let friendindex = 0; hiker.myfriends && friendindex < hiker.myfriends.length; 
                                              friendindex++) {
                                             const friend = hiker.myfriends[friendindex];
                                             console.log("friend " + friend);
@@ -3292,7 +3292,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                             }
                                             var myfriends = "";
                                             console.log("hiker.myfriends " + typeof(hiker.myfriends) + " " + hiker.myfriends.length);
-                                            for (let friendindex = 0; friendindex < hiker.myfriends && hiker.myfriends.length; 
+                                            for (let friendindex = 0; hiker.myfriends && friendindex < hiker.myfriends.length; 
                                                  friendindex++) {
                                                 const friend = hiker.myfriends[friendindex];
                                                 console.log("friend " + friend);
