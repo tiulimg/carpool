@@ -3157,6 +3157,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 hiker.seatsrequiredtothehike--;
                                                 hiker.mydriverto = {
                                                     name: neardriver.name,
+                                                    fullname: neardriver.fullname,
                                                     phone: neardriver.phone,
                                                     driverwherefrom: neardriver.wherefrom,
                                                     driverwhereto: neardriver.whereto,
@@ -3176,6 +3177,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hiker.myfriendsdriversto.push({
                                                         "hitchername": hitchhikerfriend,
                                                         "drivername": neardriver.name,
+                                                        "driverfullname": neardriver.fullname,
                                                         "driverphone": neardriver.phone,
                                                         "driverwherefrom": neardriver.wherefrom,
                                                         "driverwhereto": neardriver.whereto,
@@ -3207,6 +3209,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 hiker.seatsrequiredfromthehike--;
                                                 hiker.mydriverfrom = {
                                                     name: neardriver.name,
+                                                    fullname: neardriver.fullname,
                                                     phone: neardriver.phone,
                                                     driverwherefrom: neardriver.wherefrom,
                                                     driverwhereto: neardriver.whereto,
@@ -3226,6 +3229,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hiker.myfriendsdriversfrom.push({
                                                         "hitchername": hitchhikerfriend,
                                                         "drivername": neardriver.name,
+                                                        "driverfullname": neardriver.fullname,
                                                         "driverphone": neardriver.phone,
                                                         "driverwherefrom": neardriver.wherefrom,
                                                         "driverwhereto": neardriver.whereto,
