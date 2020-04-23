@@ -3149,7 +3149,8 @@ app.patch("/api/calculaterides", function(req, res) {
                                         var neardriver = neardriverdistanceto.link;
                                         console.log("calculaterides driver to the hike: distance " + neardriverdistanceto.distance + 
                                             " name " + neardriver.name + " isdriver " + neardriver.amidriver + " seats " + 
-                                            neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces);
+                                            neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
+                                            " neardriver.availableplacestothehike " + neardriver.availableplacestothehike);
                                         if (neardriver.amidriver && 
                                             neardriver.availableplacestothehike >= hiker.seatsrequiredtothehike) {
                                             if (!hiker.mydriverto) {
@@ -3201,7 +3202,8 @@ app.patch("/api/calculaterides", function(req, res) {
                                         var neardriver = neardriverdistancefrom.link;
                                         console.log("calculaterides driver from the hike: distance " + neardriverdistancefrom.distance + 
                                             " name " + neardriver.name + " isdriver " + neardriver.amidriver + " seats " + 
-                                            neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces);
+                                            neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
+                                            " neardriver.availableplacesfromthehike " + neardriver.availableplacesfromthehike);
                                         if (neardriver.amidriver && 
                                             neardriver.availableplacesfromthehike >= hiker.seatsrequiredfromthehike) {
                                             if (!hiker.mydriverfrom) {
