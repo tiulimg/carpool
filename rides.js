@@ -906,7 +906,7 @@ function translateaddresstolocation(address) {
                 if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
                     location = {
                         lat: responsebodyjson.hits[0]._geoloc.lat,
-                        lon: responsebodyjson.hits[0]._geoloc.lon,
+                        lon: responsebodyjson.hits[0]._geoloc.lng,
                     }
                     return resolve(location);
                 }
@@ -947,7 +947,7 @@ function translateaddresstolocation(address) {
                             if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
                                 location = {
                                     lat: responsebodyjson.hits[0]._geoloc.lat,
-                                    lon: responsebodyjson.hits[0]._geoloc.lon,
+                                    lon: responsebodyjson.hits[0]._geoloc.lng,
                                 }
                                 return resolve(location);
                             }
