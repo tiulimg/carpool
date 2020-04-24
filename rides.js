@@ -900,7 +900,7 @@ function translateaddresstolocation(address) {
             }
             else
             {
-                //console.log("translateaddresstolocation locationiq response " + JSON.stringify(response));
+                console.log("translateaddresstolocation algolia response " + JSON.stringify(response));
                 var responsebodyjson = JSON.parse(response.body);
                 //console.log("translateaddresstolocation locationiq responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
