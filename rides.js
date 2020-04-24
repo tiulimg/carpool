@@ -926,7 +926,7 @@ function translateaddresstolocation(address) {
                         'X-Algolia-Application-Id': ALGOLIA_APPID,
                         'X-Algolia-API-Key': ALGOLIA_KEY, 
                     }
-                    var requestbody = JSON.stringify({"query": address, "countries": "il"});
+                    var requestbody = JSON.stringify({"query": shortaddress, "countries": "il"});
                     console.log("translateaddresstolocation algolia address " + shortaddress + " request " + url);
                     request({
                         url: url,
