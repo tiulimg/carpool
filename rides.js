@@ -1,5 +1,7 @@
 var Promise = require('promise');
 var request = require('request');
+var places = require('places.js');
+
 var util = require("./util");
 
 module.exports = {
@@ -10,7 +12,8 @@ module.exports = {
 };
 
 const LOCATIONIQ_TOKEN = process.env.LOCATIONIQ_TOKEN;
-const HERE_APPID = process.env.HERE_APPID;
+const ALGOLIA_KEY = process.env.ALGOLIA_KEY;
+const ALGOLIA_APPID = process.env.ALGOLIA_APPID;
 
 function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST_REGISTER_COLLECTION, replies, register, handleError)
 {
@@ -880,11 +883,18 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
 function translateaddresstolocation(address) {
     return new Promise((resolve, reject) => {
         var location;
-        var url = "https://eu1.locationiq.com/v1/search.php?key="+LOCATIONIQ_TOKEN+"&q="+encodeURIComponent(address)+"&format=json&countrycodes=IL";
-        console.log("translateaddresstolocation locationiq address " + address + " request " + url);
+        var url = "https://places-dsn.algolia.net/1/places/query";
+        var headers = {
+            'X-Algolia-Application-Id': ALGOLIA_APPID,
+            'X-Algolia-API-Key': ALGOLIA_KEY, 
+        }
+        var body = {"query": address, "countries": "il"};
+        console.log("translateaddresstolocation algolia address " + address + " request " + url);
         request({
             url: url,
-            method: "GET",
+            method: "POST",
+            headers: headers,
+            body: body,
         }, function (error, response, body){
             if (error) {
                 var rejection = "translateaddresstolocation Promise reject: " + error;
@@ -896,12 +906,61 @@ function translateaddresstolocation(address) {
                 //console.log("translateaddresstolocation locationiq response " + JSON.stringify(response));
                 var responsebodyjson = JSON.parse(response.body);
                 //console.log("translateaddresstolocation locationiq responsebodyjson " + JSON.stringify(responsebodyjson));
-                location = {
-                    lat: responsebodyjson[0].lat,
-                    lon: responsebodyjson[0].lon,
+                if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
+                    location = {
+                        lat: responsebodyjson.hits[0]._geolo.lat,
+                        lon: responsebodyjson.hits[0]._geolo.lon,
+                    }
+                    return resolve(location);
+                }
+                else {
+                    var shortaddress;
+                    var parenthesisindex = address.indexOf("(");
+                    if (parenthesisindex != -1) {
+                        shortaddress = address.substr(0, parenthesisindex);
+                    }
+                    var parenthesisindex = address.indexOf(")");
+                    if (parenthesisindex != -1) {
+                        shortaddress = shortaddress.substr(0, parenthesisindex);
+                    }
+
+                    var url = "https://places-dsn.algolia.net/1/places/query";
+                    var headers = {
+                        'X-Algolia-Application-Id': ALGOLIA_APPID,
+                        'X-Algolia-API-Key': ALGOLIA_KEY, 
+                    }
+                    var body = {"query": shortaddress, "countries": "il"};
+                    console.log("translateaddresstolocation algolia address " + shortaddress + " request " + url);
+                    request({
+                        url: url,
+                        method: "POST",
+                        headers: headers,
+                        body: body,
+                    }, function (error, response, body){
+                        if (error) {
+                            var rejection = "translateaddresstolocation Promise reject: " + error;
+                            console.log(rejection);
+                            return reject(rejection);
+                        }
+                        else
+                        {
+                            //console.log("translateaddresstolocation locationiq response " + JSON.stringify(response));
+                            var responsebodyjson = JSON.parse(response.body);
+                            //console.log("translateaddresstolocation locationiq responsebodyjson " + JSON.stringify(responsebodyjson));
+                            if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
+                                location = {
+                                    lat: responsebodyjson.hits[0]._geolo.lat,
+                                    lon: responsebodyjson.hits[0]._geolo.lon,
+                                }
+                                return resolve(location);
+                            }
+                            else {
+                                reject("No geo location found " + address);
+                            }
+                        }
+                    });
                 }
                 //console.log("translateaddresstolocation locationiq location " + JSON.stringify(location));
-                return resolve(location);
             }
         });
     });

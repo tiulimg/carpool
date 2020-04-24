@@ -3104,13 +3104,13 @@ app.patch("/api/calculaterides", function(req, res) {
                                 const hiker = hikers[hikerindex];
 
                                 console.log("start calculation ");
-                                promises.push(util.wait(1000*timer)
+                                promises.push(util.wait(1*timer)
                                 .then(() => ridesmodules.translateaddresstolocation(hiker.wherefromdetailed))
                                 .then(wherefromlocation => {
                                     
                                     console.log("wherefromlocation " + JSON.stringify(wherefromlocation));
                                     hiker.wherefromlocation = wherefromlocation;
-                                    return util.wait(1000*timer);
+                                    return util.wait(1*timer);
                                 })
                                 .then(() => {
                                     return ridesmodules.translateaddresstolocation(hiker.wheretodetailed);
