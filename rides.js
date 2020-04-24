@@ -885,13 +885,13 @@ function translateaddresstolocation(address) {
             'X-Algolia-Application-Id': ALGOLIA_APPID,
             'X-Algolia-API-Key': ALGOLIA_KEY, 
         }
-        var body = {"query": address, "countries": "il"};
+        var requestbody = JSON.stringify({"query": address, "countries": "il"});
         console.log("translateaddresstolocation algolia address " + address + " request " + url);
         request({
             url: url,
             method: "POST",
             headers: headers,
-            body: body,
+            body: requestbody,
         }, function (error, response, body){
             if (error) {
                 var rejection = "translateaddresstolocation Promise reject: " + error;
@@ -926,13 +926,13 @@ function translateaddresstolocation(address) {
                         'X-Algolia-Application-Id': ALGOLIA_APPID,
                         'X-Algolia-API-Key': ALGOLIA_KEY, 
                     }
-                    var body = {"query": shortaddress, "countries": "il"};
+                    var requestbody = JSON.stringify({"query": address, "countries": "il"});
                     console.log("translateaddresstolocation algolia address " + shortaddress + " request " + url);
                     request({
                         url: url,
                         method: "POST",
                         headers: headers,
-                        body: body,
+                        body: requestbody,
                     }, function (error, response, body){
                         if (error) {
                             var rejection = "translateaddresstolocation Promise reject: " + error;
