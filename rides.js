@@ -905,8 +905,8 @@ function translateaddresstolocation(address) {
                 //console.log("translateaddresstolocation locationiq responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
                     location = {
-                        lat: responsebodyjson.hits[0]._geolo.lat,
-                        lon: responsebodyjson.hits[0]._geolo.lon,
+                        lat: responsebodyjson.hits[0]._geoloc.lat,
+                        lon: responsebodyjson.hits[0]._geoloc.lon,
                     }
                     return resolve(location);
                 }
@@ -946,8 +946,8 @@ function translateaddresstolocation(address) {
                             //console.log("translateaddresstolocation locationiq responsebodyjson " + JSON.stringify(responsebodyjson));
                             if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
                                 location = {
-                                    lat: responsebodyjson.hits[0]._geolo.lat,
-                                    lon: responsebodyjson.hits[0]._geolo.lon,
+                                    lat: responsebodyjson.hits[0]._geoloc.lat,
+                                    lon: responsebodyjson.hits[0]._geoloc.lon,
                                 }
                                 return resolve(location);
                             }
