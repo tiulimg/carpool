@@ -1,8 +1,5 @@
 var Promise = require('promise');
 var request = require('request');
-var places = require('places.js');
-
-var util = require("./util");
 
 module.exports = {
     patchridedetails: patchridedetails,
