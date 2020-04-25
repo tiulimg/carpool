@@ -3120,7 +3120,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                     console.log("returnstolocation " + JSON.stringify(returnstolocation));
                                 })
                                 .catch(rejection => {
-                                    console.log("something went wrong:");
+                                    console.log("translateaddresstolocation something went wrong:");
                                     console.dir(rejection.stack);    
                                 }));
                                 timer++;
