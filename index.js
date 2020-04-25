@@ -2843,7 +2843,7 @@ app.post("/api/choosedriver", function(req, res) {
                                 for (let index = 0; index < drivers.length; index++) {
                                     const driver = drivers[index];
                                     driversstring += (index + 1) + ": מגיע מ" + 
-                                        driver.wherefrom + " וחוזר ל" + driver.whereto + "\n";
+                                        driver.comesfrom + " וחוזר ל" + driver.returnsto + "\n";
                                 }
                                 for (let index = 0; index < chosendriversto.length; index++) {
                                     const chosendriver = chosendriversto[index];
@@ -2856,7 +2856,7 @@ app.post("/api/choosedriver", function(req, res) {
                                         }
                                     }
                                     selecteddriverstostring += (driverindex + 1) + ": מגיע מ" + 
-                                        chosendriver.wherefrom + " וחוזר ל" + chosendriver.whereto + "\n";
+                                        chosendriver.comesfrom + " וחוזר ל" + chosendriver.returnsto + "\n";
                                 }
                                 for (let index = 0; index < chosendriversfrom.length; index++) {
                                     const chosendriver = chosendriversfrom[index];
@@ -2869,14 +2869,14 @@ app.post("/api/choosedriver", function(req, res) {
                                         }
                                     }
                                     selecteddriversfromstring += (driverindex + 1) + ": מגיע מ" + 
-                                        chosendriver.wherefrom + " וחוזר ל" + chosendriver.whereto + "\n";
+                                        chosendriver.comesfrom + " וחוזר ל" + chosendriver.returnsto + "\n";
                                 }
                                 break;
                             case "en":
                                 for (let index = 0; index < drivers.length; index++) {
                                     const driver = drivers[index];
                                     driversstring += (index + 1) + ": Comes from " + 
-                                        driver.wherefrom + ", returns to " + driver.whereto + "\n";
+                                        driver.comesfrom + ", returns to " + driver.returnsto + "\n";
                                 }
                                 for (let index = 0; index < chosendriversto.length; index++) {
                                     const chosendriver = chosendriversto[index];
@@ -2889,7 +2889,7 @@ app.post("/api/choosedriver", function(req, res) {
                                         }
                                     }
                                     selecteddriverstostring += (driverindex + 1) + ": Comes from " + 
-                                        chosendriver.wherefrom + ", returns to " + chosendriver.whereto + "\n";
+                                        chosendriver.comesfrom + ", returns to " + chosendriver.returnsto + "\n";
                                 }
                                 for (let index = 0; index < chosendriversfrom.length; index++) {
                                     const chosendriver = chosendriversfrom[index];
@@ -2902,7 +2902,7 @@ app.post("/api/choosedriver", function(req, res) {
                                         }
                                     }
                                     selecteddriversfromstring += (driverindex + 1) + ": Comes from " + 
-                                        chosendriver.wherefrom + ", returns to " + chosendriver.whereto + "\n";
+                                        chosendriver.comesfrom + ", returns to " + chosendriver.returnsto + "\n";
                                 }
                                 break;
                             default:
@@ -3104,20 +3104,20 @@ app.patch("/api/calculaterides", function(req, res) {
                                 const hiker = hikers[hikerindex];
 
                                 console.log("start calculation ");
-                                promises.push(util.wait(1000*timer)
-                                .then(() => ridesmodules.translateaddresstolocation(hiker.wherefromdetailed))
-                                .then(wherefromlocation => {
+                                promises.push(util.wait(100*timer)
+                                .then(() => ridesmodules.translateaddresstolocation(hiker.comesfromdetailed))
+                                .then(comesfromlocation => {
                                     
-                                    console.log("wherefromlocation " + JSON.stringify(wherefromlocation));
-                                    hiker.wherefromlocation = wherefromlocation;
-                                    return util.wait(1000*timer);
+                                    console.log("comesfromlocation " + JSON.stringify(comesfromlocation));
+                                    hiker.comesfromlocation = comesfromlocation;
+                                    return util.wait(100*timer);
                                 })
                                 .then(() => {
-                                    return ridesmodules.translateaddresstolocation(hiker.wheretodetailed);
+                                    return ridesmodules.translateaddresstolocation(hiker.returnstodetailed);
                                 })
-                                .then(wheretolocation => {
-                                    hiker.wheretolocation = wheretolocation;
-                                    console.log("wheretolocation " + JSON.stringify(wheretolocation));
+                                .then(returnstolocation => {
+                                    hiker.returnstolocation = returnstolocation;
+                                    console.log("returnstolocation " + JSON.stringify(returnstolocation));
                                 })
                                 .catch(rejection => {
                                     console.log("something went wrong:");
@@ -3160,14 +3160,14 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     name: neardriver.name,
                                                     fullname: neardriver.fullname,
                                                     phone: neardriver.phone,
-                                                    driverwherefrom: neardriver.wherefrom,
-                                                    driverwhereto: neardriver.whereto,
+                                                    drivercomesfrom: neardriver.comesfrom,
+                                                    driverreturnsto: neardriver.returnsto,
                                                 };
                                                 neardriver.myhitchersto.push({
                                                     "hitchername": hiker.name,
                                                     "hitcherphone": hiker.phone,
-                                                    "hitcherwherefrom": hiker.wherefrom,
-                                                    "hitcherwhereto": hiker.whereto,
+                                                    "hitchercomesfrom": hiker.comesfrom,
+                                                    "hitcherreturnsto": hiker.returnsto,
                                                 });
 
                                                 hiker.myfriendsdriversto = [];
@@ -3180,14 +3180,14 @@ app.patch("/api/calculaterides", function(req, res) {
                                                         "drivername": neardriver.name,
                                                         "driverfullname": neardriver.fullname,
                                                         "driverphone": neardriver.phone,
-                                                        "driverwherefrom": neardriver.wherefrom,
-                                                        "driverwhereto": neardriver.whereto,
+                                                        "drivercomesfrom": neardriver.comesfrom,
+                                                        "driverreturnsto": neardriver.returnsto,
                                                     });
                                                     neardriver.myhitchersto.push({
                                                         "hitchername": hitchhikerfriend,
                                                         "hitcherphone": hiker.phone,
-                                                        "hitcherwherefrom": hiker.wherefrom,
-                                                        "hitcherwhereto": hiker.whereto,
+                                                        "hitchercomesfrom": hiker.comesfrom,
+                                                        "hitcherreturnsto": hiker.returnsto,
                                                     });
                                                     neardriver.availableplacestothehike--;
                                                     hiker.seatsrequiredtothehike--;
@@ -3213,14 +3213,14 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     name: neardriver.name,
                                                     fullname: neardriver.fullname,
                                                     phone: neardriver.phone,
-                                                    driverwherefrom: neardriver.wherefrom,
-                                                    driverwhereto: neardriver.whereto,
+                                                    drivercomesfrom: neardriver.comesfrom,
+                                                    driverreturnsto: neardriver.returnsto,
                                                 };
                                                 neardriver.myhitchersfrom.push({
                                                     "hitchername": hiker.name,
                                                     "hitcherphone": hiker.phone,
-                                                    "hitcherwherefrom": hiker.wherefrom,
-                                                    "hitcherwhereto": hiker.whereto,
+                                                    "hitchercomesfrom": hiker.comesfrom,
+                                                    "hitcherreturnsto": hiker.returnsto,
                                                 });
 
                                                 hiker.myfriendsdriversfrom = [];
@@ -3233,14 +3233,14 @@ app.patch("/api/calculaterides", function(req, res) {
                                                         "drivername": neardriver.name,
                                                         "driverfullname": neardriver.fullname,
                                                         "driverphone": neardriver.phone,
-                                                        "driverwherefrom": neardriver.wherefrom,
-                                                        "driverwhereto": neardriver.whereto,
+                                                        "drivercomesfrom": neardriver.comesfrom,
+                                                        "driverreturnsto": neardriver.returnsto,
                                                     });
                                                     neardriver.myhitchersfrom.push({
                                                         "hitchername": hitchhikerfriend,
                                                         "hitcherphone": hiker.phone,
-                                                        "hitcherwherefrom": hiker.wherefrom,
-                                                        "hitcherwhereto": hiker.whereto,
+                                                        "hitchercomesfrom": hiker.comesfrom,
+                                                        "hitcherreturnsto": hiker.returnsto,
                                                     });
                                                     neardriver.availableplacesfromthehike--;
                                                     hiker.seatsrequiredfromthehike--;

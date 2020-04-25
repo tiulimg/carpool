@@ -91,16 +91,16 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                             for (var i=0;i<doc.myhitchersto.length;i++)
                                                             {
                                                                 hitchers += doc.myhitchersto[i].hitchername + " " + doc.myhitchersto[i].hitcherphone + 
-                                                                    " (מגיע מ" + doc.myhitchersto[i].hitcherwherefrom + 
-                                                                    " וחוזר ל" + doc.myhitchersto[i].hitcherwhereto + ")\n";
+                                                                    " (מגיע מ" + doc.myhitchersto[i].hitchercomesfrom + 
+                                                                    " וחוזר ל" + doc.myhitchersto[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         case "en":
                                                             for (var i=0;i<doc.myhitchersto.length;i++)
                                                             {
                                                                 hitchers += doc.myhitchersto[i].hitchername + " " + doc.myhitchersto[i].hitcherphone + 
-                                                                    " (Comes from " + doc.myhitchersto[i].hitcherwherefrom + 
-                                                                    " and retuns to " + doc.myhitchersto[i].hitcherwhereto + ")\n";
+                                                                    " (Comes from " + doc.myhitchersto[i].hitchercomesfrom + 
+                                                                    " and retuns to " + doc.myhitchersto[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         default:
@@ -119,28 +119,28 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                             for (var i=0;i<doc.myhitchersto.length;i++)
                                                             {
                                                                 hitchersto += doc.myhitchersto[i].hitchername + " " + doc.myhitchersto[i].hitcherphone + 
-                                                                    " (מגיע מ" + doc.myhitchersto[i].hitcherwherefrom + 
-                                                                    " וחוזר ל" + doc.myhitchersto[i].hitcherwhereto + ")\n";
+                                                                    " (מגיע מ" + doc.myhitchersto[i].hitchercomesfrom + 
+                                                                    " וחוזר ל" + doc.myhitchersto[i].hitcherreturnsto + ")\n";
                                                             }
                                                             for (var i=0;i<doc.myhitchersfrom.length;i++)
                                                             {
                                                                 hitchersfrom += doc.myhitchersfrom[i].hitchername + " " + doc.myhitchersfrom[i].hitcherphone + 
-                                                                    " (מגיע מ" + doc.myhitchersfrom[i].hitcherwherefrom + 
-                                                                    " וחוזר ל" + doc.myhitchersfrom[i].hitcherwhereto + ")\n";
+                                                                    " (מגיע מ" + doc.myhitchersfrom[i].hitchercomesfrom + 
+                                                                    " וחוזר ל" + doc.myhitchersfrom[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         case "en":
                                                             for (var i=0;i<doc.myhitchersto.length;i++)
                                                             {
                                                                 hitchersto += doc.myhitchersto[i].hitchername + " " + doc.myhitchersto[i].hitcherphone + 
-                                                                    " (Comes from " + doc.myhitchersto[i].hitcherwherefrom + 
-                                                                    " and returns to " + doc.myhitchersto[i].hitcherwhereto + ")\n";
+                                                                    " (Comes from " + doc.myhitchersto[i].hitchercomesfrom + 
+                                                                    " and returns to " + doc.myhitchersto[i].hitcherreturnsto + ")\n";
                                                             }
                                                             for (var i=0;i<doc.myhitchersfrom.length;i++)
                                                             {
                                                                 hitchersfrom += doc.myhitchersfrom[i].hitchername + " " + doc.myhitchersfrom[i].hitcherphone + 
-                                                                    " (Comes from " + doc.myhitchersfrom[i].hitcherwherefrom + 
-                                                                    " and returns to " + doc.myhitchersfrom[i].hitcherwhereto + ")\n";
+                                                                    " (Comes from " + doc.myhitchersfrom[i].hitchercomesfrom + 
+                                                                    " and returns to " + doc.myhitchersfrom[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         default:
@@ -158,16 +158,16 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                             for (var i=0;i<doc.myhitchersto.length;i++)
                                                             {
                                                                 hitchers += doc.myhitchersto[i].hitchername + " " + doc.myhitchersto[i].hitcherphone + 
-                                                                    " (מגיע מ" + doc.myhitchersto[i].hitcherwherefrom + 
-                                                                    " וחוזר ל" + doc.myhitchersto[i].hitcherwhereto + ")\n";
+                                                                    " (מגיע מ" + doc.myhitchersto[i].hitchercomesfrom + 
+                                                                    " וחוזר ל" + doc.myhitchersto[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         case "en":
                                                             for (var i=0;i<doc.myhitchersto.length;i++)
                                                             {
                                                                 hitchers += doc.myhitchersto[i].hitchername + " " + doc.myhitchersto[i].hitcherphone + 
-                                                                    " (Comes from " + doc.myhitchersto[i].hitcherwherefrom + 
-                                                                    " and returns to " + doc.myhitchersto[i].hitcherwhereto + ")\n";
+                                                                    " (Comes from " + doc.myhitchersto[i].hitchercomesfrom + 
+                                                                    " and returns to " + doc.myhitchersto[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         default:
@@ -184,16 +184,16 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                             for (var i=0;i<doc.myhitchersfrom.length;i++)
                                                             {
                                                                 hitchersfrom += doc.myhitchersfrom[i].hitchername + " " + doc.myhitchersfrom[i].hitcherphone + 
-                                                                    " (מגיע מ" + doc.myhitchersfrom[i].hitcherwherefrom + 
-                                                                    " וחוזר ל" + doc.myhitchersfrom[i].hitcherwhereto + ")\n";
+                                                                    " (מגיע מ" + doc.myhitchersfrom[i].hitchercomesfrom + 
+                                                                    " וחוזר ל" + doc.myhitchersfrom[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         case "en":
                                                             for (var i=0;i<doc.myhitchersfrom.length;i++)
                                                             {
                                                                 hitchersfrom += doc.myhitchersfrom[i].hitchername + " " + doc.myhitchersfrom[i].hitcherphone + 
-                                                                    " (comes from " + doc.myhitchersfrom[i].hitcherwherefrom + 
-                                                                    " and returns to " + doc.myhitchersfrom[i].hitcherwhereto + ")\n";
+                                                                    " (comes from " + doc.myhitchersfrom[i].hitchercomesfrom + 
+                                                                    " and returns to " + doc.myhitchersfrom[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         default:
@@ -217,8 +217,8 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                         replies.get_recast_reply("RIDE_BACK_FORTH",language,
                                                         [doc.mydriverto.name,
                                                         doc.mydriverto.phone,
-                                                        doc.mydriverto.driverwherefrom,
-                                                        doc.mydriverto.driverwhereto],memory);
+                                                        doc.mydriverto.drivercomesfrom,
+                                                        doc.mydriverto.driverreturnsto],memory);
                                                     hadexchangednumbers = true; 
                                                 }
                                                 else if (doc.mydriverto != null && doc.mydriverfrom != null)
@@ -227,12 +227,12 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                         replies.get_recast_reply("RIDE_DIFFERENT_BACK_FORTH",language,
                                                         [doc.mydriverto.name,
                                                         doc.mydriverto.phone,
-                                                        doc.mydriverto.driverwherefrom,
-                                                        doc.mydriverto.driverwhereto,
+                                                        doc.mydriverto.drivercomesfrom,
+                                                        doc.mydriverto.driverreturnsto,
                                                         doc.mydriverfrom.name,
                                                         doc.mydriverfrom.phone,
-                                                        doc.mydriverfrom.driverwherefrom,
-                                                        doc.mydriverfrom.driverwhereto,
+                                                        doc.mydriverfrom.drivercomesfrom,
+                                                        doc.mydriverfrom.driverreturnsto,
                                                         doc.mydriverto.name],memory);
                                                     hadexchangednumbers = true;
                                                 }
@@ -242,8 +242,8 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                         replies.get_recast_reply("RIDE_FORTH",language,
                                                         [doc.mydriverto.name,
                                                         doc.mydriverto.phone,
-                                                        doc.mydriverto.driverwherefrom,
-                                                        doc.mydriverto.driverwhereto],memory);
+                                                        doc.mydriverto.drivercomesfrom,
+                                                        doc.mydriverto.driverreturnsto],memory);
                                                     hadexchangednumbers = true;
                                                 }
                                                 else
@@ -252,8 +252,8 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                         replies.get_recast_reply("RIDE_BACK",language,
                                                         [doc.mydriverfrom.name,
                                                         doc.mydriverfrom.phone,
-                                                        doc.mydriverfrom.driverwherefrom,
-                                                        doc.mydriverfrom.driverwhereto],memory);
+                                                        doc.mydriverfrom.drivercomesfrom,
+                                                        doc.mydriverfrom.driverreturnsto],memory);
                                                     hadexchangednumbers = true;
                                                 }
                                                 if (JSON.stringify(doc.myfriendsdriversto) == JSON.stringify(doc.myfriendsdriversfrom)) {
@@ -264,7 +264,7 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                                 const currdriver = doc.myfriendsdriversto[i];
                                                                 text = currdriver.hitchername + " יכול לבוא ולחזור עם " + 
                                                                     currdriver.drivername + " " + currdriver.driverphone + ". הוא מגיע מ" +
-                                                                    currdriver.driverwherefrom + " וחוזר ל" + currdriver.driverwhereto;
+                                                                    currdriver.drivercomesfrom + " וחוזר ל" + currdriver.driverreturnsto;
                                                                 recast_conversation_reply = 
                                                                     replies.push_to_recast_reply(recast_conversation_reply,text);  
                                                             }    
@@ -274,7 +274,7 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                                 const currdriver = doc.myfriendsdriversto[i];
                                                                 text = currdriver.hitchername + " can come and return with " + 
                                                                     currdriver.drivername + " " + currdriver.driverphone + ". He comes from " +
-                                                                    currdriver.driverwherefrom + " and returns to " + currdriver.driverwhereto;
+                                                                    currdriver.drivercomesfrom + " and returns to " + currdriver.driverreturnsto;
                                                                 recast_conversation_reply = 
                                                                     replies.push_to_recast_reply(recast_conversation_reply,text);  
                                                             }
@@ -292,10 +292,10 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                                 const currdriverfrom = doc.myfriendsdriversfrom[i];
                                                                 text = currdriverto.hitchername + " יכול לבוא עם " + 
                                                                     currdriverto.drivername + " " + currdriverto.driverphone + ". הוא מגיע מ" +
-                                                                    currdriverto.driverwherefrom + " וחוזר ל" + currdriverto.driverwhereto + ".\n" +
+                                                                    currdriverto.drivercomesfrom + " וחוזר ל" + currdriverto.driverreturnsto + ".\n" +
                                                                     "ולחזור עם " + currdriverfrom.drivername + " " + currdriverfrom.driverphone + 
-                                                                    ". הוא מגיע מ" + currdriverfrom.driverwherefrom + " וחוזר ל" + 
-                                                                    currdriverfrom.driverwhereto;
+                                                                    ". הוא מגיע מ" + currdriverfrom.drivercomesfrom + " וחוזר ל" + 
+                                                                    currdriverfrom.driverreturnsto;
                                                                 recast_conversation_reply = 
                                                                     replies.push_to_recast_reply(recast_conversation_reply,text); 
                                                             }
@@ -306,10 +306,10 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                                 const currdriverfrom = doc.myfriendsdriversfrom[i];
                                                                 text = currdriverto.hitchername + " can come with " + 
                                                                     currdriverto.drivername + " " + currdriverto.driverphone + ". He comes from " +
-                                                                    currdriverto.driverwherefrom + " and returns to " + currdriverto.driverwhereto + ".\n" +
+                                                                    currdriverto.drivercomesfrom + " and returns to " + currdriverto.driverreturnsto + ".\n" +
                                                                     "And return with " + currdriverfrom.drivername + " " + currdriverfrom.driverphone + 
-                                                                    ". He comes from " + currdriverfrom.driverwherefrom + " and returns to " + 
-                                                                    currdriverfrom.driverwhereto;
+                                                                    ". He comes from " + currdriverfrom.drivercomesfrom + " and returns to " + 
+                                                                    currdriverfrom.driverreturnsto;
                                                                 recast_conversation_reply = 
                                                                     replies.push_to_recast_reply(recast_conversation_reply,text); 
                                                             }
@@ -326,7 +326,7 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                                 const currdriver = doc.myfriendsdriversto[i];
                                                                 text = currdriver.hitchername + " יכול לבוא בהלוך בלבד עם " + 
                                                                     currdriver.drivername + " " + currdriver.driverphone + ". הוא מגיע מ" +
-                                                                    currdriver.driverwherefrom + " וחוזר ל" + currdriver.driverwhereto;
+                                                                    currdriver.drivercomesfrom + " וחוזר ל" + currdriver.driverreturnsto;
                                                                 recast_conversation_reply = 
                                                                     replies.push_to_recast_reply(recast_conversation_reply,text);
                                                             }
@@ -336,7 +336,7 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                                 const currdriver = doc.myfriendsdriversto[i];
                                                                 text = currdriver.hitchername + " can come with " + 
                                                                     currdriver.drivername + " " + currdriver.driverphone + ". He comes from " +
-                                                                    currdriver.driverwherefrom + " and returns to " + currdriver.driverwhereto;
+                                                                    currdriver.drivercomesfrom + " and returns to " + currdriver.driverreturnsto;
                                                                 recast_conversation_reply = 
                                                                     replies.push_to_recast_reply(recast_conversation_reply,text);
                                                             }
@@ -354,7 +354,7 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                                 const currdriver = doc.myfriendsdriversfrom[i];
                                                                 text = currdriver.hitchername + " יכול לחזור בלבד עם " + 
                                                                     currdriver.drivername + " " + currdriver.driverphone + ". הוא מגיע מ" +
-                                                                    currdriver.driverwherefrom + " וחוזר ל" + currdriver.driverwhereto;
+                                                                    currdriver.drivercomesfrom + " וחוזר ל" + currdriver.driverreturnsto;
                                                                 recast_conversation_reply = 
                                                                     replies.push_to_recast_reply(recast_conversation_reply,text);
                                                             }    
@@ -364,7 +364,7 @@ function patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST
                                                                 const currdriver = doc.myfriendsdriversfrom[i];
                                                                 text = currdriver.hitchername + " can return with " + 
                                                                     currdriver.drivername + " " + currdriver.driverphone + ". He comes from " +
-                                                                    currdriver.driverwherefrom + " and returns to " + currdriver.driverwhereto;
+                                                                    currdriver.drivercomesfrom + " and returns to " + currdriver.driverreturnsto;
                                                                 recast_conversation_reply = 
                                                                     replies.push_to_recast_reply(recast_conversation_reply,text);
                                                             }
@@ -473,16 +473,16 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                             for (var i=0;i<doc.myhitchersto.length;i++)
                                                             {
                                                                 hitchers += doc.myhitchersto[i].hitchername + " " + doc.myhitchersto[i].hitcherphone + 
-                                                                    " (מגיע מ" + doc.myhitchersto[i].hitcherwherefrom + 
-                                                                    " וחוזר ל" + doc.myhitchersto[i].hitcherwhereto + ")\n";
+                                                                    " (מגיע מ" + doc.myhitchersto[i].hitchercomesfrom + 
+                                                                    " וחוזר ל" + doc.myhitchersto[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         case "en":
                                                             for (var i=0;i<doc.myhitchersto.length;i++)
                                                             {
                                                                 hitchers += doc.myhitchersto[i].hitchername + " " + doc.myhitchersto[i].hitcherphone + 
-                                                                    " (Comes from " + doc.myhitchersto[i].hitcherwherefrom + 
-                                                                    " and retuns to " + doc.myhitchersto[i].hitcherwhereto + ")\n";
+                                                                    " (Comes from " + doc.myhitchersto[i].hitchercomesfrom + 
+                                                                    " and retuns to " + doc.myhitchersto[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         default:
@@ -502,28 +502,28 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                             for (var i=0;i<doc.myhitchersto.length;i++)
                                                             {
                                                                 hitchersto += doc.myhitchersto[i].hitchername + " " + doc.myhitchersto[i].hitcherphone + 
-                                                                    " (מגיע מ" + doc.myhitchersto[i].hitcherwherefrom + 
-                                                                    " וחוזר ל" + doc.myhitchersto[i].hitcherwhereto + ")\n";
+                                                                    " (מגיע מ" + doc.myhitchersto[i].hitchercomesfrom + 
+                                                                    " וחוזר ל" + doc.myhitchersto[i].hitcherreturnsto + ")\n";
                                                             }
                                                             for (var i=0;i<doc.myhitchersfrom.length;i++)
                                                             {
                                                                 hitchersfrom += doc.myhitchersfrom[i].hitchername + " " + doc.myhitchersfrom[i].hitcherphone + 
-                                                                    " (מגיע מ" + doc.myhitchersfrom[i].hitcherwherefrom + 
-                                                                    " וחוזר ל" + doc.myhitchersfrom[i].hitcherwhereto + ")\n";
+                                                                    " (מגיע מ" + doc.myhitchersfrom[i].hitchercomesfrom + 
+                                                                    " וחוזר ל" + doc.myhitchersfrom[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         case "en":
                                                             for (var i=0;i<doc.myhitchersto.length;i++)
                                                             {
                                                                 hitchersto += doc.myhitchersto[i].hitchername + " " + doc.myhitchersto[i].hitcherphone + 
-                                                                    " (Comes from " + doc.myhitchersto[i].hitcherwherefrom + 
-                                                                    " and returns to " + doc.myhitchersto[i].hitcherwhereto + ")\n";
+                                                                    " (Comes from " + doc.myhitchersto[i].hitchercomesfrom + 
+                                                                    " and returns to " + doc.myhitchersto[i].hitcherreturnsto + ")\n";
                                                             }
                                                             for (var i=0;i<doc.myhitchersfrom.length;i++)
                                                             {
                                                                 hitchersfrom += doc.myhitchersfrom[i].hitchername + " " + doc.myhitchersfrom[i].hitcherphone + 
-                                                                    " (Comes from " + doc.myhitchersfrom[i].hitcherwherefrom + 
-                                                                    " and returns to " + doc.myhitchersfrom[i].hitcherwhereto + ")\n";
+                                                                    " (Comes from " + doc.myhitchersfrom[i].hitchercomesfrom + 
+                                                                    " and returns to " + doc.myhitchersfrom[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         default:
@@ -542,16 +542,16 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                             for (var i=0;i<doc.myhitchersto.length;i++)
                                                             {
                                                                 hitchers += doc.myhitchersto[i].hitchername + " " + doc.myhitchersto[i].hitcherphone + 
-                                                                    " (מגיע מ" + doc.myhitchersto[i].hitcherwherefrom + 
-                                                                    " וחוזר ל" + doc.myhitchersto[i].hitcherwhereto + ")\n";
+                                                                    " (מגיע מ" + doc.myhitchersto[i].hitchercomesfrom + 
+                                                                    " וחוזר ל" + doc.myhitchersto[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         case "en":
                                                             for (var i=0;i<doc.myhitchersto.length;i++)
                                                             {
                                                                 hitchers += doc.myhitchersto[i].hitchername + " " + doc.myhitchersto[i].hitcherphone + 
-                                                                    " (Comes from " + doc.myhitchersto[i].hitcherwherefrom + 
-                                                                    " and returns to " + doc.myhitchersto[i].hitcherwhereto + ")\n";
+                                                                    " (Comes from " + doc.myhitchersto[i].hitchercomesfrom + 
+                                                                    " and returns to " + doc.myhitchersto[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         default:
@@ -569,16 +569,16 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                             for (var i=0;i<doc.myhitchersfrom.length;i++)
                                                             {
                                                                 hitchersfrom += doc.myhitchersfrom[i].hitchername + " " + doc.myhitchersfrom[i].hitcherphone + 
-                                                                    " (מגיע מ" + doc.myhitchersfrom[i].hitcherwherefrom + 
-                                                                    " וחוזר ל" + doc.myhitchersfrom[i].hitcherwhereto + ")\n";
+                                                                    " (מגיע מ" + doc.myhitchersfrom[i].hitchercomesfrom + 
+                                                                    " וחוזר ל" + doc.myhitchersfrom[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         case "en":
                                                             for (var i=0;i<doc.myhitchersfrom.length;i++)
                                                             {
                                                                 hitchersfrom += doc.myhitchersfrom[i].hitchername + " " + doc.myhitchersfrom[i].hitcherphone + 
-                                                                    " (comes from " + doc.myhitchersfrom[i].hitcherwherefrom + 
-                                                                    " and returns to " + doc.myhitchersfrom[i].hitcherwhereto + ")\n";
+                                                                    " (comes from " + doc.myhitchersfrom[i].hitchercomesfrom + 
+                                                                    " and returns to " + doc.myhitchersfrom[i].hitcherreturnsto + ")\n";
                                                             }
                                                             break;
                                                         default:
@@ -616,7 +616,7 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                 for (let index = 0; index < drivers.length; index++) {
                                                                     const driver = drivers[index];
                                                                     driversstring += (index + 1) + ": מגיע מ" + 
-                                                                        driver.wherefrom + " וחוזר ל" + driver.whereto + "\n";
+                                                                        driver.comesfrom + " וחוזר ל" + driver.returnsto + "\n";
                                                                 }
                                                                 for (let index = 0; index < chosendriversto.length; index++) {
                                                                     const chosendriver = chosendriversto[index];
@@ -629,7 +629,7 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                         }
                                                                     }
                                                                     selecteddriverstostring += (driverindex + 1) + ": מגיע מ" + 
-                                                                        chosendriver.wherefrom + " וחוזר ל" + chosendriver.whereto + "\n";
+                                                                        chosendriver.comesfrom + " וחוזר ל" + chosendriver.returnsto + "\n";
                                                                 }
                                                                 for (let index = 0; index < chosendriversfrom.length; index++) {
                                                                     const chosendriver = chosendriversfrom[index];
@@ -642,14 +642,14 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                         }
                                                                     }
                                                                     selecteddriversfromstring += (driverindex + 1) + ": מגיע מ" + 
-                                                                        chosendriver.wherefrom + " וחוזר ל" + chosendriver.whereto + "\n";
+                                                                        chosendriver.comesfrom + " וחוזר ל" + chosendriver.returnsto + "\n";
                                                                 }
                                                                 break;
                                                             case "en":
                                                                 for (let index = 0; index < drivers.length; index++) {
                                                                     const driver = drivers[index];
                                                                     driversstring += (index + 1) + ": Comes from " + 
-                                                                        driver.wherefrom + ", returns to " + driver.whereto + "\n";
+                                                                        driver.comesfrom + ", returns to " + driver.returnsto + "\n";
                                                                 }
                                                                 for (let index = 0; index < chosendriversto.length; index++) {
                                                                     const chosendriver = chosendriversto[index];
@@ -662,7 +662,7 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                         }
                                                                     }
                                                                     selecteddriverstostring += (driverindex + 1) + ": Comes from " + 
-                                                                        chosendriver.wherefrom + ", returns to " + chosendriver.whereto + "\n";
+                                                                        chosendriver.comesfrom + ", returns to " + chosendriver.returnsto + "\n";
                                                                 }
                                                                 for (let index = 0; index < chosendriversfrom.length; index++) {
                                                                     const chosendriver = chosendriversfrom[index];
@@ -675,7 +675,7 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                         }
                                                                     }
                                                                     selecteddriversfromstring += (driverindex + 1) + ": Comes from " + 
-                                                                        chosendriver.wherefrom + ", returns to " + chosendriver.whereto + "\n";
+                                                                        chosendriver.comesfrom + ", returns to " + chosendriver.returnsto + "\n";
                                                                 }
                                                                 break;
                                                             default:
@@ -697,8 +697,8 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                 replies.get_recast_reply("RIDE_BACK_FORTH",language,
                                                                 [doc.mydriverto.name,
                                                                 doc.mydriverto.phone,
-                                                                doc.mydriverto.driverwherefrom,
-                                                                doc.mydriverto.driverwhereto],memory);
+                                                                doc.mydriverto.drivercomesfrom,
+                                                                doc.mydriverto.driverreturnsto],memory);
                                                             hadexchangednumbers = true;
                                                         }
                                                         else if (doc.mydriverto != null && doc.mydriverfrom != null)
@@ -707,12 +707,12 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                 replies.get_recast_reply("RIDE_DIFFERENT_BACK_FORTH",language,
                                                                 [doc.mydriverto.name,
                                                                 doc.mydriverto.phone,
-                                                                doc.mydriverto.driverwherefrom,
-                                                                doc.mydriverto.driverwhereto,
+                                                                doc.mydriverto.drivercomesfrom,
+                                                                doc.mydriverto.driverreturnsto,
                                                                 doc.mydriverfrom.name,
                                                                 doc.mydriverfrom.phone,
-                                                                doc.mydriverfrom.driverwherefrom,
-                                                                doc.mydriverfrom.driverwhereto,
+                                                                doc.mydriverfrom.drivercomesfrom,
+                                                                doc.mydriverfrom.driverreturnsto,
                                                                 doc.mydriverto.name],memory);
                                                             hadexchangednumbers = true;
                                                         }
@@ -722,8 +722,8 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                 replies.get_recast_reply("RIDE_FORTH",language,
                                                                 [doc.mydriverto.name,
                                                                 doc.mydriverto.phone,
-                                                                doc.mydriverto.driverwherefrom,
-                                                                doc.mydriverto.driverwhereto],memory);
+                                                                doc.mydriverto.drivercomesfrom,
+                                                                doc.mydriverto.driverreturnsto],memory);
                                                             hadexchangednumbers = true;
                                                         }
                                                         else
@@ -732,8 +732,8 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                 replies.get_recast_reply("RIDE_BACK",language,
                                                                 [doc.mydriverfrom.name,
                                                                 doc.mydriverfrom.phone,
-                                                                doc.mydriverfrom.driverwherefrom,
-                                                                doc.mydriverfrom.driverwhereto],memory);
+                                                                doc.mydriverfrom.drivercomesfrom,
+                                                                doc.mydriverfrom.driverreturnsto],memory);
                                                             hadexchangednumbers = true;
                                                         }
                                                         if (JSON.stringify(doc.myfriendsdriversto) == JSON.stringify(doc.myfriendsdriversfrom)) {
@@ -744,7 +744,7 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                         const currdriver = doc.myfriendsdriversto[i];
                                                                         text = currdriver.hitchername + " יכול לבוא ולחזור עם " + 
                                                                             currdriver.drivername + " " + currdriver.driverphone + ". הוא מגיע מ" +
-                                                                            currdriver.driverwherefrom + " וחוזר ל" + currdriver.driverwhereto;
+                                                                            currdriver.drivercomesfrom + " וחוזר ל" + currdriver.driverreturnsto;
                                                                         recast_conversation_reply = 
                                                                             replies.push_to_recast_reply(recast_conversation_reply,text);  
                                                                     }    
@@ -754,7 +754,7 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                         const currdriver = doc.myfriendsdriversto[i];
                                                                         text = currdriver.hitchername + " can come and return with " + 
                                                                             currdriver.drivername + " " + currdriver.driverphone + ". He comes from " +
-                                                                            currdriver.driverwherefrom + " and returns to " + currdriver.driverwhereto;
+                                                                            currdriver.drivercomesfrom + " and returns to " + currdriver.driverreturnsto;
                                                                         recast_conversation_reply = 
                                                                             replies.push_to_recast_reply(recast_conversation_reply,text);  
                                                                     }
@@ -772,10 +772,10 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                         const currdriverfrom = doc.myfriendsdriversfrom[i];
                                                                         text = currdriverto.hitchername + " יכול לבוא עם " + 
                                                                             currdriverto.drivername + " " + currdriverto.driverphone + ". הוא מגיע מ" +
-                                                                            currdriverto.driverwherefrom + " וחוזר ל" + currdriverto.driverwhereto + ".\n" +
+                                                                            currdriverto.drivercomesfrom + " וחוזר ל" + currdriverto.driverreturnsto + ".\n" +
                                                                             "ולחזור עם " + currdriverfrom.drivername + " " + currdriverfrom.driverphone + 
-                                                                            ". הוא מגיע מ" + currdriverfrom.driverwherefrom + " וחוזר ל" + 
-                                                                            currdriverfrom.driverwhereto;
+                                                                            ". הוא מגיע מ" + currdriverfrom.drivercomesfrom + " וחוזר ל" + 
+                                                                            currdriverfrom.driverreturnsto;
                                                                         recast_conversation_reply = 
                                                                             replies.push_to_recast_reply(recast_conversation_reply,text); 
                                                                     }
@@ -786,10 +786,10 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                         const currdriverfrom = doc.myfriendsdriversfrom[i];
                                                                         text = currdriverto.hitchername + " can come with " + 
                                                                             currdriverto.drivername + " " + currdriverto.driverphone + ". He comes from " +
-                                                                            currdriverto.driverwherefrom + " and returns to " + currdriverto.driverwhereto + ".\n" +
+                                                                            currdriverto.drivercomesfrom + " and returns to " + currdriverto.driverreturnsto + ".\n" +
                                                                             "And return with " + currdriverfrom.drivername + " " + currdriverfrom.driverphone + 
-                                                                            ". He comes from " + currdriverfrom.driverwherefrom + " and returns to " + 
-                                                                            currdriverfrom.driverwhereto;
+                                                                            ". He comes from " + currdriverfrom.drivercomesfrom + " and returns to " + 
+                                                                            currdriverfrom.driverreturnsto;
                                                                         recast_conversation_reply = 
                                                                             replies.push_to_recast_reply(recast_conversation_reply,text); 
                                                                     }
@@ -806,7 +806,7 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                         const currdriver = doc.myfriendsdriversto[i];
                                                                         text = currdriver.hitchername + " יכול לבוא בהלוך בלבד עם " + 
                                                                             currdriver.drivername + " " + currdriver.driverphone + ". הוא מגיע מ" +
-                                                                            currdriver.driverwherefrom + " וחוזר ל" + currdriver.driverwhereto;
+                                                                            currdriver.drivercomesfrom + " וחוזר ל" + currdriver.driverreturnsto;
                                                                         recast_conversation_reply = 
                                                                             replies.push_to_recast_reply(recast_conversation_reply,text);
                                                                     }
@@ -816,7 +816,7 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                         const currdriver = doc.myfriendsdriversto[i];
                                                                         text = currdriver.hitchername + " can come with " + 
                                                                             currdriver.drivername + " " + currdriver.driverphone + ". He comes from " +
-                                                                            currdriver.driverwherefrom + " and returns to " + currdriver.driverwhereto;
+                                                                            currdriver.drivercomesfrom + " and returns to " + currdriver.driverreturnsto;
                                                                         recast_conversation_reply = 
                                                                             replies.push_to_recast_reply(recast_conversation_reply,text);
                                                                     }
@@ -834,7 +834,7 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                         const currdriver = doc.myfriendsdriversfrom[i];
                                                                         text = currdriver.hitchername + " יכול לחזור בלבד עם " + 
                                                                             currdriver.drivername + " " + currdriver.driverphone + ". הוא מגיע מ" +
-                                                                            currdriver.driverwherefrom + " וחוזר ל" + currdriver.driverwhereto;
+                                                                            currdriver.drivercomesfrom + " וחוזר ל" + currdriver.driverreturnsto;
                                                                         recast_conversation_reply = 
                                                                             replies.push_to_recast_reply(recast_conversation_reply,text);
                                                                     }    
@@ -844,7 +844,7 @@ function patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LA
                                                                         const currdriver = doc.myfriendsdriversfrom[i];
                                                                         text = currdriver.hitchername + " can return with " + 
                                                                             currdriver.drivername + " " + currdriver.driverphone + ". He comes from " +
-                                                                            currdriver.driverwherefrom + " and returns to " + currdriver.driverwhereto;
+                                                                            currdriver.drivercomesfrom + " and returns to " + currdriver.driverreturnsto;
                                                                         recast_conversation_reply = 
                                                                             replies.push_to_recast_reply(recast_conversation_reply,text);
                                                                     }
