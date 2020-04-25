@@ -298,6 +298,12 @@ function getDistanceMatrix(hikers) {
 
     for (let index = 1; index < hikers.length; index++) {
         const hiker = hikers[index];
+        if (hikers[0].phone == hiker.phone) {
+            continue;
+        }
+        else if (!hikers[0].amidriver && !hiker.amidriver) {
+            continue;
+        }
 
         var distancetothehike = distanceLatLons(
             hiker.comesfromlocation.lat, hiker.comesfromlocation.lon,
@@ -338,7 +344,10 @@ function getDistanceMatrix(hikers) {
         const hiker = hikers[index];
         for (let indexpartner = index; indexpartner < hikers.length; indexpartner++) {
             const partner = hikers[indexpartner];
-            if (hiker == partner) {
+            if (hiker == partner || hiker.phone == partner.phone) {
+                continue;
+            }
+            else if (!partner.amidriver && !hiker.amidriver) {
                 continue;
             }
 
@@ -457,8 +466,14 @@ function getHikerAreas(hikers) {
         },
     };
 
+    var phones = [];
+
     for (let index = 0; index < hikers.length; index++) {
         const hiker = hikers[index];
+        if (phones.indexOf(hiker.phone) != -1) {
+            continue;
+        }
+        phones.push(hiker.phone);
         if (hiker.amidriver) {
             if (hiker.comesfromarea) {
                 areas.sumtothehikeareas[hiker.comesfromarea] += hiker.availableplaces;
