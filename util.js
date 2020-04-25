@@ -461,29 +461,29 @@ function getHikerAreas(hikers) {
         const hiker = hikers[index];
         if (hiker.amidriver) {
             if (hiker.comesfromarea) {
-                areas.sumtothehikeareas[hiker.returnstoarea] += hiker.availableplaces;
+                areas.sumtothehikeareas[hiker.comesfromarea] += hiker.availableplaces;
                 areas.sumtothehikeareas.all += hiker.availableplaces;                    
-                areas.driverstothehikeareas[hiker.returnstoarea].push(hiker);
+                areas.driverstothehikeareas[hiker.comesfromarea].push(hiker);
                 hiker.availableplacestothehike = hiker.availableplaces;
             }
             if (hiker.returnstoarea) {
-                areas.sumfromthehikeareas[hiker.comesfromarea] += hiker.availableplaces;
+                areas.sumfromthehikeareas[hiker.returnstoarea] += hiker.availableplaces;
                 areas.sumfromthehikeareas.all += hiker.availableplaces;                    
-                areas.driversfromthehikeareas[hiker.comesfromarea].push(hiker);
+                areas.driversfromthehikeareas[hiker.returnstoarea].push(hiker);
                 hiker.availableplacesfromthehike = hiker.availableplaces;
             }
         }
         else {
             if (hiker.comesfromarea) {
-                areas.sumtothehikeareas[hiker.returnstoarea] -= hiker.seatsrequired;
+                areas.sumtothehikeareas[hiker.comesfromarea] -= hiker.seatsrequired;
                 areas.sumtothehikeareas.all -= hiker.seatsrequired;
-                areas.hitchhikerstothehikeareas[hiker.returnstoarea].push(hiker);
+                areas.hitchhikerstothehikeareas[hiker.comesfromarea].push(hiker);
                 hiker.seatsrequiredtothehike = hiker.seatsrequired;
             }
             if (hiker.returnstoarea) {
-                areas.sumfromthehikeareas[hiker.comesfromarea] -= hiker.seatsrequired;
+                areas.sumfromthehikeareas[hiker.returnstoarea] -= hiker.seatsrequired;
                 areas.sumfromthehikeareas.all -= hiker.seatsrequired;
-                areas.hitchhikersfromthehikeareas[hiker.comesfromarea].push(hiker);
+                areas.hitchhikersfromthehikeareas[hiker.returnstoarea].push(hiker);
                 hiker.seatsrequiredfromthehike = hiker.seatsrequired;
             }
         }
