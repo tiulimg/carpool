@@ -481,11 +481,17 @@ function getHikerAreas(hikers) {
                 areas.driverstothehikeareas[hiker.comesfromarea].push(hiker);
                 hiker.availableplacestothehike = hiker.availableplaces;
             }
+            else {
+                hiker.availableplacestothehike = 0;
+            }
             if (hiker.returnstoarea) {
                 areas.sumfromthehikeareas[hiker.returnstoarea] += hiker.availableplaces;
                 areas.sumfromthehikeareas.all += hiker.availableplaces;                    
                 areas.driversfromthehikeareas[hiker.returnstoarea].push(hiker);
                 hiker.availableplacesfromthehike = hiker.availableplaces;
+            }
+            else {
+                hiker.availableplacesfromthehike = 0;
             }
         }
         else {
@@ -495,11 +501,17 @@ function getHikerAreas(hikers) {
                 areas.hitchhikerstothehikeareas[hiker.comesfromarea].push(hiker);
                 hiker.seatsrequiredtothehike = hiker.seatsrequired;
             }
+            else {
+                hiker.seatsrequiredtothehike = 0;
+            }
             if (hiker.returnstoarea) {
                 areas.sumfromthehikeareas[hiker.returnstoarea] -= hiker.seatsrequired;
                 areas.sumfromthehikeareas.all -= hiker.seatsrequired;
                 areas.hitchhikersfromthehikeareas[hiker.returnstoarea].push(hiker);
                 hiker.seatsrequiredfromthehike = hiker.seatsrequired;
+            }
+            else {
+                hiker.seatsrequiredfromthehike = 0;
             }
         }
     }

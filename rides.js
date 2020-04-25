@@ -911,7 +911,7 @@ function translateaddresstolocation(address) {
                     return resolve(location);
                 }
                 else {
-                    var shortaddress;
+                    var shortaddress = address;
                     var parenthesisindex = address.indexOf("(");
                     if (parenthesisindex != -1) {
                         shortaddress = address.substr(0, parenthesisindex);
@@ -921,41 +921,46 @@ function translateaddresstolocation(address) {
                         shortaddress = shortaddress.substr(0, parenthesisindex);
                     }
 
-                    var url = "https://places-dsn.algolia.net/1/places/query";
-                    var headers = {
-                        'X-Algolia-Application-Id': ALGOLIA_APPID,
-                        'X-Algolia-API-Key': ALGOLIA_KEY, 
-                    }
-                    var requestbody = JSON.stringify({"query": shortaddress, "countries": "il"});
-                    console.log("translateaddresstolocation algolia address " + shortaddress + " request " + url);
-                    request({
-                        url: url,
-                        method: "POST",
-                        headers: headers,
-                        body: requestbody,
-                    }, function (error, response, body){
-                        if (error) {
-                            var rejection = "translateaddresstolocation Promise reject: " + error;
-                            console.log(rejection);
-                            return reject(rejection);
+                    if (address != shortaddress) {
+                        var url = "https://places-dsn.algolia.net/1/places/query";
+                        var headers = {
+                            'X-Algolia-Application-Id': ALGOLIA_APPID,
+                            'X-Algolia-API-Key': ALGOLIA_KEY, 
                         }
-                        else
-                        {
-                            //console.log("translateaddresstolocation locationiq response " + JSON.stringify(response));
-                            var responsebodyjson = JSON.parse(response.body);
-                            //console.log("translateaddresstolocation locationiq responsebodyjson " + JSON.stringify(responsebodyjson));
-                            if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
-                                location = {
-                                    lat: responsebodyjson.hits[0]._geoloc.lat,
-                                    lon: responsebodyjson.hits[0]._geoloc.lng,
+                        var requestbody = JSON.stringify({"query": shortaddress, "countries": "il"});
+                        console.log("translateaddresstolocation algolia address " + shortaddress + " request " + url);
+                        request({
+                            url: url,
+                            method: "POST",
+                            headers: headers,
+                            body: requestbody,
+                        }, function (error, response, body){
+                            if (error) {
+                                var rejection = "translateaddresstolocation Promise reject: " + error;
+                                console.log(rejection);
+                                return reject(rejection);
+                            }
+                            else
+                            {
+                                //console.log("translateaddresstolocation locationiq response " + JSON.stringify(response));
+                                var responsebodyjson = JSON.parse(response.body);
+                                //console.log("translateaddresstolocation locationiq responsebodyjson " + JSON.stringify(responsebodyjson));
+                                if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
+                                    location = {
+                                        lat: responsebodyjson.hits[0]._geoloc.lat,
+                                        lon: responsebodyjson.hits[0]._geoloc.lng,
+                                    }
+                                    return resolve(location);
                                 }
-                                return resolve(location);
+                                else {
+                                    reject("No geo location found " + address);
+                                }
                             }
-                            else {
-                                reject("No geo location found " + address);
-                            }
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        reject("No geo location found " + address);
+                    }
                 }
                 //console.log("translateaddresstolocation locationiq location " + JSON.stringify(location));
             }
