@@ -3137,8 +3137,9 @@ app.patch("/api/calculaterides", function(req, res) {
 
                                 for (let index = 0; index < hikers.length; index++) {
                                     const hiker = hikers[index];
-                                    console.log("calculaterides hiker: " + hiker.name + " isdriver " + hiker.amidriver + 
-                                        " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces);
+                                    console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
+                                        " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
+                                        " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
 
                                     if (hiker.amidriver || hiker.seatsrequired == 0) {
                                         continue;
@@ -3148,9 +3149,10 @@ app.patch("/api/calculaterides", function(req, res) {
                                         const neardriverdistanceto = distances[hiker.phone].tothehike[neardriverindex];
                                         var neardriver = neardriverdistanceto.link;
                                         console.log("calculaterides driver to the hike: distance " + neardriverdistanceto.distance + 
-                                            " name " + neardriver.name + " isdriver " + neardriver.amidriver + " seats " + 
+                                            " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
                                             neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
-                                            " neardriver.availableplacestothehike " + neardriver.availableplacestothehike);
+                                            " neardriver.availableplacestothehike " + neardriver.availableplacestothehike + 
+                                            " comesfrom " + neardriver.comesfromdetailed + " returnsto " + neardriver.returnstodetailed);
                                         if (neardriver.amidriver && 
                                             neardriver.availableplacestothehike >= hiker.seatsrequiredtothehike) {
                                             if (!hiker.mydriverto) {
@@ -3201,9 +3203,10 @@ app.patch("/api/calculaterides", function(req, res) {
                                         const neardriverdistancefrom = distances[hiker.phone].fromthehike[neardriverindex];
                                         var neardriver = neardriverdistancefrom.link;
                                         console.log("calculaterides driver from the hike: distance " + neardriverdistancefrom.distance + 
-                                            " name " + neardriver.name + " isdriver " + neardriver.amidriver + " seats " + 
+                                            " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
                                             neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
-                                            " neardriver.availableplacesfromthehike " + neardriver.availableplacesfromthehike);
+                                            " neardriver.availableplacesfromthehike " + neardriver.availableplacesfromthehike + 
+                                            " comesfrom " + neardriver.comesfromdetailed + " returnsto " + neardriver.returnstodetailed);
                                         if (neardriver.amidriver && 
                                             neardriver.availableplacesfromthehike >= hiker.seatsrequiredfromthehike) {
                                             if (!hiker.mydriverfrom) {
@@ -3285,13 +3288,13 @@ app.patch("/api/calculaterides", function(req, res) {
                                             for (let driverindex = 0; 
                                                  hiker.myfriendsdriversto && driverindex < hiker.myfriendsdriversto.length; 
                                                  driverindex++) {
-                                                const driver = hiker.myfriendsdriversto[driverindex].drivername;
+                                                const driver = hiker.myfriendsdriversto[driverindex].driverfullname;
                                                 friendsdriversto += ", " + driver;
                                             }
                                             for (let driverindex = 0; 
                                                  hiker.myfriendsdriversfrom && driverindex < hiker.myfriendsdriversfrom.length; 
                                                  driverindex++) {
-                                                const driver = hiker.myfriendsdriversfrom[driverindex].drivername;
+                                                const driver = hiker.myfriendsdriversfrom[driverindex].driverfullname;
                                                 friendsdriversfrom += ", " + driver;
                                             }
                                             var myfriends = "";
@@ -3301,9 +3304,9 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 myfriends +=  ", " + friend;
                                             }
                                             console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
-                                                " to the hike: joins " + hiker.mydriverto.name + friendsdriversto);
+                                                " to the hike: joins " + hiker.mydriverto.fullname + friendsdriversto);
                                             console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
-                                                " from the hike: joins " + hiker.mydriverfrom.name + friendsdriversfrom);
+                                                " from the hike: joins " + hiker.mydriverfrom.fullname + friendsdriversfrom);
                                         }
                                         else
                                         {
