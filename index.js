@@ -3108,7 +3108,9 @@ app.patch("/api/calculaterides", function(req, res) {
                                 .then(() => ridesmodules.translateaddresstolocation(hiker.comesfromdetailed))
                                 .then(comesfromlocation => {
                                     
-                                    console.log("comesfromlocation " + JSON.stringify(comesfromlocation));
+                                    console.log("comesfromlocation " + JSON.stringify(comesfromlocation) + " link " +
+                                        "<a href='https://www.google.com/maps?z=12&t=m&q="+
+                                        comesfromlocation.lat+","+comesfromlocation.lon+"'>link</a>");
                                     hiker.comesfromlocation = comesfromlocation;
                                     return util.wait(100*timer);
                                 })
@@ -3117,7 +3119,9 @@ app.patch("/api/calculaterides", function(req, res) {
                                 })
                                 .then(returnstolocation => {
                                     hiker.returnstolocation = returnstolocation;
-                                    console.log("returnstolocation " + JSON.stringify(returnstolocation));
+                                    console.log("returnstolocation " + JSON.stringify(returnstolocation) + " link " +
+                                    "<a href='https://www.google.com/maps?z=12&t=m&q="+
+                                    returnstolocation.lat+","+returnstolocation.lon+"'>link</a>");
                                 })
                                 .catch(rejection => {
                                     console.log("translateaddresstolocation something went wrong:");
