@@ -392,15 +392,35 @@ function getDistanceMatrix(hikers) {
         const hiker = hikers[index];
         
         distances[hiker.phone].tothehike.sort(function(b,a){
-            a = a.distance;
-            b = b.distance;
-            result = a>b ? -1 : a<b ? 1 : 0;
+            adistance = a.distance;
+            bdistance = b.distance;
+            result = adistance>bdistance ? -1 : adistance<bdistance ? 1 : 0;
+            if (result == 0) {
+                aage = a.link.age;
+                bage = b.link.age;
+                hikerage = hiker.age;
+                if (aage && bage && hikerage) {
+                    aage = Math.abs(hikerage - aage);
+                    bage = Math.abs(hikerage - bage);
+                    result = aage>bage ? -1 : aage<bage ? 1 : 0;
+                }                    
+            }
             return result;
         });
         distances[hiker.phone].fromthehike.sort(function(b,a){
-            a = a.distance;
-            b = b.distance;
-            result = a>b ? -1 : a<b ? 1 : 0;
+            adistance = a.distance;
+            bdistance = b.distance;
+            result = adistance>bdistance ? -1 : adistance<bdistance ? 1 : 0;
+            if (result == 0) {
+                aage = a.link.age;
+                bage = b.link.age;
+                hikerage = hiker.age;
+                if (aage && bage && hikerage) {
+                    aage = Math.abs(hikerage - aage);
+                    bage = Math.abs(hikerage - bage);
+                    result = aage>bage ? -1 : aage<bage ? 1 : 0;
+                }                    
+            }
             return result;
         });
 
@@ -411,12 +431,12 @@ function getDistanceMatrix(hikers) {
         source = distances[source];
         for (let index = 0; index < source.tothehike.length; index++) {
             const dest = source.tothehike[index];
-            console.log("tothehike: source " + source.link.name + " distance " + dest.distance + " dest " + dest.link.name);
+            console.log("tothehike: source " + source.link.fullname + " distance " + dest.distance + " dest " + dest.link.fullname);
         }
 
         for (let index = 0; index < source.fromthehike.length; index++) {
             const dest = source.fromthehike[index];
-            console.log("fromthehike: source " + source.link.name + " distance " + dest.distance + " dest " + dest.link.name);
+            console.log("fromthehike: source " + source.link.fullname + " distance " + dest.distance + " dest " + dest.link.fullname);
         }
     }
 
@@ -526,22 +546,22 @@ function getHikerAreas(hikers) {
         console.log("area " + area);
         for (let index = 0; index < areas.driverstothehikeareas[area].length; index++) {
             const hiker = areas.driverstothehikeareas[area][index];
-            console.log("driverstothehikearea: " + area + " " + hiker.name + " available " + hiker.availableplaces + 
+            console.log("driverstothehikearea: " + area + " " + hiker.fullname + " available " + hiker.availableplaces + 
                 " friends " + JSON.stringify(hiker.myfriends));
         }
         for (let index = 0; index < areas.driversfromthehikeareas[area].length; index++) {
             const hiker = areas.driversfromthehikeareas[area][index];
-            console.log("driversfromthehikeareas: " + area + " " + hiker.name + " available " + hiker.availableplaces + 
+            console.log("driversfromthehikeareas: " + area + " " + hiker.fullname + " available " + hiker.availableplaces + 
                 " friends " + JSON.stringify(hiker.myfriends));
         }
         for (let index = 0; index < areas.hitchhikerstothehikeareas[area].length; index++) {
             const hiker = areas.hitchhikerstothehikeareas[area][index];
-            console.log("hitchhikerstothehikeareas: " + area + " " + hiker.name + " seatsrequired " + hiker.seatsrequired + 
+            console.log("hitchhikerstothehikeareas: " + area + " " + hiker.fullname + " seatsrequired " + hiker.seatsrequired + 
                 " friends " + JSON.stringify(hiker.myfriends));
         }
         for (let index = 0; index < areas.hitchhikersfromthehikeareas[area].length; index++) {
             const hiker = areas.hitchhikersfromthehikeareas[area][index];
-            console.log("hitchhikersfromthehikeareas: " + area + " " + hiker.name + " seatsrequired " + hiker.seatsrequired + 
+            console.log("hitchhikersfromthehikeareas: " + area + " " + hiker.fullname + " seatsrequired " + hiker.seatsrequired + 
                 " friends " + JSON.stringify(hiker.myfriends));
         }
         console.log("sumtothehikeareas: " + areas.sumtothehikeareas[area]);
