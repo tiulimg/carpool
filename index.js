@@ -3109,8 +3109,8 @@ app.patch("/api/calculaterides", function(req, res) {
                                 .then(comesfromlocation => {
                                     
                                     console.log("comesfromlocation " + JSON.stringify(comesfromlocation) + " link " +
-                                        "<a href='https://www.google.com/maps?z=12&t=m&q="+
-                                        comesfromlocation.lat+","+comesfromlocation.lon+"'>link</a>");
+                                        "https://www.google.com/maps?z=12&t=m&q="+
+                                        comesfromlocation.lat+","+comesfromlocation.lon);
                                     hiker.comesfromlocation = comesfromlocation;
                                     return util.wait(100*timer);
                                 })
@@ -3120,8 +3120,8 @@ app.patch("/api/calculaterides", function(req, res) {
                                 .then(returnstolocation => {
                                     hiker.returnstolocation = returnstolocation;
                                     console.log("returnstolocation " + JSON.stringify(returnstolocation) + " link " +
-                                    "<a href='https://www.google.com/maps?z=12&t=m&q="+
-                                    returnstolocation.lat+","+returnstolocation.lon+"'>link</a>");
+                                    "https://www.google.com/maps?z=12&t=m&q="+
+                                    returnstolocation.lat+","+returnstolocation.lon);
                                 })
                                 .catch(rejection => {
                                     console.log("translateaddresstolocation something went wrong:");
@@ -3171,6 +3171,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 };
                                                 neardriver.myhitchersto.push({
                                                     "hitchername": hiker.name,
+                                                    "hitcherfullname": hiker.fullname,
                                                     "hitcherphone": hiker.phone,
                                                     "hitchercomesfrom": hiker.comesfrom,
                                                     "hitcherreturnsto": hiker.returnsto,
@@ -3225,6 +3226,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 };
                                                 neardriver.myhitchersfrom.push({
                                                     "hitchername": hiker.name,
+                                                    "hitcherfullname": hiker.fullname,
                                                     "hitcherphone": hiker.phone,
                                                     "hitchercomesfrom": hiker.comesfrom,
                                                     "hitcherreturnsto": hiker.returnsto,
@@ -3266,12 +3268,18 @@ app.patch("/api/calculaterides", function(req, res) {
                                         var hitchersfrom = "";
                                         for (let hitcherindex = 0; hiker.myhitchersto && hitcherindex < hiker.myhitchersto.length; 
                                              hitcherindex++) {
-                                            const hitcher = hiker.myhitchersto[hitcherindex].hitchername;
+                                            var hitcher = hiker.myhitchersto[hitcherindex].hitchername;
+                                            if (hiker.myhitchersto[hitcherindex].hitcherfullname) {
+                                                hitcher = hiker.myhitchersto[hitcherindex].hitcherfullname;
+                                            }
                                             hitchersto += hitcher + ", ";
                                         }
                                         for (let hitcherindex = 0; hiker.myhitchersfrom && hitcherindex < hiker.myhitchersfrom.length; 
                                              hitcherindex++) {
-                                            const hitcher = hiker.myhitchersfrom[hitcherindex].hitchername;
+                                            var hitcher = hiker.myhitchersfrom[hitcherindex].hitchername;
+                                            if (hiker.myhitchersfrom[hitcherindex].hitcherfullname) {
+                                                hitcher = hiker.myhitchersfrom[hitcherindex].hitcherfullname;
+                                            }
                                             hitchersfrom += hitcher + ", ";
                                         }
                                         var myfriends = "";
