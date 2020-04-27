@@ -3099,11 +3099,11 @@ app.patch("/api/calculaterides", function(req, res) {
                         if (err) {
                             handleError(res, err.message, "Failed to get hikers for the near hikes.");
                         } else if (hikers && hikers.length > 0){
+                            console.log("start calculation for " + hike.hikenamehebrew);
                             for (let hikerindex = 0; hikerindex < hikers.length; hikerindex++) {
 
                                 const hiker = hikers[hikerindex];
 
-                                console.log("start calculation ");
                                 promises.push(util.wait(100*timer)
                                 .then(() => ridesmodules.translateaddresstolocation(hiker.comesfromdetailed))
                                 .then(comesfromlocation => {
@@ -3134,6 +3134,11 @@ app.patch("/api/calculaterides", function(req, res) {
                                 console.log("calculaterides getDistanceMatrix");
                                 var distances = util.getDistanceMatrix(hikers);
                                 var areas = util.getHikerAreas(hikers);
+                                if (hike.startlatitude) {
+                                    var hikestartenddistance = util.distanceLatLons(
+                                        hike.startlatitude, hike.startlongitude, hike.endlatitude, hike.endlongitude);
+                                    hike.iscircular = hikestartenddistance < 500 ? true : false;
+                                }
 
                                 // for (var area in ["דרום", "צפון", "ירושלים", "חיפה", "מרכז"]) {
 
@@ -3264,7 +3269,11 @@ app.patch("/api/calculaterides", function(req, res) {
 
                                 for (let index = 0; index < hikers.length; index++) {
                                     const hiker = hikers[index];
-                                    
+                                    if (hiker.amidriver && 
+                                        (hiker.needaride == "אני צריך טרמפ (אבל יש לי רכב)" ||
+                                         hiker.needaride == "I need a ride but I do have a car")) {
+                                        
+                                    }
                                 }
 
                                 console.log("calculaterides carpool calculation result:");
@@ -3334,20 +3343,44 @@ app.patch("/api/calculaterides", function(req, res) {
                                     }
                                 }
 
-                                db.collection(HIKERS_COLLECTION).deleteMany({hikenamehebrew: { $regex : ".*"+hike.hikedate+".*" }},
-                                        function(err, result) {
-                                    if (err) {
-                                        handleError(res, err.message, "Failed to delete hikers of " + hike.hikedate);
-                                    } else {
-                                        db.collection(HIKERS_COLLECTION).insertMany(hikers, function(err, docs) {
-                                            if (err) {
-                                                handleError(res, err.message, "Failed to insert all hikers of " + hike.hikedate);
-                                            }
-                                            else {
-                                                register.sendForm("1EV8BBJfZGseTFzJo-EMcgZdPHzedRC8zTZyfyRw2LoQ", "" , "", "", res, null, null, null, "");
-                                            }
-                                        });
+                                var promises = [];
+                                for (let index = 0; index < hikers.length; index++) {
+                                    const hiker = hikers[index];
+                                    if (!hiker.amidriver && 
+                                        (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
+                                         hiker.needaride == "I come in bus, a motorcycle or other")) {
+                                        promises.push(
+                                            ridesmodules.calculateroute(
+                                                hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude,
+                                                hike.startlongitude, "publicTransport", hike.starttime, null)
+                                            .then(instructions => {
+                                                //hiker.instructionstothehike = instructions;
+                                                return ridesmodules.calculateroute(
+                                                    hike.endlatitude, hike.endlongitude, hiker.returnstolocation.lat, 
+                                                    hiker.returnstolocation.lon, "publicTransport", null, hike.endtime);
+                                            })
+                                            .then(instructions => {
+                                                //hiker.instructionsfromthehike = instructions;
+                                        }));
                                     }
+                                }
+
+                                Promise.all(promises).then(() => {
+                                    db.collection(HIKERS_COLLECTION).deleteMany({hikenamehebrew: { $regex : ".*"+hike.hikedate+".*" }},
+                                            function(err, result) {
+                                        if (err) {
+                                            handleError(res, err.message, "Failed to delete hikers of " + hike.hikedate);
+                                        } else {
+                                            db.collection(HIKERS_COLLECTION).insertMany(hikers, function(err, docs) {
+                                                if (err) {
+                                                    handleError(res, err.message, "Failed to insert all hikers of " + hike.hikedate);
+                                                }
+                                                else {
+                                                    register.sendForm("1EV8BBJfZGseTFzJo-EMcgZdPHzedRC8zTZyfyRw2LoQ", "" , "", "", res, null, null, null, "");
+                                                }
+                                            });
+                                        }
+                                    });
                                 });
                             })
                             .catch(rejection => {

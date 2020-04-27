@@ -977,12 +977,20 @@ function translateaddresstolocation(address) {
     });
 }
 
-function calculateroute(startlat,startlon,endlat,endlon,mode) { // mode = car | publicTransport
+function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) { // mode = car | publicTransport
     return new Promise((resolve, reject) => {
+        var arrivaldepartaddition = "";
+        if (arrivaltime) {
+            arrivaldepartaddition = "&arrival="+arrivaltime;
+        }
+        else if (departtime) {
+            arrivaldepartaddition = "&depart="+departtime;
+        }
         var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID+
-            "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon+"&mode=fastest%3B"+mode+"&combineChange=true";
-        console.log("calculatecarroute here (startlat,startlon) (endlat,endlon): mode " + mode + "(" + 
-            startlat+","+startlon+") ("+endlat+","+endlon + ")");
+            "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
+            "&combineChange=true&language=he" + arrivaldepartaddition;
+        console.log("calculatecarroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
+            " depart " + departtime + " mode " + mode);
         request({
             url: url,
             method: "GET",
