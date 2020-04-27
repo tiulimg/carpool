@@ -8,7 +8,7 @@ module.exports = {
     calculateroute: calculateroute,
 };
 
-const LOCATIONIQ_TOKEN = process.env.LOCATIONIQ_TOKEN;
+const HERE_APPID = process.env.HERE_APPID;
 const ALGOLIA_KEY = process.env.ALGOLIA_KEY;
 const ALGOLIA_APPID = process.env.ALGOLIA_APPID;
 
