@@ -288,62 +288,16 @@ function distanceLatLons(lat1,lon1,lat2,lon2) {
 function getDistanceMatrix(hikers) {
     var distances = {};
 
-    if (hikers.length > 0) {
-        distances[hikers[0].phone] = {
-            tothehike: [],
-            fromthehike: [],
-            link: hikers[0],
-        };
-    }
-
-    for (let index = 1; index < hikers.length; index++) {
+    for (let index = 0; index < hikers.length; index++) {
         const hiker = hikers[index];
-        if (hikers[0].phone == hiker.phone) {
-            continue;
-        }
-        else if (!hikers[0].amidriver && !hiker.amidriver) {
-            continue;
-        }
-
         distances[hiker.phone] = {
             tothehike: [],
             fromthehike: [],
             link: hiker,
         };
-
-        if (hikers[0].comesfromlocation && hiker.comesfromlocation) {
-            var distancetothehike = distanceLatLons(
-                hiker.comesfromlocation.lat, hiker.comesfromlocation.lon,
-                hikers[0].comesfromlocation.lat, hikers[0].comesfromlocation.lon);
-            distances[hikers[0].phone].tothehike.push({
-                phone: hiker.phone,
-                distance: distancetothehike,
-                link: hiker,
-            });
-            distances[hiker.phone].tothehike.push({
-                phone: hikers[0].phone,
-                distance: distancetothehike,
-                link: hikers[0],
-            });    
-        }
-        if (hikers[0].returnstolocation && hiker.returnstolocation) {
-            var distancefromthehike = distanceLatLons(
-                hiker.returnstolocation.lat, hiker.returnstolocation.lon,
-                hikers[0].returnstolocation.lat, hikers[0].returnstolocation.lon);
-            distances[hikers[0].phone].fromthehike.push({
-                phone: hiker.phone,
-                distance: distancefromthehike,
-                link: hiker,
-            });
-            distances[hiker.phone].fromthehike.push({
-                phone: hikers[0].phone,
-                distance: distancefromthehike,
-                link: hikers[0],
-            });    
-        }
     }
 
-    for (let index = 1; index < hikers.length; index++) {
+    for (let index = 0; index < hikers.length; index++) {
         const hiker = hikers[index];
         for (let indexpartner = index; indexpartner < hikers.length; indexpartner++) {
             const partner = hikers[indexpartner];
