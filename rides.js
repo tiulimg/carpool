@@ -978,7 +978,9 @@ function translateaddresstolocation(address) {
 }
 
 function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) { // mode = car | publicTransport
+    console.log("C");
     return new Promise((resolve, reject) => {
+        console.log("D");
         var arrivaldepartaddition = "";
         if (arrivaltime) {
             arrivaldepartaddition = "&arrival="+arrivaltime;

@@ -3351,12 +3351,10 @@ app.patch("/api/calculaterides", function(req, res) {
                                         (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                                          hiker.needaride == "I come in bus, a motorcycle or other")) {
                                         console.log("B");
-                                        promises.push((() => {
-                                            console.log("C");
+                                        promises.push(
                                             ridesmodules.calculateroute(
                                                 hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude,
-                                                hike.startlongitude, "publicTransport", hike.starttime, null);
-                                            })
+                                                hike.startlongitude, "publicTransport", hike.starttime, null)
                                             .then(instructions => {
                                                 //hiker.instructionstothehike = instructions;
                                                 return ridesmodules.calculateroute(
