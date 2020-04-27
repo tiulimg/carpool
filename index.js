@@ -3350,7 +3350,6 @@ app.patch("/api/calculaterides", function(req, res) {
                                     if (!hiker.amidriver && 
                                         (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                                          hiker.needaride == "I come in bus, a motorcycle or other")) {
-                                        console.log("B");
                                         promises.push(
                                             ridesmodules.calculateroute(
                                                 hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude,
@@ -3363,7 +3362,12 @@ app.patch("/api/calculaterides", function(req, res) {
                                             })
                                             .then(instructions => {
                                                 //hiker.instructionsfromthehike = instructions;
-                                        }));
+                                            })
+                                            .catch(rejection => {
+                                                console.log("something went wrong:");
+                                                console.dir(rejection.stack);
+                                            })
+                                        );
                                     }
                                 }
 

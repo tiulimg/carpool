@@ -978,9 +978,8 @@ function translateaddresstolocation(address) {
 }
 
 function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) { // mode = car | publicTransport
-    console.log("C");
     return new Promise((resolve, reject) => {
-        console.log("D");
+        console.log("B");
         var arrivaldepartaddition = "";
         if (arrivaltime) {
             arrivaldepartaddition = "&arrival="+arrivaltime;
@@ -988,9 +987,11 @@ function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departt
         else if (departtime) {
             arrivaldepartaddition = "&depart="+departtime;
         }
+        console.log("C");
         var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID+
             "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
             "&combineChange=true&language=he" + arrivaldepartaddition;
+        console.log("D url " + url);
         console.log("calculatecarroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
             " depart " + departtime + " mode " + mode);
         request({
