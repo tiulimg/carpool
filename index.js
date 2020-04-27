@@ -3145,7 +3145,9 @@ app.patch("/api/calculaterides", function(req, res) {
                                         " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
                                         " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
 
-                                    if (hiker.amidriver || hiker.seatsrequired == 0) {
+                                    if (hiker.amidriver || hiker.seatsrequired == 0 || 
+                                        hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
+                                        hiker.needaride == "I come in bus, a motorcycle or other") {
                                         continue;
                                     }
 
