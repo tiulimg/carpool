@@ -903,9 +903,14 @@ function translateaddresstolocation(address) {
                 var responsebodyjson = JSON.parse(response.body);
                 //console.log("translateaddresstolocation algolia responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
+                    if (responsebodyjson.hits[0].locale_names && responsebodyjson.hits[0].locale_names.default &&
+                        responsebodyjson.hits[0].locale_names.default[0]) {
+                        locationname = responsebodyjson.hits[0].locale_names.default[0];
+                    }
                     location = {
                         lat: responsebodyjson.hits[0]._geoloc.lat,
                         lon: responsebodyjson.hits[0]._geoloc.lng,
+                        locationname: locationname,
                     }
                     return resolve(location);
                 }
@@ -942,11 +947,17 @@ function translateaddresstolocation(address) {
                             else
                             {
                                 var responsebodyjson = JSON.parse(response.body);
-                                console.log("translateaddresstolocation algolia responsebodyjson " + JSON.stringify(responsebodyjson));
+                                //console.log("translateaddresstolocation algolia responsebodyjson " + JSON.stringify(responsebodyjson));
                                 if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
+                                    var locationname = null;
+                                    if (responsebodyjson.hits[0].locale_names && responsebodyjson.hits[0].locale_names.default &&
+                                        responsebodyjson.hits[0].locale_names.default[0]) {
+                                        locationname = responsebodyjson.hits[0].locale_names.default[0];
+                                    }
                                     location = {
                                         lat: responsebodyjson.hits[0]._geoloc.lat,
                                         lon: responsebodyjson.hits[0]._geoloc.lng,
+                                        locationname: locationname,
                                     }
                                     return resolve(location);
                                 }

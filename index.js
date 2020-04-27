@@ -3262,6 +3262,11 @@ app.patch("/api/calculaterides", function(req, res) {
                                     }
                                 }
 
+                                for (let index = 0; index < hikers.length; index++) {
+                                    const hiker = hikers[index];
+                                    
+                                }
+
                                 console.log("calculaterides carpool calculation result:");
                                 for (let index = 0; index < hikers.length; index++) {
                                     const hiker = hikers[index];
