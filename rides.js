@@ -1025,7 +1025,6 @@ function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departt
                             instruction: instruction,
                         });
                     }
-                    console.log("leg.length " + leg.length + " leg.travelTime " + leg.travelTime);
                     var route = {
                         length: leg.length,
                         traveltime: leg.travelTime,

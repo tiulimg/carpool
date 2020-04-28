@@ -3146,8 +3146,8 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 .then(route => {
                                                     hiker.routetothehike = route;
                                                 })
-                                                .catch(rejection => {
-                                                    console.log("something went wrong:");
+                                                .catch((rejection, promise) => {
+                                                    console.log(promise + " something went wrong:");
                                                     console.dir(rejection.stack);
                                                 })
                                             );                                                
@@ -3161,8 +3161,8 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 .then(route => {
                                                     hiker.routefromthehike = route;
                                                 })
-                                                .catch(rejection => {
-                                                    console.log("something went wrong:");
+                                                .catch((rejection, promise) => {
+                                                    console.log(promise + " something went wrong:");
                                                     console.dir(rejection.stack);
                                                 })
                                             );
@@ -3208,11 +3208,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 if (neardriver.amidriver && 
                                                     neardriver.availableplacestothehike >= hiker.seatsrequiredtothehike) {
                                                     if (!hiker.mydriverto) {
-                                                        console.log("AAA neardriver.availableplacestothehike " + 
-                                                            neardriver.availableplacestothehike);
                                                         neardriver.availableplacestothehike--;
-                                                        console.log("AAA neardriver.availableplacestothehike " + 
-                                                            neardriver.availableplacestothehike);
                                                         hiker.seatsrequiredtothehike--;
                                                         hiker.mydriverto = {
                                                             name: neardriver.name,
