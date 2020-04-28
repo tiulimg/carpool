@@ -979,7 +979,6 @@ function translateaddresstolocation(address) {
 
 function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) { // mode = car | publicTransport
     return new Promise((resolve, reject) => {
-        console.log("B");
         var arrivaldepartaddition = "";
         if (arrivaltime) {
             arrivaldepartaddition = "&arrival="+arrivaltime;
@@ -987,13 +986,12 @@ function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departt
         else if (departtime) {
             arrivaldepartaddition = "&depart="+departtime;
         }
-        console.log("C");
         var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID+
             "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
             "&combineChange=true&language=he" + arrivaldepartaddition;
-        console.log("D url " + url);
         console.log("calculatecarroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
             " depart " + departtime + " mode " + mode);
+        console.log("url " + url);
         request({
             url: url,
             method: "GET",
@@ -1005,12 +1003,36 @@ function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departt
             }
             else
             {
-                //console.log("translateaddresstolocation locationiq response " + JSON.stringify(response));
                 var responsebodyjson = JSON.parse(response.body);
-                console.log("calculatecarroute here responsebodyjson " + JSON.stringify(responsebodyjson));
-                
-                //console.log("translateaddresstolocation locationiq location " + JSON.stringify(location));
-                return resolve(responsebodyjson.response);
+                //console.log("calculatecarroute here responsebodyjson " + JSON.stringify(responsebodyjson));
+                if (responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
+                    return reject("No route found");
+                }
+                else if (responsebodyjson.response && responsebodyjson.response.route && responsebodyjson.response.route[0] &&
+                    responsebodyjson.response.route[0].leg && responsebodyjson.response.route[0].leg[0])
+                {
+                    var leg = responsebodyjson.response.route[0].leg[0];
+                    var maneuver = [];
+                    for (let index = 0; index < leg.maneuver.length; index++) {
+                        const step = leg.maneuver[index];
+                        //var instruction = (new DOMParser).parseFromString(step.instruction,"text/html").documentElement.textContent;
+                        var instruction = step.instruction.replace(/<[^>]+>/g, '');
+                        console.log("instruction " + instruction);
+                        maneuver.push({
+                            position: step.position,
+                            length: step.length,
+                            traveltime: step.travelTime,
+                            instruction: instruction,
+                        });
+                    }
+                    var route = {
+                        length: leg.length,
+                        traveltime: leg.travelTime,
+                        maneuver: maneuver,
+                    };
+                    return resolve(route);
+                }
+                return reject("No route found");
             }
         });
     });

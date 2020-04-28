@@ -3354,14 +3354,14 @@ app.patch("/api/calculaterides", function(req, res) {
                                             ridesmodules.calculateroute(
                                                 hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude,
                                                 hike.startlongitude, "publicTransport", hike.starttime, null)
-                                            .then(instructions => {
-                                                //hiker.instructionstothehike = instructions;
+                                            .then(route => {
+                                                //hiker.routetothehike = route;
                                                 return ridesmodules.calculateroute(
                                                     hike.endlatitude, hike.endlongitude, hiker.returnstolocation.lat, 
                                                     hiker.returnstolocation.lon, "publicTransport", null, hike.endtime);
                                             })
-                                            .then(instructions => {
-                                                //hiker.instructionsfromthehike = instructions;
+                                            .then(route => {
+                                                //hiker.routefromthehike = route;
                                             })
                                             .catch(rejection => {
                                                 console.log("something went wrong:");
