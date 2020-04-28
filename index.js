@@ -3144,14 +3144,15 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude,
                                                     hike.startlongitude, "publicTransport", hike.starttime, null)
                                                 .then(route => {
-                                                    hiker.routetothehike = route;
+                                                    if (route) {
+                                                        hiker.routetothehike = route;
+                                                    }
                                                 })
                                                 .catch(rejection => {
                                                     console.log("something went wrong:");
                                                     console.dir(rejection.stack);
                                                 })
                                             );
-                                            console.log("CCC");
                                         }
                                         if (!hiker.mydriverfrom) {
                                             console.log("publicTransport from the hike for hiker " + hiker.fullname);
@@ -3160,17 +3161,17 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hike.endlatitude, hike.endlongitude, hiker.returnstolocation.lat, 
                                                     hiker.returnstolocation.lon, "publicTransport", null, hike.endtime)
                                                 .then(route => {
-                                                    hiker.routefromthehike = route;
+                                                    if (route) {
+                                                        hiker.routefromthehike = route;
+                                                    }
                                                 })
                                                 .catch(rejection => {
                                                     console.log("something went wrong:");
                                                     console.dir(rejection.stack);
                                                 })
                                             );
-                                            console.log("DDD");
                                         }
                                     }
-                                    console.log("EEE");
                                 }
                                 Promise.all(promises).then(() => {
                                     console.log("calculaterides getDistanceMatrix");
