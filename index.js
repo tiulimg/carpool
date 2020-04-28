@@ -3144,12 +3144,10 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude,
                                                     hike.startlongitude, "publicTransport", hike.starttime, null)
                                                 .then(route => {
-                                                    if (route) {
-                                                        hiker.routetothehike = route;
-                                                    }
+                                                    hiker.routetothehike = route;
                                                 })
                                                 .catch(rejection => {
-                                                    console.log("something went wrong:");
+                                                    console.log("something went wrong:"  + rejection);
                                                     console.dir(rejection.stack);
                                                 })
                                             );
@@ -3161,12 +3159,10 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hike.endlatitude, hike.endlongitude, hiker.returnstolocation.lat, 
                                                     hiker.returnstolocation.lon, "publicTransport", null, hike.endtime)
                                                 .then(route => {
-                                                    if (route) {
-                                                        hiker.routefromthehike = route;
-                                                    }
+                                                    hiker.routefromthehike = route;
                                                 })
                                                 .catch(rejection => {
-                                                    console.log("something went wrong:");
+                                                    console.log("something went wrong: " + rejection);
                                                     console.dir(rejection.stack);
                                                 })
                                             );
