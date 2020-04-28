@@ -1005,8 +1005,10 @@ function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departt
             {
                 var responsebodyjson = JSON.parse(response.body);
                 console.log("responsebodyjson " + JSON.stringify(responsebodyjson));
+                console.log("responsebodyjson.subtype " + responsebodyjson.subtype);
                 //console.log("calculatecarroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
+                    console.log("AAA");
                     return reject("No route found");
                 }
                 else if (responsebodyjson.response && responsebodyjson.response.route && responsebodyjson.response.route[0] &&
@@ -1016,7 +1018,6 @@ function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departt
                     var maneuver = [];
                     for (let index = 0; index < leg.maneuver.length; index++) {
                         const step = leg.maneuver[index];
-                        //var instruction = (new DOMParser).parseFromString(step.instruction,"text/html").documentElement.textContent;
                         var instruction = step.instruction.replace(/<[^>]+>/g, '');
                         console.log("instruction " + instruction);
                         maneuver.push({
@@ -1034,6 +1035,7 @@ function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departt
                     return resolve(route);
                 }
                 else {
+                    console.log("BBB");
                     return reject("No route found");
                 }
             }

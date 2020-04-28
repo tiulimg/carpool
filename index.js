@@ -3134,7 +3134,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                 var promises = [];
                                 for (let index = 0; index < hikers.length; index++) {
                                     const hiker = hikers[index];
-                                    if (!hiker.amidriver && 
+                                    if (!hiker.amidriver && hike.startlatitude && hike.endlatitude &&
                                         (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                                          hiker.needaride == "I come in bus, a motorcycle or other")) {
                                         if (!hiker.mydriverto) {
@@ -3144,15 +3144,14 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude,
                                                     hike.startlongitude, "publicTransport", hike.starttime, null)
                                                 .then(route => {
-                                                    console.log("AAA:");
                                                     hiker.routetothehike = route;
-                                                    console.log("BBB:");
                                                 })
                                                 .catch(rejection => {
                                                     console.log("something went wrong:");
                                                     console.dir(rejection.stack);
                                                 })
-                                            );                                                
+                                            );
+                                            console.log("CCC");
                                         }
                                         if (!hiker.mydriverfrom) {
                                             console.log("publicTransport from the hike for hiker " + hiker.fullname);
@@ -3161,17 +3160,17 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hike.endlatitude, hike.endlongitude, hiker.returnstolocation.lat, 
                                                     hiker.returnstolocation.lon, "publicTransport", null, hike.endtime)
                                                 .then(route => {
-                                                    console.log("CCC:");
                                                     hiker.routefromthehike = route;
-                                                    console.log("DDD:");
                                                 })
                                                 .catch(rejection => {
                                                     console.log("something went wrong:");
                                                     console.dir(rejection.stack);
                                                 })
                                             );
+                                            console.log("DDD");
                                         }
                                     }
+                                    console.log("EEE");
                                 }
                                 Promise.all(promises).then(() => {
                                     console.log("calculaterides getDistanceMatrix");
@@ -3197,7 +3196,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                             continue;
                                         }
 
-                                        if (!hiker.routetothehike) {
+                                        if (!hiker.routetothehike && hike.startlatitude) {
                                             for (let neardriverindex = 0; neardriverindex < distances[hiker.phone].tothehike.length; 
                                                  neardriverindex++) {
                                                 const neardriverdistanceto = distances[hiker.phone].tothehike[neardriverindex];
@@ -3257,7 +3256,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                             }
                                         }
 
-                                        if (!hiker.routefromthehike) {
+                                        if (!hiker.routefromthehike && hike.startlatitude) {
                                             for (let neardriverindex = 0; neardriverindex < distances[hiker.phone].fromthehike.length; 
                                                  neardriverindex++) {
                                                 const neardriverdistancefrom = distances[hiker.phone].fromthehike[neardriverindex];
