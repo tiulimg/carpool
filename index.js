@@ -3208,7 +3208,11 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 if (neardriver.amidriver && 
                                                     neardriver.availableplacestothehike >= hiker.seatsrequiredtothehike) {
                                                     if (!hiker.mydriverto) {
+                                                        console.log("AAA neardriver.availableplacestothehike " + 
+                                                            neardriver.availableplacestothehike);
                                                         neardriver.availableplacestothehike--;
+                                                        console.log("AAA neardriver.availableplacestothehike " + 
+                                                            neardriver.availableplacestothehike);
                                                         hiker.seatsrequiredtothehike--;
                                                         hiker.mydriverto = {
                                                             name: neardriver.name,
