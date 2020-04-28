@@ -3143,13 +3143,13 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude,
                                                 hike.startlongitude, "publicTransport", hike.starttime, null)
                                             .then(route => {
-                                                //hiker.routetothehike = route;
+                                                hiker.routetothehike = route;
                                                 return ridesmodules.calculateroute(
                                                     hike.endlatitude, hike.endlongitude, hiker.returnstolocation.lat, 
                                                     hiker.returnstolocation.lon, "publicTransport", null, hike.endtime);
                                             })
                                             .then(route => {
-                                                //hiker.routefromthehike = route;
+                                                hiker.routefromthehike = route;
                                             })
                                             .catch(rejection => {
                                                 console.log("something went wrong:");
