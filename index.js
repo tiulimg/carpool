@@ -3257,7 +3257,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                             }
                                         }
 
-                                        if (hiker.routefromthehike) {
+                                        if (!hiker.routefromthehike) {
                                             for (let neardriverindex = 0; neardriverindex < distances[hiker.phone].fromthehike.length; 
                                                  neardriverindex++) {
                                                 const neardriverdistancefrom = distances[hiker.phone].fromthehike[neardriverindex];
