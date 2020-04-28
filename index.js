@@ -3144,10 +3144,12 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude,
                                                     hike.startlongitude, "publicTransport", hike.starttime, null)
                                                 .then(route => {
+                                                    console.log("AAA:");
                                                     hiker.routetothehike = route;
+                                                    console.log("BBB:");
                                                 })
-                                                .catch((rejection, promise) => {
-                                                    console.log(promise + " something went wrong:");
+                                                .catch(rejection => {
+                                                    console.log("something went wrong:");
                                                     console.dir(rejection.stack);
                                                 })
                                             );                                                
@@ -3159,10 +3161,12 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hike.endlatitude, hike.endlongitude, hiker.returnstolocation.lat, 
                                                     hiker.returnstolocation.lon, "publicTransport", null, hike.endtime)
                                                 .then(route => {
+                                                    console.log("CCC:");
                                                     hiker.routefromthehike = route;
+                                                    console.log("DDD:");
                                                 })
-                                                .catch((rejection, promise) => {
-                                                    console.log(promise + " something went wrong:");
+                                                .catch(rejection => {
+                                                    console.log("something went wrong:");
                                                     console.dir(rejection.stack);
                                                 })
                                             );

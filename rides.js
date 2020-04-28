@@ -1030,9 +1030,12 @@ function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departt
                         traveltime: leg.travelTime,
                         maneuver: maneuver,
                     };
+                    console.log("maneuver " + JSON.stringify(maneuver));
                     return resolve(route);
                 }
-                return reject("No route found");
+                else {
+                    return reject("No route found");
+                }
             }
         });
     });
