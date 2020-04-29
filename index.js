@@ -6,6 +6,7 @@ var moment = require("moment");
 var fs = require('fs');
 
 // Custom modules
+var dbservices = require("./dbservices");
 var replies = require("./replies");
 var register = require("./register_to_hikes");
 var ridesmodules = require("./rides");
@@ -2935,13 +2936,23 @@ app.get("/api/ironnumber", function(req, res) {
     }
     else
     {
-        db.collection(IRONNUMBERS_COLLECTION).find({}).toArray(function(err, docs) {
-            if (err) {
-                handleError(res, err.message, "Failed to get iron numbers.");
-            } else {
-                res.status(200).json(docs);
+        dbservices.getironnumbers()
+        .then(ironnumbers => {
+            res.status(200).json(ironnumbers);
+        })
+        .catch(rejection => {
+            console.log("something went wrong: "  + rejection);
+            if (rejection.stack) {
+                console.dir(rejection.stack);
             }
         });
+        // db.collection(IRONNUMBERS_COLLECTION).find({}).toArray(function(err, docs) {
+        //     if (err) {
+        //         handleError(res, err.message, "Failed to get iron numbers.");
+        //     } else {
+        //         res.status(200).json(docs);
+        //     }
+        // });
     }
 });
 
