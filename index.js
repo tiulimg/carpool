@@ -18,6 +18,7 @@ var HIKERS_COLLECTION = "hikers";
 var HIKE_COLLECTION = "hike";
 var LAST_REGISTER_COLLECTION = "last_register";
 var IRONNUMBERS_COLLECTION = "ironnumbers";
+var ROUTES_COLLECTION = "routes";
 
 var app = express();
 // Serve static files from the React app
@@ -3054,6 +3055,48 @@ app.post("/api/ironnumber", function(req, res) {
         }
     }
 });
+
+/*  "/api/findhikerslocation"
+*    PATCH: queries for lat lon locations for hikers comesfromdetailed and returnstodetailed
+*/
+app.patch("/api/findhikerslocation", function(req, res) {
+    if (!req.query.pwd || !req.query.specialpwd) {
+        handleError(res, "Unauthorized", "Password and special password are required.", 400);
+    }
+    else if (req.query.pwd != process.env.PSWD || req.query.specialpwd != process.env.SPECIALPWD) {
+        handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
+    }
+    else
+    {
+        db.collection(HIKERS_COLLECTION).find({}).toArray(function(err, hikers) {
+            if (err) {
+                handleError(res, err.message, "Failed to get hikers.");
+            } else {
+                ridesmodules.findhikerslocation(hikers)
+                .then(hikers => {
+                    db.collection(HIKERS_COLLECTION).deleteMany({},
+                            function(err, result) {
+                        if (err) {
+                            handleError(res, err.message, "Failed to delete hikers");
+                        } else {
+                            db.collection(HIKERS_COLLECTION).insertMany(hikers, function(err, docs) {
+                                if (err) {
+                                    handleError(res, err.message, "Failed to insert all hikers");
+                                }
+                                else {
+                                    register.sendForm("1EV8BBJfZGseTFzJo-EMcgZdPHzedRC8zTZyfyRw2LoQ", 
+                                        "" , "", "", res, null, null, null, "");
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        });
+        res.status(200).json("Working...");
+    }
+});
+
   
 /*  "/api/calculaterides"
 *    GET: shows the output of ride calculation if exists
@@ -3089,9 +3132,6 @@ app.patch("/api/calculaterides", function(req, res) {
             } else {
                 var nearhikes = util.get_near_hikes(hikes);
 
-                var timer = 0;
-                var promises = [];
-
                 for (let hikeindex = 0; hikeindex < nearhikes.length; hikeindex++) {
                     const hike = nearhikes[hikeindex];
                     db.collection(HIKERS_COLLECTION).find(
@@ -3100,44 +3140,15 @@ app.patch("/api/calculaterides", function(req, res) {
                             handleError(res, err.message, "Failed to get hikers for the near hikes.");
                         } else if (hikers && hikers.length > 0){
                             console.log("start calculation for " + hike.hikenamehebrew);
-                            for (let hikerindex = 0; hikerindex < hikers.length; hikerindex++) {
-
-                                const hiker = hikers[hikerindex];
-
-                                promises.push(util.wait(100*timer)
-                                .then(() => ridesmodules.translateaddresstolocation(hiker.comesfromdetailed))
-                                .then(comesfromlocation => {
-                                    
-                                    console.log("comesfromlocation " + JSON.stringify(comesfromlocation) + " link " +
-                                        "https://www.google.com/maps?z=12&t=m&q="+
-                                        comesfromlocation.lat+","+comesfromlocation.lon);
-                                    hiker.comesfromlocation = comesfromlocation;
-                                    return util.wait(100*timer);
-                                })
-                                .then(() => {
-                                    return ridesmodules.translateaddresstolocation(hiker.returnstodetailed);
-                                })
-                                .then(returnstolocation => {
-                                    hiker.returnstolocation = returnstolocation;
-                                    console.log("returnstolocation " + JSON.stringify(returnstolocation) + " link " +
-                                    "https://www.google.com/maps?z=12&t=m&q="+
-                                    returnstolocation.lat+","+returnstolocation.lon);
-                                })
-                                .catch(rejection => {
-                                    console.log("translateaddresstolocation something went wrong:");
-                                    console.dir(rejection.stack);    
-                                }));
-                                timer++;
-                            }
-
-                            Promise.all(promises).then(() => {
+                            ridesmodules.findhikerslocation(hikers)
+                            .then(() => {
                                 var promises = [];
                                 for (let index = 0; index < hikers.length; index++) {
                                     const hiker = hikers[index];
                                     if (!hiker.amidriver && hike.startlatitude && hike.endlatitude &&
                                         (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                                          hiker.needaride == "I come in bus, a motorcycle or other")) {
-                                        if (!hiker.mydriverto) {
+                                        if (!hiker.mydriverto && !hiker.routetothehike) {
                                             console.log("publicTransport to the hike for hiker " + hiker.fullname);
                                             promises.push(
                                                 ridesmodules.calculateroute(
@@ -3147,12 +3158,14 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hiker.routetothehike = route;
                                                 })
                                                 .catch(rejection => {
-                                                    console.log("something went wrong:"  + rejection);
-                                                    console.dir(rejection.stack);
+                                                    console.log("something went wrong: "  + rejection);
+                                                    if (rejection.stack) {
+                                                        console.dir(rejection.stack);
+                                                    }
                                                 })
                                             );
                                         }
-                                        if (!hiker.mydriverfrom) {
+                                        if (!hiker.mydriverfrom && !hiker.routefromthehike) {
                                             console.log("publicTransport from the hike for hiker " + hiker.fullname);
                                             promises.push(
                                                 ridesmodules.calculateroute(
@@ -3162,187 +3175,219 @@ app.patch("/api/calculaterides", function(req, res) {
                                                     hiker.routefromthehike = route;
                                                 })
                                                 .catch(rejection => {
-                                                    console.log("something went wrong: " + rejection);
-                                                    console.dir(rejection.stack);
+                                                    console.log("something went wrong: "  + rejection);
+                                                    if (rejection.stack) {
+                                                        console.dir(rejection.stack);
+                                                    }
                                                 })
                                             );
                                         }
                                     }
                                 }
                                 Promise.all(promises).then(() => {
-                                    console.log("calculaterides getDistanceMatrix");
-                                    var distances = util.getDistanceMatrix(hikers);
-                                    var areas = util.getHikerAreas(hikers);
-                                    if (hike.startlatitude) {
-                                        var hikestartenddistance = util.distanceLatLons(
-                                            hike.startlatitude, hike.startlongitude, hike.endlatitude, hike.endlongitude);
-                                        hike.iscircular = hikestartenddistance < 500 ? true : false;
+                                })
+                            })
+                            .then(() => {
+                                console.log("calculaterides getDistanceMatrix");
+                                var distances = util.getDistanceMatrix(hikers);
+                                var areas = util.getHikerAreas(hikers);
+                                if (hike.startlatitude) {
+                                    var hikestartenddistance = util.distanceLatLons(
+                                        hike.startlatitude, hike.startlongitude, hike.endlatitude, hike.endlongitude);
+                                    hike.iscircular = hikestartenddistance < 500 ? true : false;
+                                }
+
+                                // for (var area in ["דרום", "צפון", "ירושלים", "חיפה", "מרכז"]) {
+
+                                // }
+
+                                for (let index = 0; index < hikers.length; index++) {
+                                    const hiker = hikers[index];
+                                    console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
+                                        " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
+                                        " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
+
+                                    if (hiker.amidriver || hiker.seatsrequired == 0) {
+                                        continue;
                                     }
 
-                                    // for (var area in ["דרום", "צפון", "ירושלים", "חיפה", "מרכז"]) {
+                                    if (!hiker.routetothehike && hike.startlatitude) {
+                                        for (let neardriverindex = 0; neardriverindex < distances[hiker.phone].tothehike.length; 
+                                                neardriverindex++) {
+                                            const neardriverdistanceto = distances[hiker.phone].tothehike[neardriverindex];
+                                            var neardriver = neardriverdistanceto.link;
+                                            console.log("calculaterides driver to the hike: distance " + 
+                                                neardriverdistanceto.distance + 
+                                                " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
+                                                neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
+                                                " neardriver.availableplacestothehike " + neardriver.availableplacestothehike + 
+                                                " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
+                                                neardriver.returnstodetailed);
+                                            if (neardriver.amidriver && 
+                                                neardriver.availableplacestothehike >= hiker.seatsrequiredtothehike) {
+                                                if (!hiker.mydriverto) {
+                                                    neardriver.availableplacestothehike--;
+                                                    hiker.seatsrequiredtothehike--;
+                                                    hiker.mydriverto = {
+                                                        name: neardriver.name,
+                                                        fullname: neardriver.fullname,
+                                                        phone: neardriver.phone,
+                                                        drivercomesfrom: neardriver.comesfrom,
+                                                        driverreturnsto: neardriver.returnsto,
+                                                    };
+                                                    neardriver.myhitchersto.push({
+                                                        "hitchername": hiker.name,
+                                                        "hitcherfullname": hiker.fullname,
+                                                        "hitcherphone": hiker.phone,
+                                                        "hitchercomesfrom": hiker.comesfrom,
+                                                        "hitcherreturnsto": hiker.returnsto,
+                                                    });
 
-                                    // }
-
-                                    for (let index = 0; index < hikers.length; index++) {
-                                        const hiker = hikers[index];
-                                        console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
-                                            " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
-                                            " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
-
-                                        if (hiker.amidriver || hiker.seatsrequired == 0) {
-                                            continue;
-                                        }
-
-                                        if (!hiker.routetothehike && hike.startlatitude) {
-                                            for (let neardriverindex = 0; neardriverindex < distances[hiker.phone].tothehike.length; 
-                                                 neardriverindex++) {
-                                                const neardriverdistanceto = distances[hiker.phone].tothehike[neardriverindex];
-                                                var neardriver = neardriverdistanceto.link;
-                                                console.log("calculaterides driver to the hike: distance " + 
-                                                    neardriverdistanceto.distance + 
-                                                    " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
-                                                    neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
-                                                    " neardriver.availableplacestothehike " + neardriver.availableplacestothehike + 
-                                                    " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
-                                                    neardriver.returnstodetailed);
-                                                if (neardriver.amidriver && 
-                                                    neardriver.availableplacestothehike >= hiker.seatsrequiredtothehike) {
-                                                    if (!hiker.mydriverto) {
+                                                    hiker.myfriendsdriversto = [];
+                                                    for (let hitchhikerfriendindex = 0; 
+                                                        hiker.myfriends != null && hitchhikerfriendindex < hiker.myfriends.length; 
+                                                        hitchhikerfriendindex++) {
+                                                        const hitchhikerfriend = hiker.myfriends[hitchhikerfriendindex];
+                                                        hiker.myfriendsdriversto.push({
+                                                            "hitchername": hitchhikerfriend,
+                                                            "drivername": neardriver.name,
+                                                            "driverfullname": neardriver.fullname,
+                                                            "driverphone": neardriver.phone,
+                                                            "drivercomesfrom": neardriver.comesfrom,
+                                                            "driverreturnsto": neardriver.returnsto,
+                                                        });
+                                                        neardriver.myhitchersto.push({
+                                                            "hitchername": hitchhikerfriend,
+                                                            "hitcherphone": hiker.phone,
+                                                            "hitchercomesfrom": hiker.comesfrom,
+                                                            "hitcherreturnsto": hiker.returnsto,
+                                                        });
                                                         neardriver.availableplacestothehike--;
                                                         hiker.seatsrequiredtothehike--;
-                                                        hiker.mydriverto = {
-                                                            name: neardriver.name,
-                                                            fullname: neardriver.fullname,
-                                                            phone: neardriver.phone,
-                                                            drivercomesfrom: neardriver.comesfrom,
-                                                            driverreturnsto: neardriver.returnsto,
-                                                        };
-                                                        neardriver.myhitchersto.push({
-                                                            "hitchername": hiker.name,
-                                                            "hitcherfullname": hiker.fullname,
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    if (!hiker.routefromthehike && hike.startlatitude) {
+                                        for (let neardriverindex = 0; neardriverindex < distances[hiker.phone].fromthehike.length; 
+                                                neardriverindex++) {
+                                            const neardriverdistancefrom = distances[hiker.phone].fromthehike[neardriverindex];
+                                            var neardriver = neardriverdistancefrom.link;
+                                            console.log("calculaterides driver from the hike: distance " + 
+                                                neardriverdistancefrom.distance + " name " + neardriver.fullname + " isdriver " + 
+                                                neardriver.amidriver + " seats " + neardriver.seatsrequired + " availableplaces " + 
+                                                neardriver.availableplaces + " neardriver.availableplacesfromthehike " + 
+                                                neardriver.availableplacesfromthehike + " comesfrom " + 
+                                                neardriver.comesfromdetailed + " returnsto " + neardriver.returnstodetailed);
+                                            if (neardriver.amidriver && 
+                                                neardriver.availableplacesfromthehike >= hiker.seatsrequiredfromthehike) {
+                                                if (!hiker.mydriverfrom) {
+                                                    neardriver.availableplacesfromthehike--;
+                                                    hiker.seatsrequiredfromthehike--;
+                                                    hiker.mydriverfrom = {
+                                                        name: neardriver.name,
+                                                        fullname: neardriver.fullname,
+                                                        phone: neardriver.phone,
+                                                        drivercomesfrom: neardriver.comesfrom,
+                                                        driverreturnsto: neardriver.returnsto,
+                                                    };
+                                                    neardriver.myhitchersfrom.push({
+                                                        "hitchername": hiker.name,
+                                                        "hitcherfullname": hiker.fullname,
+                                                        "hitcherphone": hiker.phone,
+                                                        "hitchercomesfrom": hiker.comesfrom,
+                                                        "hitcherreturnsto": hiker.returnsto,
+                                                    });
+
+                                                    hiker.myfriendsdriversfrom = [];
+                                                    for (let hitchhikerfriendindex = 0; 
+                                                        hiker.myfriends != null && hitchhikerfriendindex < hiker.myfriends.length; 
+                                                        hitchhikerfriendindex++) {
+                                                        const hitchhikerfriend = hiker.myfriends[hitchhikerfriendindex];
+                                                        hiker.myfriendsdriversfrom.push({
+                                                            "hitchername": hitchhikerfriend,
+                                                            "drivername": neardriver.name,
+                                                            "driverfullname": neardriver.fullname,
+                                                            "driverphone": neardriver.phone,
+                                                            "drivercomesfrom": neardriver.comesfrom,
+                                                            "driverreturnsto": neardriver.returnsto,
+                                                        });
+                                                        neardriver.myhitchersfrom.push({
+                                                            "hitchername": hitchhikerfriend,
                                                             "hitcherphone": hiker.phone,
                                                             "hitchercomesfrom": hiker.comesfrom,
                                                             "hitcherreturnsto": hiker.returnsto,
                                                         });
-
-                                                        hiker.myfriendsdriversto = [];
-                                                        for (let hitchhikerfriendindex = 0; 
-                                                            hiker.myfriends != null && hitchhikerfriendindex < hiker.myfriends.length; 
-                                                            hitchhikerfriendindex++) {
-                                                            const hitchhikerfriend = hiker.myfriends[hitchhikerfriendindex];
-                                                            hiker.myfriendsdriversto.push({
-                                                                "hitchername": hitchhikerfriend,
-                                                                "drivername": neardriver.name,
-                                                                "driverfullname": neardriver.fullname,
-                                                                "driverphone": neardriver.phone,
-                                                                "drivercomesfrom": neardriver.comesfrom,
-                                                                "driverreturnsto": neardriver.returnsto,
-                                                            });
-                                                            neardriver.myhitchersto.push({
-                                                                "hitchername": hitchhikerfriend,
-                                                                "hitcherphone": hiker.phone,
-                                                                "hitchercomesfrom": hiker.comesfrom,
-                                                                "hitcherreturnsto": hiker.returnsto,
-                                                            });
-                                                            neardriver.availableplacestothehike--;
-                                                            hiker.seatsrequiredtothehike--;
-                                                        }
-                                                    }
-                                                    break;
-                                                }
-                                            }
-                                        }
-
-                                        if (!hiker.routefromthehike && hike.startlatitude) {
-                                            for (let neardriverindex = 0; neardriverindex < distances[hiker.phone].fromthehike.length; 
-                                                 neardriverindex++) {
-                                                const neardriverdistancefrom = distances[hiker.phone].fromthehike[neardriverindex];
-                                                var neardriver = neardriverdistancefrom.link;
-                                                console.log("calculaterides driver from the hike: distance " + 
-                                                    neardriverdistancefrom.distance + " name " + neardriver.fullname + " isdriver " + 
-                                                    neardriver.amidriver + " seats " + neardriver.seatsrequired + " availableplaces " + 
-                                                    neardriver.availableplaces + " neardriver.availableplacesfromthehike " + 
-                                                    neardriver.availableplacesfromthehike + " comesfrom " + 
-                                                    neardriver.comesfromdetailed + " returnsto " + neardriver.returnstodetailed);
-                                                if (neardriver.amidriver && 
-                                                    neardriver.availableplacesfromthehike >= hiker.seatsrequiredfromthehike) {
-                                                    if (!hiker.mydriverfrom) {
                                                         neardriver.availableplacesfromthehike--;
                                                         hiker.seatsrequiredfromthehike--;
-                                                        hiker.mydriverfrom = {
-                                                            name: neardriver.name,
-                                                            fullname: neardriver.fullname,
-                                                            phone: neardriver.phone,
-                                                            drivercomesfrom: neardriver.comesfrom,
-                                                            driverreturnsto: neardriver.returnsto,
-                                                        };
-                                                        neardriver.myhitchersfrom.push({
-                                                            "hitchername": hiker.name,
-                                                            "hitcherfullname": hiker.fullname,
-                                                            "hitcherphone": hiker.phone,
-                                                            "hitchercomesfrom": hiker.comesfrom,
-                                                            "hitcherreturnsto": hiker.returnsto,
-                                                        });
-
-                                                        hiker.myfriendsdriversfrom = [];
-                                                        for (let hitchhikerfriendindex = 0; 
-                                                            hiker.myfriends != null && hitchhikerfriendindex < hiker.myfriends.length; 
-                                                            hitchhikerfriendindex++) {
-                                                            const hitchhikerfriend = hiker.myfriends[hitchhikerfriendindex];
-                                                            hiker.myfriendsdriversfrom.push({
-                                                                "hitchername": hitchhikerfriend,
-                                                                "drivername": neardriver.name,
-                                                                "driverfullname": neardriver.fullname,
-                                                                "driverphone": neardriver.phone,
-                                                                "drivercomesfrom": neardriver.comesfrom,
-                                                                "driverreturnsto": neardriver.returnsto,
-                                                            });
-                                                            neardriver.myhitchersfrom.push({
-                                                                "hitchername": hitchhikerfriend,
-                                                                "hitcherphone": hiker.phone,
-                                                                "hitchercomesfrom": hiker.comesfrom,
-                                                                "hitcherreturnsto": hiker.returnsto,
-                                                            });
-                                                            neardriver.availableplacesfromthehike--;
-                                                            hiker.seatsrequiredfromthehike--;
-                                                        }
                                                     }
-                                                    break;
                                                 }
+                                                break;
                                             }
                                         }
                                     }
+                                }
 
-                                    for (let index = 0; index < hikers.length; index++) {
-                                        const hiker = hikers[index];
-                                        if (hiker.amidriver && 
-                                            (hiker.needaride == "אני צריך טרמפ (אבל יש לי רכב)" ||
-                                            hiker.needaride == "I need a ride but I do have a car")) {
-                                            
-                                        }
+                                for (let index = 0; index < hikers.length; index++) {
+                                    const hiker = hikers[index];
+                                    if (hiker.amidriver && 
+                                        (hiker.needaride == "אני צריך טרמפ (אבל יש לי רכב)" ||
+                                        hiker.needaride == "I need a ride but I do have a car")) {
+                                        
                                     }
+                                }
 
-                                    console.log("calculaterides carpool calculation result:");
-                                    for (let index = 0; index < hikers.length; index++) {
-                                        const hiker = hikers[index];
-                                        if (hiker.amidriver) {
-                                            var hitchersto = "";
-                                            var hitchersfrom = "";
-                                            for (let hitcherindex = 0; hiker.myhitchersto && hitcherindex < hiker.myhitchersto.length; 
-                                                hitcherindex++) {
-                                                var hitcher = hiker.myhitchersto[hitcherindex].hitchername;
-                                                if (hiker.myhitchersto[hitcherindex].hitcherfullname) {
-                                                    hitcher = hiker.myhitchersto[hitcherindex].hitcherfullname;
-                                                }
-                                                hitchersto += hitcher + ", ";
+                                console.log("calculaterides carpool calculation result:");
+                                for (let index = 0; index < hikers.length; index++) {
+                                    const hiker = hikers[index];
+                                    if (hiker.amidriver) {
+                                        var hitchersto = "";
+                                        var hitchersfrom = "";
+                                        for (let hitcherindex = 0; hiker.myhitchersto && hitcherindex < hiker.myhitchersto.length; 
+                                            hitcherindex++) {
+                                            var hitcher = hiker.myhitchersto[hitcherindex].hitchername;
+                                            if (hiker.myhitchersto[hitcherindex].hitcherfullname) {
+                                                hitcher = hiker.myhitchersto[hitcherindex].hitcherfullname;
                                             }
-                                            for (let hitcherindex = 0; hiker.myhitchersfrom && hitcherindex < hiker.myhitchersfrom.length; 
-                                                hitcherindex++) {
-                                                var hitcher = hiker.myhitchersfrom[hitcherindex].hitchername;
-                                                if (hiker.myhitchersfrom[hitcherindex].hitcherfullname) {
-                                                    hitcher = hiker.myhitchersfrom[hitcherindex].hitcherfullname;
-                                                }
-                                                hitchersfrom += hitcher + ", ";
+                                            hitchersto += hitcher + ", ";
+                                        }
+                                        for (let hitcherindex = 0; hiker.myhitchersfrom && hitcherindex < hiker.myhitchersfrom.length; 
+                                            hitcherindex++) {
+                                            var hitcher = hiker.myhitchersfrom[hitcherindex].hitchername;
+                                            if (hiker.myhitchersfrom[hitcherindex].hitcherfullname) {
+                                                hitcher = hiker.myhitchersfrom[hitcherindex].hitcherfullname;
+                                            }
+                                            hitchersfrom += hitcher + ", ";
+                                        }
+                                        var myfriends = "";
+                                        for (let friendindex = 0; hiker.myfriends && friendindex < hiker.myfriends.length; 
+                                            friendindex++) {
+                                            const friend = hiker.myfriends[friendindex];
+                                            myfriends +=  ", " + friend;
+                                        }
+                                        console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
+                                            " to the hike: takes " + hitchersto);                                        
+                                        console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
+                                            " from the hike: takes " + hitchersfrom);                                        
+                                    }
+                                    else {
+                                        if (hiker.mydriverto && hiker.mydriverfrom) {
+                                            var friendsdriversto = "";
+                                            var friendsdriversfrom = "";
+                                            for (let driverindex = 0; 
+                                                hiker.myfriendsdriversto && driverindex < hiker.myfriendsdriversto.length; 
+                                                driverindex++) {
+                                                const driver = hiker.myfriendsdriversto[driverindex].driverfullname;
+                                                friendsdriversto += ", " + driver;
+                                            }
+                                            for (let driverindex = 0; 
+                                                hiker.myfriendsdriversfrom && driverindex < hiker.myfriendsdriversfrom.length; 
+                                                driverindex++) {
+                                                const driver = hiker.myfriendsdriversfrom[driverindex].driverfullname;
+                                                friendsdriversfrom += ", " + driver;
                                             }
                                             var myfriends = "";
                                             for (let friendindex = 0; hiker.myfriends && friendindex < hiker.myfriends.length; 
@@ -3350,66 +3395,40 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 const friend = hiker.myfriends[friendindex];
                                                 myfriends +=  ", " + friend;
                                             }
-                                            console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
-                                                " to the hike: takes " + hitchersto);                                        
-                                            console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
-                                                " from the hike: takes " + hitchersfrom);                                        
+                                            console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
+                                                " to the hike: joins " + hiker.mydriverto.fullname + friendsdriversto);
+                                            console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
+                                                " from the hike: joins " + hiker.mydriverfrom.fullname + friendsdriversfrom);
                                         }
-                                        else {
-                                            if (hiker.mydriverto && hiker.mydriverfrom) {
-                                                var friendsdriversto = "";
-                                                var friendsdriversfrom = "";
-                                                for (let driverindex = 0; 
-                                                    hiker.myfriendsdriversto && driverindex < hiker.myfriendsdriversto.length; 
-                                                    driverindex++) {
-                                                    const driver = hiker.myfriendsdriversto[driverindex].driverfullname;
-                                                    friendsdriversto += ", " + driver;
-                                                }
-                                                for (let driverindex = 0; 
-                                                    hiker.myfriendsdriversfrom && driverindex < hiker.myfriendsdriversfrom.length; 
-                                                    driverindex++) {
-                                                    const driver = hiker.myfriendsdriversfrom[driverindex].driverfullname;
-                                                    friendsdriversfrom += ", " + driver;
-                                                }
-                                                var myfriends = "";
-                                                for (let friendindex = 0; hiker.myfriends && friendindex < hiker.myfriends.length; 
-                                                    friendindex++) {
-                                                    const friend = hiker.myfriends[friendindex];
-                                                    myfriends +=  ", " + friend;
-                                                }
-                                                console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
-                                                    " to the hike: joins " + hiker.mydriverto.fullname + friendsdriversto);
-                                                console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
-                                                    " from the hike: joins " + hiker.mydriverfrom.fullname + friendsdriversfrom);
-                                            }
-                                            else
-                                            {
-                                                console.log(hiker.hikerindex + " " + hiker.fullname + " no drivers");
-                                            }
+                                        else
+                                        {
+                                            console.log(hiker.hikerindex + " " + hiker.fullname + " no drivers");
                                         }
                                     }
+                                }
 
-                                    db.collection(HIKERS_COLLECTION).deleteMany({hikenamehebrew: { $regex : ".*"+hike.hikedate+".*" }},
-                                            function(err, result) {
-                                        if (err) {
-                                            handleError(res, err.message, "Failed to delete hikers of " + hike.hikedate);
-                                        } else {
-                                            db.collection(HIKERS_COLLECTION).insertMany(hikers, function(err, docs) {
-                                                if (err) {
-                                                    handleError(res, err.message, "Failed to insert all hikers of " + hike.hikedate);
-                                                }
-                                                else {
-                                                    register.sendForm("1EV8BBJfZGseTFzJo-EMcgZdPHzedRC8zTZyfyRw2LoQ", 
-                                                        "" , "", "", res, null, null, null, "");
-                                                }
-                                            });
-                                        }
-                                    });
-                                })
-                                .catch(rejection => {
-                                    console.log("something went wrong:");
-                                    console.dir(rejection.stack);
+                                db.collection(HIKERS_COLLECTION).deleteMany({hikenamehebrew: { $regex : ".*"+hike.hikedate+".*" }},
+                                        function(err, result) {
+                                    if (err) {
+                                        handleError(res, err.message, "Failed to delete hikers of " + hike.hikedate);
+                                    } else {
+                                        db.collection(HIKERS_COLLECTION).insertMany(hikers, function(err, docs) {
+                                            if (err) {
+                                                handleError(res, err.message, "Failed to insert all hikers of " + hike.hikedate);
+                                            }
+                                            else {
+                                                register.sendForm("1EV8BBJfZGseTFzJo-EMcgZdPHzedRC8zTZyfyRw2LoQ", 
+                                                    "" , "", "", res, null, null, null, "");
+                                            }
+                                        });
+                                    }
                                 });
+                            })
+                            .catch(rejection => {
+                                console.log("something went wrong: "  + rejection);
+                                if (rejection.stack) {
+                                    console.dir(rejection.stack);
+                                }
                             });
                         };
                     });

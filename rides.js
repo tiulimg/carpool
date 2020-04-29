@@ -1,10 +1,13 @@
 var Promise = require('promise');
 var request = require('request');
 
+var util = require("./util");
+
 module.exports = {
     patchridedetails: patchridedetails,
     patchridedetailsv2: patchridedetailsv2,
     translateaddresstolocation: translateaddresstolocation,
+    findhikerslocation: findhikerslocation,
     calculateroute: calculateroute,
 };
 
@@ -973,6 +976,63 @@ function translateaddresstolocation(address) {
                 }
                 //console.log("translateaddresstolocation algolia location " + JSON.stringify(location));
             }
+        });
+    });
+}
+
+function findhikerslocation(hikers) {
+    return new Promise((resolve, reject) => {
+        var timer = 0;
+        var promises = [];
+        for (let hikerindex = 0; hikerindex < hikers.length; hikerindex++) {
+
+            const hiker = hikers[hikerindex];
+
+            if (!hiker.comesfromlocation) {
+                promises.push(
+                    util.wait(30*timer)
+                    .then(() => {
+                        return translateaddresstolocation(hiker.comesfromdetailed);
+                    })
+                    .then(comesfromlocation => {
+                        console.log("comesfromlocation " + JSON.stringify(comesfromlocation) + " link " +
+                            "https://www.google.com/maps?z=12&t=m&q="+
+                            comesfromlocation.lat+","+comesfromlocation.lon);
+                        hiker.comesfromlocation = comesfromlocation;
+                    })
+                    .catch(rejection => {
+                        console.log("something went wrong: "  + rejection);
+                        if (rejection.stack) {
+                            console.dir(rejection.stack);
+                        }
+                    })
+                );
+            }
+            if (!hiker.returnstolocation) {
+                promises.push(
+                    util.wait(30*timer)
+                    .then(() => {
+                        return translateaddresstolocation(hiker.returnstodetailed);
+                    })
+                    .then(returnstolocation => {
+                        console.log("returnstolocation " + JSON.stringify(returnstolocation) + " link " +
+                            "https://www.google.com/maps?z=12&t=m&q="+
+                            returnstolocation.lat+","+returnstolocation.lon);
+                        hiker.returnstolocation = returnstolocation;
+                    })
+                    .catch(rejection => {
+                        console.log("something went wrong: "  + rejection);
+                        if (rejection.stack) {
+                            console.dir(rejection.stack);
+                        }
+                    })
+                );
+            }
+
+            timer++;
+        }
+        Promise.all(promises).then(() => {
+            resolve(hikers);
         });
     });
 }
