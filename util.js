@@ -1,8 +1,8 @@
 var Promise = require('promise');
 
+var logservices = require("./logservices");
+
 module.exports = {
-    handleError: handleError,
-    logRejection: logRejection,
     checkpwd: checkpwd,
     checkspecialpwd: checkspecialpwd,
     wait: wait,
@@ -20,35 +20,22 @@ module.exports = {
     getHikerAreas: getHikerAreas,
 };
 
-// Generic error handler used by all endpoints.
-function handleError(res, reason, message, code) {
-    console.error("ERROR: " + reason);
-    res.status(code || 500).json({"error": message});
-}
-
-function logRejection(rejection) {
-    console.log("something went wrong: "  + rejection);
-    if (rejection.stack) {
-        console.dir(rejection.stack);
-    }
-}
-
 function checkpwd(pwd) {
     if (!pwd) {
-        util.handleError(res, "Unauthorized", "Password is required.", 400);
+        logservices.handleError("Unauthorized", "Password is required.", 400);
     }
     else if (pwd != process.env.PSWD) {
-        util.handleError(res, "Unauthorized", "Password is incorrect.", 400);
+        logservices.handleError("Unauthorized", "Password is incorrect.", 400);
     }
     return true;
 }
 
 function checkspecialpwd(pwd, specialpwd) {
     if (!pwd || !specialpwd) {
-        util.handleError(res, "Unauthorized", "Password and special password are required.", 400);
+        logservices.handleError("Unauthorized", "Password and special password are required.", 400);
     }
     else if (pwd != process.env.PSWD || specialpwd != process.env.SPECIALPWD) {
-        util.handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
+        logservices.handleError("Unauthorized", "Password or special password are incorrect.", 400);
     }
     return true;
 }

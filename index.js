@@ -7,6 +7,7 @@ var fs = require('fs');
 
 // Custom modules
 var dbservices = require("./dbservices");
+var logservices = require("./logservices");
 var replies = require("./replies");
 var register = require("./register_to_hikes");
 var ridesmodules = require("./rides");
@@ -37,9 +38,13 @@ app.use((err, req, res, next) => {
 });
 
 // Connect to the database before starting the application server.
-dbservices.initialize(app, res)
+dbservices.initialize(app)
 .catch(rejection => {
-    util.logRejection(rejection);
+    logservices.logRejection(rejection);
+});
+logservices.initialize(res)
+.catch(rejection => {
+    logservices.logRejection(rejection);
 });
 
 /*  "/api/debug"
@@ -87,7 +92,7 @@ app.patch("/api/areridessetuped", function(req, res) {
         res.status(200).json(recast_conversation_reply);
     })
     .catch(rejection => {
-        util.logRejection(rejection);
+        logservices.logRejection(rejection);
     });
 });
 
@@ -406,7 +411,7 @@ app.put("/api/wanttomodify", function(req, res) {
                         res.status(200).json(recast_conversation_reply);
                     })
                     .catch(rejection => {
-                        util.logRejection(rejection);
+                        logservices.logRejection(rejection);
                     });
                     break;
                 case "friends joining":
@@ -537,7 +542,7 @@ app.get("/api/lastregister", function(req, res) {
             res.status(200).json(docs);
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -742,7 +747,7 @@ app.post("/api/lastregister", function(req, res) {
                         res.status(200).json("success");
                     })
                     .catch(rejection => {
-                        util.logRejection(rejection);
+                        logservices.logRejection(rejection);
                     });
                 }
                 else {
@@ -831,16 +836,16 @@ app.post("/api/lastregister", function(req, res) {
                         res.status(200).json("success");
                     })
                     .catch(rejection => {
-                        util.logRejection(rejection);
+                        logservices.logRejection(rejection);
                     });
                 }
             })
             .catch(rejection => {
-                util.logRejection(rejection);
+                logservices.logRejection(rejection);
             });
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -852,7 +857,7 @@ app.delete("/api/lastregister", function(req, res) {
             res.status(200).json("success");
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -1005,12 +1010,12 @@ app.patch("/api/lastregister/:phone", function(req, res) {
                     res.status(200).json(recast_conversation_reply);
                 })
                 .catch(rejection => {
-                    util.logRejection(rejection);
+                    logservices.logRejection(rejection);
                 });
             }
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -1087,7 +1092,7 @@ app.put("/api/lastregister/:phone", function(req, res) {
             }
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -1175,7 +1180,7 @@ app.post("/api/lastregister/:phone", function(req, res) {
             }
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -1189,7 +1194,7 @@ app.delete("/api/lastregister/:phone", function(req, res) {
             res.status(200).json("success");
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -1334,12 +1339,12 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                     res.status(200).json(recast_conversation_reply);
                 })
                 .catch(rejection => {
-                    util.logRejection(rejection);
+                    logservices.logRejection(rejection);
                 });
             }
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -1577,11 +1582,11 @@ app.post("/api/registertohikes", function(req, res) {
                 }
             })
             .catch(rejection => {
-                util.logRejection(rejection);
+                logservices.logRejection(rejection);
             });
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
   });
@@ -1834,7 +1839,7 @@ app.post("/api/registertohikes", function(req, res) {
                 register.edithikes(language, res, registerparams, memory);
             })
             .catch(rejection => {
-                util.logRejection(rejection);
+                logservices.logRejection(rejection);
             });
         }
         else {
@@ -1923,7 +1928,7 @@ app.patch("/api/selecthikes", function(req, res) {
             res.status(200).json(recast_conversation_reply);
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -2039,7 +2044,7 @@ app.post("/api/selecthikes", function(req, res) {
             res.status(200).json(recast_conversation_reply);
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -2057,7 +2062,7 @@ app.get("/api/hike", function(req, res) {
             res.status(200).json(docs);
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -2087,7 +2092,7 @@ app.patch("/api/hike", function(req, res) {
             res.status(200).json(recast_conversation_reply);
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -2100,7 +2105,7 @@ app.put("/api/hike", function(req, res) {
             res.status(200).json("success");
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -2117,7 +2122,7 @@ app.get("/api/hikers", function(req, res) {
             res.status(200).json(docs);
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
   });
@@ -2130,7 +2135,7 @@ app.put("/api/hikers", function(req, res) {
             res.status(200).json("success");
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -2198,7 +2203,7 @@ app.patch("/api/choosehike/:phone", function(req, res) {
                         }
                     })
                     .catch(rejection => {
-                        util.logRejection(rejection);
+                        logservices.logRejection(rejection);
                     });
                 }
                 else {
@@ -2207,11 +2212,11 @@ app.patch("/api/choosehike/:phone", function(req, res) {
                 }
             })
             .catch(rejection => {
-                util.logRejection(rejection);
+                logservices.logRejection(rejection);
             });
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -2266,7 +2271,7 @@ app.put("/api/ridedetails/:phone", function(req, res) {
                                     replies.get_recast_reply("GREAT_FOR_UPDATE",language,null,memory); 
                                 dbservices.updatehikerstatus(hiketodate, phonenumber, "hadsetup")
                                 .catch(rejection => {
-                                    util.logRejection(rejection);
+                                    logservices.logRejection(rejection);
                                 });
                                 register.updateCarpool();
                             }
@@ -2274,16 +2279,16 @@ app.put("/api/ridedetails/:phone", function(req, res) {
                         res.status(200).json(recast_conversation_reply);
                     })
                     .catch(rejection => {
-                        util.logRejection(rejection);
+                        logservices.logRejection(rejection);
                     });
                 }
             })
             .catch(rejection => {
-                util.logRejection(rejection);
+                logservices.logRejection(rejection);
             });
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -2357,7 +2362,7 @@ app.post("/api/choosedriver", function(req, res) {
                     }
                     dbservices.updatehikerchoosedrivers(direction, chosendrivers)
                     .catch(rejection => {
-                        util.logRejection(rejection);
+                        logservices.logRejection(rejection);
                     });
 
                     var selecteddriverstostring = "";
@@ -2440,12 +2445,12 @@ app.post("/api/choosedriver", function(req, res) {
                     res.status(200).json(recast_conversation_reply);
                 })
                 .catch(rejection => {
-                    util.logRejection(rejection);
+                    logservices.logRejection(rejection);
                 });
             }
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -2463,7 +2468,7 @@ app.get("/api/ironnumber", function(req, res) {
             res.status(200).json(ironnumbers);
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -2516,11 +2521,11 @@ app.patch("/api/ironnumber", function(req, res) {
                     res.status(200).json(ironnumbers);
                 })
                 .catch(rejection => {
-                    util.logRejection(rejection);
+                    logservices.logRejection(rejection);
                 });
             })
             .catch(rejection => {
-                util.logRejection(rejection);
+                logservices.logRejection(rejection);
             });
         }
         else {
@@ -2547,7 +2552,7 @@ app.post("/api/ironnumber", function(req, res) {
                     res.status(200).json("success");
                 })
                 .catch(rejection => {
-                    util.logRejection(rejection);
+                    logservices.logRejection(rejection);
                 });
             }
             else {
@@ -2574,13 +2579,13 @@ app.patch("/api/findhikerslocation", function(req, res) {
                     register.updateCarpool();
                 })
                 .catch(rejection => {
-                    util.logRejection(rejection);
+                    logservices.logRejection(rejection);
                 });
             });
             res.status(200).json("Working...");
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });
@@ -2627,7 +2632,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 hiker.routetothehike = route;
                                             })
                                             .catch(rejection => {
-                                                util.logRejection(rejection);
+                                                logservices.logRejection(rejection);
                                             })
                                         );
                                     }
@@ -2641,7 +2646,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                                 hiker.routefromthehike = route;
                                             })
                                             .catch(rejection => {
-                                                util.logRejection(rejection);
+                                                logservices.logRejection(rejection);
                                             })
                                         );
                                     }
@@ -2875,22 +2880,22 @@ app.patch("/api/calculaterides", function(req, res) {
                                 register.updateCarpool();
                             })
                             .catch(rejection => {
-                                util.logRejection(rejection);
+                                logservices.logRejection(rejection);
                             });
                         })
                         .catch(rejection => {
-                            util.logRejection(rejection);
+                            logservices.logRejection(rejection);
                         });
                     };
                 })
                 .catch(rejection => {
-                    util.logRejection(rejection);
+                    logservices.logRejection(rejection);
                 });
             }
             res.status(200).json("Working...");
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 });

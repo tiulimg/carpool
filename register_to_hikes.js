@@ -1,4 +1,5 @@
 var dbservices = require("./dbservices");
+var logservices = require("./logservices");
 var replies = require("./replies");
 var util = require("./util");
 
@@ -115,7 +116,7 @@ function sendForm(formId, body, language, recast_reply, res, memory, edit)
 
                 dbservices.replaceonelastregister(phonenumber, registerObj)
                 .catch(rejection => {
-                    util.logRejection(rejection);
+                    logservices.logRejection(rejection);
                 });
 
                 var recast_conversation_reply;
@@ -164,7 +165,7 @@ function sendForm(formId, body, language, recast_reply, res, memory, edit)
 
                 dbservices.replaceonelastregister(phonenumber, registerObj)
                 .catch(rejection => {
-                    util.logRejection(rejection);
+                    logservices.logRejection(rejection);
                 });
 
                 var recast_conversation_reply;

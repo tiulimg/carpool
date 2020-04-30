@@ -2,6 +2,7 @@ var Promise = require('promise');
 var request = require('request');
 
 var dbservices = require("./dbservices");
+var logservices = require("./logservices");
 var register = require("./register_to_hikes");
 var util = require("./util");
 
@@ -252,7 +253,7 @@ function patchridedetails(req, res, replies)
                             if (hadexchangednumbers) {
                                 dbservices.updatehikerstatus(hiketodate, phonenumber, "hadexchangednumbers")
                                 .catch(rejection => {
-                                    util.logRejection(rejection);
+                                    logservices.logRejection(rejection);
                                 });
                                 register.updateCarpool();
                             }
@@ -260,16 +261,16 @@ function patchridedetails(req, res, replies)
                         res.status(200).json(recast_conversation_reply);
                     })
                     .catch(rejection => {
-                        util.logRejection(rejection);
+                        logservices.logRejection(rejection);
                     });
                 }
             })
             .catch(rejection => {
-                util.logRejection(rejection);
+                logservices.logRejection(rejection);
             });
         })
         .catch(rejection => {
-            util.logRejection(rejection);
+            logservices.logRejection(rejection);
         });
     }
 }
@@ -426,7 +427,7 @@ function findhikerslocation(hikers) {
                         hiker.comesfromlocation = comesfromlocation;
                     })
                     .catch(rejection => {
-                        util.logRejection(rejection);
+                        logservices.logRejection(rejection);
                     })
                 );
             }
@@ -443,7 +444,7 @@ function findhikerslocation(hikers) {
                         hiker.returnstolocation = returnstolocation;
                     })
                     .catch(rejection => {
-                        util.logRejection(rejection);
+                        logservices.logRejection(rejection);
                     })
                 );
             }
