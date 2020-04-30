@@ -38,6 +38,15 @@ app.use((err, req, res, next) => {
     next();
 });
 
+// Connect to the database before starting the application server.
+dbservices.initialize(app)
+.catch(rejection => {
+    console.log("something went wrong: "  + rejection);
+    if (rejection.stack) {
+        console.dir(rejection.stack);
+    }
+});
+
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 var db;
 

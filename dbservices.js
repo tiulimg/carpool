@@ -15,6 +15,9 @@ module.exports = {
 
 var ObjectID = mongodb.ObjectID;
 
+// Create a database variable outside of the database connection callback to reuse the connection pool in your app.
+var db;
+
 var HIKERS_COLLECTION = "hikers";
 var HIKE_COLLECTION = "hike";
 var LAST_REGISTER_COLLECTION = "last_register";
@@ -22,9 +25,6 @@ var IRONNUMBERS_COLLECTION = "ironnumbers";
 var ROUTES_COLLECTION = "routes";
 
 function initialize(app) {
-    // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
-    var db;
-
     // Connect to the database before starting the application server.
     var mongoClient = new mongodb.MongoClient(process.env.MONGODB_URI || "mongodb://localhost:27017/test",{ useUnifiedTopology: true });
     mongoClient.connect(function (err, client) {
