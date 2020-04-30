@@ -18,8 +18,6 @@ var ObjectID = mongodb.ObjectID;
 var HIKERS_COLLECTION = "hikers";
 var HIKE_COLLECTION = "hike";
 var LAST_REGISTER_COLLECTION = "last_register";
-//var IRONNUMBERS_COLLECTION = "ironnumbers";
-var ROUTES_COLLECTION = "routes";
 
 var app = express();
 // Serve static files from the React app
@@ -39,41 +37,10 @@ app.use((err, req, res, next) => {
 });
 
 // Connect to the database before starting the application server.
-dbservices.initialize(app)
+dbservices.initialize(app, res)
 .catch(rejection => {
-    console.log("something went wrong: "  + rejection);
-    if (rejection.stack) {
-        console.dir(rejection.stack);
-    }
+    util.logRejection(rejection);
 });
-
-// Create a database variable outside of the database connection callback to reuse the connection pool in your app.
-// var db;
-
-// // Connect to the database before starting the application server.
-// var mongoClient = new mongodb.MongoClient(process.env.MONGODB_URI || "mongodb://localhost:27017/test",{ useUnifiedTopology: true });
-// mongoClient.connect(function (err, client) {
-//   if (err) {
-//     console.log(err);
-//     process.exit(1);
-//   }
-
-//   // Save database object from the callback for reuse.
-//   db = client.db();
-//   console.log("Database connection ready");
-
-//   // Initialize the app.
-//   var server = app.listen(process.env.PORT || 8080, function () {
-//     var port = server.address().port;
-//     console.log("App now running on port", port);
-//   });
-// });
-
-// Generic error handler used by all endpoints.
-function handleError(res, reason, message, code) {
-    console.error("ERROR: " + reason);
-    res.status(code || 500).json({"error": message});
-}
 
 /*  "/api/debug"
 *    POST: prints all conversation details
@@ -91,83 +58,36 @@ app.post("/api/debug", function(req, res) {
 
 app.patch("/api/areridessetuped", function(req, res) {
     var memory = req.body.conversation.memory;
-    db.collection(HIKERS_COLLECTION).find({$or: [{mydriverfrom: {$ne:null}}, {mydriverto: {$ne: null}}] }).toArray(function(err, docs) {
-        if (err) {
-            handleError(res, err.message, "Failed to get hikers.");
-        } else {
-            var language = util.set_language(memory);
-            var setuped = false;
-            if (typeof docs !== 'undefined' && docs != null && docs.length > 0) {
-                setuped = true;
-            }
-            memory.rideshadsetuped = setuped;
-            if (setuped) {
-                if (!memory.phonenumber) {
-                    recast_conversation_reply = replies.get_recast_reply("GETRIDEDETAILS_ENTERPHONE",language,null,memory);    
-                    memory.stage = "getridedetails_getphone";
-                }
-                else if (!memory.password) {
-                    recast_conversation_reply = replies.get_recast_reply("GETRIDEDETAILS_ENTERPASSWORD",language,null,memory);    
-                    memory.stage = "getridedetails_getpassword";
-                }
-                else {
-                    recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
-                    memory.stage = "getridedetails_getpassword";
-                }
-            }
-            else {
-                recast_conversation_reply = replies.get_recast_reply("RIDES_ARENT_SETUPED",language,null,memory);
-                delete memory.stage;
-            }
-            res.status(200).json(recast_conversation_reply);
+    dbservices.gethikerswithdrivers()
+    .then(docs => {
+        var language = util.set_language(memory);
+        var setuped = false;
+        if (typeof docs !== 'undefined' && docs != null && docs.length > 0) {
+            setuped = true;
         }
-    });
-});
-
-/*  "/api/areridessetupedv2"
-*    PATCH: checks whether rides are already setuped or open for setup 
-*/
-
-app.patch("/api/areridessetupedv2", function(req, res) {
-    var memory = req.body.conversation.memory;
-    db.collection(HIKERS_COLLECTION).find({$or: [{amidriver: true}] }).toArray(function(err, docs) {
-        if (err) {
-            handleError(res, err.message, "Failed to get hikers.");
-        } else {
-            var language = util.set_language(memory);
-            var hadsentresponse = false;
-            if (typeof docs !== 'undefined' && docs != null && docs.length > 0) {
+        memory.rideshadsetuped = setuped;
+        if (setuped) {
+            if (!memory.phonenumber) {
                 recast_conversation_reply = replies.get_recast_reply("GETRIDEDETAILS_ENTERPHONE",language,null,memory);    
                 memory.stage = "getridedetails_getphone";
             }
-            else {
-                db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
-                    if (err) {
-                        handleError(res, err.message, "Failed to get hike details.");
-                    } else {
-                        docs = util.remove_past_hikes(docs, false);
-                        docs = util.sort_hikes(docs, false);
-                        if (docs.length == 0) {
-                            hadsentresponse = true;
-                            recast_conversation_reply = replies.get_recast_reply("NO_HIKES_PLANNED",language,null,memory);                        
-                            delete memory.stage;
-                            res.status(200).json(recast_conversation_reply);
-                        }
-                    }
-                });
-                recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
-                var title = replies.get_conversation_string("NO_DRIVERS", language);
-                var startover = replies.get_conversation_string("STARTOVER", language);
-                var joinnewhike = replies.get_conversation_string("JOIN_NEW_HIKE", language);
-                recast_conversation_reply = replies.push_quick_reply_to_recast(recast_conversation_reply, title);
-                recast_conversation_reply = replies.push_quick_reply_option_to_recast(recast_conversation_reply, joinnewhike);
-                recast_conversation_reply = replies.push_quick_reply_option_to_recast(recast_conversation_reply, startover);
-                delete memory.stage;
+            else if (!memory.password) {
+                recast_conversation_reply = replies.get_recast_reply("GETRIDEDETAILS_ENTERPASSWORD",language,null,memory);    
+                memory.stage = "getridedetails_getpassword";
             }
-            if (!hadsentresponse) {
-                res.status(200).json(recast_conversation_reply);
+            else {
+                recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
+                memory.stage = "getridedetails_getpassword";
             }
         }
+        else {
+            recast_conversation_reply = replies.get_recast_reply("RIDES_ARENT_SETUPED",language,null,memory);
+            delete memory.stage;
+        }
+        res.status(200).json(recast_conversation_reply);
+    })
+    .catch(rejection => {
+        util.logRejection(rejection);
     });
 });
 
@@ -178,14 +98,7 @@ app.patch("/api/areridessetupedv2", function(req, res) {
 
 app.post("/api/wanttomodify", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!memory.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (memory.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(memory.pwd)) {
         console.log("memory: " + JSON.stringify(memory));
         var language = util.set_language(memory);
 
@@ -301,13 +214,7 @@ app.post("/api/wanttomodify", function(req, res) {
 
 app.put("/api/wanttomodify", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!memory.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (memory.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else {
+    if (util.checkpwd(memory.pwd)) {
         console.log("memory: " + JSON.stringify(memory));
         var language = util.set_language(memory);
 
@@ -491,15 +398,15 @@ app.put("/api/wanttomodify", function(req, res) {
                     needtosubmit = false;
                     recast_conversation_reply =
                         replies.get_recast_reply("HIKES_SELECTED",language,[memory.selectedhikes.join("\n")],memory);
-                    db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
-                        if (err) {
-                            handleError(res, err.message, "An error occured.");
-                        } else {
-                            docs = util.sort_hikes(docs, false);
-                            recast_conversation_reply = 
-                                register.setAvailableHikesReplyBut(recast_conversation_reply, docs, language, memory.selectedhikes);
-                            res.status(200).json(recast_conversation_reply);
-                        }
+                    dbservices.gethikes()
+                    .then(docs => {
+                        docs = util.sort_hikes(docs, false);
+                        recast_conversation_reply = 
+                            register.setAvailableHikesReplyBut(recast_conversation_reply, docs, language, memory.selectedhikes);
+                        res.status(200).json(recast_conversation_reply);
+                    })
+                    .catch(rejection => {
+                        util.logRejection(rejection);
                     });
                     break;
                 case "friends joining":
@@ -563,13 +470,7 @@ app.put("/api/wanttomodify", function(req, res) {
 
 app.post("/api/friendsdetails", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!memory.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (memory.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else {
+    if (util.checkpwd(memory.pwd)) {
         var language = util.set_language(memory);
         if (typeof memory.friendsdetails === 'undefined' || memory.friendsdetails == null) {
             memory.friendsdetails = [];
@@ -607,13 +508,7 @@ app.post("/api/friendsdetails", function(req, res) {
 
 app.put("/api/friendsdetails", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!memory.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (memory.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else {
+    if (util.checkpwd(memory.pwd)) {
         var language = util.set_language(memory);
         delete memory.friendname;
         delete memory.friendage;
@@ -636,33 +531,19 @@ app.put("/api/friendsdetails", function(req, res) {
 */
 
 app.get("/api/lastregister", function(req, res) {
-    if (!req.query.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
-        db.collection(LAST_REGISTER_COLLECTION).find({}).toArray(function(err, docs) {
-            if (err) {
-                handleError(res, err.message, "Failed to get last registers' details.");
-            } else {
-                res.status(200).json(docs);
-            }
+    if (util.checkpwd(req.query.pwd)) {
+        dbservices.getlastregisters()
+        .then(docs => {
+            res.status(200).json(docs);
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
 
 app.post("/api/lastregister", function(req, res) {
-    if (!req.query.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(req.query.pwd)) {
         console.log(JSON.stringify(req.body));
 
         var formParams = {
@@ -794,193 +675,184 @@ app.post("/api/lastregister", function(req, res) {
 
         formObj["friends joining"] = util.friendstext_from_friendsdetails(formObj.friendsdetails);
 
-        db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
+        dbservices.gethikes()
+        .then(docs => {
             formObj.selectedhikes = util.remove_hikes_notinlist(formObj.selectedhikes, docs);
             formObj.selectedhikes = util.remove_past_hikes(formObj.selectedhikes, true);
 
             console.log("formobj2: " + JSON.stringify(formObj));
 
-            db.collection(LAST_REGISTER_COLLECTION).findOne(
-                { $or: [ { 'phone number': phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, doc) {
+            dbservices.getlastregisterbyphonenumber(phonenumber)
+            .then(doc => {
                 if (typeof(doc) === 'undefined' || doc == null) {
-                        var nowdate = new Date();
-                        var editforms = {};
-                        for (let index = 0; index < formObj.selectedhikes.length; index++) {
-                            const hike = formObj.selectedhikes[index];
-                            var hikedate = hike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
-                            if (hikedate != null) {
-                                hikedate = hikedate[0];
-                                hikedate = hikedate.replace(/\./g,"_");
-                                editforms[hikedate] = {
-                                    "car/ride": formObj["car/ride"],
-                                    "plays on": formObj["plays on"],
-                                    "comes from": formObj["comes from"],
-                                    "returns to": formObj["returns to"],
-                                    "can organize": formObj["can organize"],
-                                    "saved the date": formObj["saved the date"],
-                                    "friends joining": formObj["friends joining"],
-                                    "available places": formObj["available places"],
-                                    friendsdetails: formObj.friendsdetails,
-                                    link: formObj.link,
-                                    "hikes": formObj.selectedhikes,
-                                };
-                            }
+                    var nowdate = new Date();
+                    var editforms = {};
+                    for (let index = 0; index < formObj.selectedhikes.length; index++) {
+                        const hike = formObj.selectedhikes[index];
+                        var hikedate = hike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
+                        if (hikedate != null) {
+                            hikedate = hikedate[0];
+                            hikedate = hikedate.replace(/\./g,"_");
+                            editforms[hikedate] = {
+                                "car/ride": formObj["car/ride"],
+                                "plays on": formObj["plays on"],
+                                "comes from": formObj["comes from"],
+                                "returns to": formObj["returns to"],
+                                "can organize": formObj["can organize"],
+                                "saved the date": formObj["saved the date"],
+                                "friends joining": formObj["friends joining"],
+                                "available places": formObj["available places"],
+                                friendsdetails: formObj.friendsdetails,
+                                link: formObj.link,
+                                "hikes": formObj.selectedhikes,
+                            };
                         }
-                        formObj.hikeseditforms = editforms;
-                        formObj.lastageupdate = nowdate;
-
-                        var registerObj = {
-                            name: formObj.name,
-                            email: formObj.email,
-                            selectedhikes: formObj.selectedhikes,
-                            "phone number": formObj["phone number"],
-                            "share my age": formObj["share my age"],
-                            age: formObj.age,
-                            password: formObj.password,
-                            "i'm gay": formObj["i'm gay"],
-                            "heard of the group": formObj["heard of the group"],
-                            hikeseditforms: formObj.hikeseditforms,
-                            lastageupdate: formObj.lastageupdate,
-                            "car/ride": formObj["car/ride"],
-                            "plays on": formObj["plays on"],
-                            "comes from": formObj["comes from"],
-                            "returns to": formObj["returns to"],
-                            "can organize": formObj["can organize"],
-                            "saved the date": formObj["saved the date"],
-                            "i fear of": formObj["i fear of"],
-                            "friends joining": formObj["friends joining"],
-                            "available places": formObj["available places"],
-                            friendsdetails: formObj.friendsdetails,
-                            "i approve": formObj["i approve"],
-                        };
-                        console.log("registerObj: " + JSON.stringify(registerObj));
-                
-                        db.collection(LAST_REGISTER_COLLECTION).insertOne(registerObj, function(err, doc) {
-                            if (err) {
-                                handleError(res, err.message, "Failed to create or update last register.");
-                            }
-                            else {
-                                res.status(200).json("success");
-                            }
-                        });
                     }
-                    else {
-                        var nowdate = new Date();
+                    formObj.hikeseditforms = editforms;
+                    formObj.lastageupdate = nowdate;
 
-                        var savedthedate = doc["saved the date"];
-                        var editforms = doc.hikeseditforms;
-                        var allhikes = doc.selectedhikes;
-                        for (let index = 0; index < formObj.selectedhikes.length; index++) {
-                            const hike = formObj.selectedhikes[index];
-                            if (allhikes.indexOf(hike) == -1) {
-                                allhikes.push(hike);
-                            }
-                            var hikedate = hike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
-                            if (hikedate != null) {
-                                hikedate = hikedate[0];
-                                hikedate = hikedate.replace(/\./g,"_");
-                                editforms[hikedate] = {
-                                    "car/ride": formObj["car/ride"],
-                                    "plays on": formObj["plays on"],
-                                    "comes from": formObj["comes from"],
-                                    "returns to": formObj["returns to"],
-                                    "can organize": formObj["can organize"],
-                                    "saved the date": formObj["saved the date"],
-                                    "friends joining": formObj["friends joining"],
-                                    "available places": formObj["available places"],
-                                    friendsdetails: formObj.friendsdetails,
-                                    link: formObj.link,
-                                    "hikes": formObj.selectedhikes,
-                                };
-                            }
+                    var registerObj = {
+                        name: formObj.name,
+                        email: formObj.email,
+                        selectedhikes: formObj.selectedhikes,
+                        "phone number": formObj["phone number"],
+                        "share my age": formObj["share my age"],
+                        age: formObj.age,
+                        password: formObj.password,
+                        "i'm gay": formObj["i'm gay"],
+                        "heard of the group": formObj["heard of the group"],
+                        hikeseditforms: formObj.hikeseditforms,
+                        lastageupdate: formObj.lastageupdate,
+                        "car/ride": formObj["car/ride"],
+                        "plays on": formObj["plays on"],
+                        "comes from": formObj["comes from"],
+                        "returns to": formObj["returns to"],
+                        "can organize": formObj["can organize"],
+                        "saved the date": formObj["saved the date"],
+                        "i fear of": formObj["i fear of"],
+                        "friends joining": formObj["friends joining"],
+                        "available places": formObj["available places"],
+                        friendsdetails: formObj.friendsdetails,
+                        "i approve": formObj["i approve"],
+                    };
+                    console.log("registerObj: " + JSON.stringify(registerObj));
+            
+                    dbservices.insertnewlastregister(registerObj)
+                    .then(() => {
+                        res.status(200).json("success");
+                    })
+                    .catch(rejection => {
+                        util.logRejection(rejection);
+                    });
+                }
+                else {
+                    var nowdate = new Date();
+
+                    var savedthedate = doc["saved the date"];
+                    var editforms = doc.hikeseditforms;
+                    var allhikes = doc.selectedhikes;
+                    for (let index = 0; index < formObj.selectedhikes.length; index++) {
+                        const hike = formObj.selectedhikes[index];
+                        if (allhikes.indexOf(hike) == -1) {
+                            allhikes.push(hike);
                         }
-
-                        for (let index = 0; index < doc.selectedhikes.length; index++) {
-                            const dochike = doc.selectedhikes[index];
-                            var hikedate = dochike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
-                            if (hikedate != null) {
-                                hikedate = hikedate[0];
-                                hikedate = hikedate.replace(/\./g,"_");
-                                if (typeof editforms[hikedate] !== 'undefined' && 
-                                    editforms[hikedate].link == formObj.link && 
-                                    formObj.selectedhikes.indexOf(dochike) == -1) {
-                                        console.log("removed hike " + dochike + " with link " + formObj.link);
-                                        delete editforms[hikedate];
-                                        allhikes.splice(allhikes.indexOf(dochike),1);
-                                }
-                            }
+                        var hikedate = hike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
+                        if (hikedate != null) {
+                            hikedate = hikedate[0];
+                            hikedate = hikedate.replace(/\./g,"_");
+                            editforms[hikedate] = {
+                                "car/ride": formObj["car/ride"],
+                                "plays on": formObj["plays on"],
+                                "comes from": formObj["comes from"],
+                                "returns to": formObj["returns to"],
+                                "can organize": formObj["can organize"],
+                                "saved the date": formObj["saved the date"],
+                                "friends joining": formObj["friends joining"],
+                                "available places": formObj["available places"],
+                                friendsdetails: formObj.friendsdetails,
+                                link: formObj.link,
+                                "hikes": formObj.selectedhikes,
+                            };
                         }
-
-                        if (formObj["saved the date"] != "I planned joining the hike but I now have to cancel" && 
-                            formObj["saved the date"] != "תכננתי לבוא ואני נאלץ לבטל הגעה") {
-                            savedthedate = formObj["saved the date"];
-                        }
-
-                        formObj.hikeseditforms = editforms;
-                        formObj.lastageupdate = nowdate;
-
-                        var registerObj = {
-                            name: formObj.name,
-                            email: formObj.email,
-                            selectedhikes: allhikes,
-                            "phone number": formObj["phone number"],
-                            "share my age": formObj["share my age"],
-                            age: formObj.age,
-                            password: formObj.password,
-                            "i'm gay": formObj["i'm gay"],
-                            "heard of the group": formObj["heard of the group"],
-                            hikeseditforms: formObj.hikeseditforms,
-                            lastageupdate: formObj.lastageupdate,
-                            "car/ride": formObj["car/ride"],
-                            "plays on": formObj["plays on"],
-                            "comes from": formObj["comes from"],
-                            "returns to": formObj["returns to"],
-                            "can organize": formObj["can organize"],
-                            "saved the date": savedthedate,
-                            "i fear of": formObj["i fear of"],
-                            "friends joining": formObj["friends joining"],
-                            "available places": formObj["available places"],
-                            friendsdetails: formObj.friendsdetails,
-                            "i approve": formObj["i approve"],
-                        };
-                        console.log("registerObj: " + JSON.stringify(registerObj));
-
-                        db.collection(LAST_REGISTER_COLLECTION).deleteMany(
-                            { $or: [ { 'phone number': phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, result) {
-                                if (err) {
-                                    handleError(res, err.message, "Failed to delete last register's details");
-                                } else {
-                                    db.collection(LAST_REGISTER_COLLECTION).insertOne(registerObj, function(err, doc) {
-                                        if (err) {
-                                            handleError(res, err.message, "Failed to create or update last register.");
-                                        }
-                                        else {
-                                            res.status(200).json("success");
-                                        }
-                                    });
-                                }
-                        });
                     }
+
+                    for (let index = 0; index < doc.selectedhikes.length; index++) {
+                        const dochike = doc.selectedhikes[index];
+                        var hikedate = dochike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
+                        if (hikedate != null) {
+                            hikedate = hikedate[0];
+                            hikedate = hikedate.replace(/\./g,"_");
+                            if (typeof editforms[hikedate] !== 'undefined' && 
+                                editforms[hikedate].link == formObj.link && 
+                                formObj.selectedhikes.indexOf(dochike) == -1) {
+                                    console.log("removed hike " + dochike + " with link " + formObj.link);
+                                    delete editforms[hikedate];
+                                    allhikes.splice(allhikes.indexOf(dochike),1);
+                            }
+                        }
+                    }
+
+                    if (formObj["saved the date"] != "I planned joining the hike but I now have to cancel" && 
+                        formObj["saved the date"] != "תכננתי לבוא ואני נאלץ לבטל הגעה") {
+                        savedthedate = formObj["saved the date"];
+                    }
+
+                    formObj.hikeseditforms = editforms;
+                    formObj.lastageupdate = nowdate;
+
+                    var registerObj = {
+                        name: formObj.name,
+                        email: formObj.email,
+                        selectedhikes: allhikes,
+                        "phone number": formObj["phone number"],
+                        "share my age": formObj["share my age"],
+                        age: formObj.age,
+                        password: formObj.password,
+                        "i'm gay": formObj["i'm gay"],
+                        "heard of the group": formObj["heard of the group"],
+                        hikeseditforms: formObj.hikeseditforms,
+                        lastageupdate: formObj.lastageupdate,
+                        "car/ride": formObj["car/ride"],
+                        "plays on": formObj["plays on"],
+                        "comes from": formObj["comes from"],
+                        "returns to": formObj["returns to"],
+                        "can organize": formObj["can organize"],
+                        "saved the date": savedthedate,
+                        "i fear of": formObj["i fear of"],
+                        "friends joining": formObj["friends joining"],
+                        "available places": formObj["available places"],
+                        friendsdetails: formObj.friendsdetails,
+                        "i approve": formObj["i approve"],
+                    };
+                    console.log("registerObj: " + JSON.stringify(registerObj));
+
+                    dbservices.replaceonelastregister(phonenumber, registerObj)
+                    .then(() => {
+                        res.status(200).json("success");
+                    })
+                    .catch(rejection => {
+                        util.logRejection(rejection);
+                    });
+                }
+            })
+            .catch(rejection => {
+                util.logRejection(rejection);
             });
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
 
 app.delete("/api/lastregister", function(req, res) {
-    if (!req.query.pwd || !req.query.specialpwd) {
-        handleError(res, "Unauthorized", "Password and special password are required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD || req.query.specialpwd != process.env.SPECIALPWD) {
-        handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
-    }
-    else
-    {
-        db.collection(LAST_REGISTER_COLLECTION).deleteMany({}, function(err, docs) {
-            if (err) {
-                handleError(res, err.message, "Failed to delete last registers' details.");
-            } else {
-                res.status(200).json("success");
-            }
+    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
+        dbservices.deletealllastregisters()
+        .then(() => {
+            res.status(200).json("success");
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
@@ -994,18 +866,11 @@ app.delete("/api/lastregister", function(req, res) {
 
 app.patch("/api/lastregister/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!req.query.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = util.normalize_phonenumber(phonenumber);
-        db.collection(LAST_REGISTER_COLLECTION).findOne(
-            { $or: [ { 'phone number': phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, doc) {
+        dbservices.getlastregisterbyphonenumber(phonenumber)
+        .then(doc => {
             var recast_conversation_reply;
             var language = util.set_language(memory);
 
@@ -1062,112 +927,105 @@ app.patch("/api/lastregister/:phone", function(req, res) {
                 memory.lastageupdate = memory.registertohikes.lastageupdate;
                 memory.friendstext = util.friendstext_from_friendsdetails(memory.friendsdetails);
         
-                db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
-                    if (err) {
-                        handleError(res, err.message, "An error occured.");
-                    } else {
-                        docs = util.sort_hikes(docs, false);
-                        var selectedHikes = [];
-                        if (typeof memory.selectedhikes !== 'undefined' && memory.selectedhikes != null &&
-                            memory.selectedhikes != "") {
-                            selectedHikes = memory.selectedhikes;
-                        }
-                        docs = util.remove_past_hikes(docs, false);
-                        selectedHikes = util.remove_past_hikes(selectedHikes, true);
-                        selectedHikes = util.remove_hikes_notinlist(selectedHikes, docs);
-                        console.log("lastregister selectedHikes " + JSON.stringify(selectedHikes));
-                        selectedHikes = util.sort_hikes(selectedHikes, true);
-                        console.log("lastregister selectedHikes sort_hikes " + JSON.stringify(selectedHikes));
-                        selectedHikes = util.only_hikes_in_lang(docs, selectedHikes, true, language);
-                        console.log("lastregister selectedHikes only_hikes_in_lang " + JSON.stringify(selectedHikes));
-                        var selectHike = "";
-                        if (typeof memory.selecthike !== 'undefined' && memory.selecthike != null ) {
-                            var memorySelectHike = memory.selecthike.raw;
-                            selectHike = docs.find(function(element) {
-                                var result = false;
-                                if ((element.hikenamehebrew && 
-                                    element.hikenamehebrew.indexOf(memorySelectHike) != -1) ||
-                                    (element.hikenameenglish && 
-                                    element.hikenameenglish.indexOf(memorySelectHike) != -1)) {
-                                    result = true;
-                                }
-                                return result;
-                            });
-        
-                            if (selectHike != "") {
-                                switch (language) {
-                                    case "he":
-                                        var indexhe = selectedHikes.indexOf(selectHike.hikenamehebrew);
-                                        var indexen = selectedHikes.indexOf(selectHike.hikenameenglish);
-                                        if (indexhe == -1 && indexen == -1) {
-                                            selectedHikes.push(selectHike.hikenamehebrew);
-                                        }
-                                        else {
-                                            selectedHikes.splice(index, 1);
-                                        }
-                                        break;
-                                    case "en":
-                                        var indexhe = selectedHikes.indexOf(selectHike.hikenamehebrew);
-                                        var indexen = selectedHikes.indexOf(selectHike.hikenameenglish);
-                                        if (indexhe == -1 && indexen == -1) {
-                                            selectedHikes.push(selectHike.hikenameenglish);
-                                        }
-                                        else {
-                                            selectedHikes.splice(index, 1);
-                                        }
-                                        break;
-                                    default:
-                                        break;
-                                }
+                dbservices.gethikes()
+                .then(docs => {
+                    docs = util.sort_hikes(docs, false);
+                    var selectedHikes = [];
+                    if (typeof memory.selectedhikes !== 'undefined' && memory.selectedhikes != null &&
+                        memory.selectedhikes != "") {
+                        selectedHikes = memory.selectedhikes;
+                    }
+                    docs = util.remove_past_hikes(docs, false);
+                    selectedHikes = util.remove_past_hikes(selectedHikes, true);
+                    selectedHikes = util.remove_hikes_notinlist(selectedHikes, docs);
+                    console.log("lastregister selectedHikes " + JSON.stringify(selectedHikes));
+                    selectedHikes = util.sort_hikes(selectedHikes, true);
+                    console.log("lastregister selectedHikes sort_hikes " + JSON.stringify(selectedHikes));
+                    selectedHikes = util.only_hikes_in_lang(docs, selectedHikes, true, language);
+                    console.log("lastregister selectedHikes only_hikes_in_lang " + JSON.stringify(selectedHikes));
+                    var selectHike = "";
+                    if (typeof memory.selecthike !== 'undefined' && memory.selecthike != null ) {
+                        var memorySelectHike = memory.selecthike.raw;
+                        selectHike = docs.find(function(element) {
+                            var result = false;
+                            if ((element.hikenamehebrew && 
+                                element.hikenamehebrew.indexOf(memorySelectHike) != -1) ||
+                                (element.hikenameenglish && 
+                                element.hikenameenglish.indexOf(memorySelectHike) != -1)) {
+                                result = true;
+                            }
+                            return result;
+                        });
+    
+                        if (selectHike != "") {
+                            switch (language) {
+                                case "he":
+                                    var indexhe = selectedHikes.indexOf(selectHike.hikenamehebrew);
+                                    var indexen = selectedHikes.indexOf(selectHike.hikenameenglish);
+                                    if (indexhe == -1 && indexen == -1) {
+                                        selectedHikes.push(selectHike.hikenamehebrew);
+                                    }
+                                    else {
+                                        selectedHikes.splice(index, 1);
+                                    }
+                                    break;
+                                case "en":
+                                    var indexhe = selectedHikes.indexOf(selectHike.hikenamehebrew);
+                                    var indexen = selectedHikes.indexOf(selectHike.hikenameenglish);
+                                    if (indexhe == -1 && indexen == -1) {
+                                        selectedHikes.push(selectHike.hikenameenglish);
+                                    }
+                                    else {
+                                        selectedHikes.splice(index, 1);
+                                    }
+                                    break;
+                                default:
+                                    break;
                             }
                         }
-                        if (selectedHikes.length == 0) {
-                            memory.emptyhikes = "yes";
-                        }
-                        else {
-                            memory.emptyhikes = selectedHikes.join("\n");
-                        }
-                        memory.selectedhikes = selectedHikes;
-                        var recast_conversation_reply = replies.get_recast_reply("HIKES_SELECTED",language,
-                            [selectedHikes.join("\n")],memory);
-                        
-                        if (memory.stage == "whichhikesregistered_password") {
-                            delete memory.stage;
-                        }
-                        else if (memory.stage == "haslastregister_true" || memory.stage == "haslastregister") {
-                            memory.stage = "wanttomodify_selecthikes";
-                            recast_conversation_reply = 
-                                register.setAvailableHikesReplyBut(recast_conversation_reply, docs, language, selectedHikes);
-                        }
-                        res.status(200).json(recast_conversation_reply);
                     }
+                    if (selectedHikes.length == 0) {
+                        memory.emptyhikes = "yes";
+                    }
+                    else {
+                        memory.emptyhikes = selectedHikes.join("\n");
+                    }
+                    memory.selectedhikes = selectedHikes;
+                    var recast_conversation_reply = replies.get_recast_reply("HIKES_SELECTED",language,
+                        [selectedHikes.join("\n")],memory);
+                    
+                    if (memory.stage == "whichhikesregistered_password") {
+                        delete memory.stage;
+                    }
+                    else if (memory.stage == "haslastregister_true" || memory.stage == "haslastregister") {
+                        memory.stage = "wanttomodify_selecthikes";
+                        recast_conversation_reply = 
+                            register.setAvailableHikesReplyBut(recast_conversation_reply, docs, language, selectedHikes);
+                    }
+                    res.status(200).json(recast_conversation_reply);
+                })
+                .catch(rejection => {
+                    util.logRejection(rejection);
                 });
-            } 
+            }
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
 
 app.put("/api/lastregister/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!req.query.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = util.normalize_phonenumber(phonenumber);
-        db.collection(LAST_REGISTER_COLLECTION).findOne(
-            { $or: [ { 'phone number': phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, doc) {
+        dbservices.getlastregisterbyphonenumber(phonenumber)
+        .then(doc => {
             var recast_conversation_reply;
             var language = util.set_language(memory);
 
-            if (err) {
-                console.log("An error occured: " + err);
-            }
-            else if (doc.password != memory.password) {
+            if (doc.password != memory.password) {
                 memory.stage = "haslastregister_true";
                 delete memory.password;
                 recast_conversation_reply = 
@@ -1203,58 +1061,48 @@ app.put("/api/lastregister/:phone", function(req, res) {
                     }
                 }
         
-                db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
-                    if (err) {
-                        handleError(res, err.message, "An error occured.");
-                    } else {
-                        docs = util.sort_hikes(docs, false);
-                        var selectedHikes = memory.registertohikes.hikes.split("\n");
-                        selectedHikes = util.remove_past_hikes(selectedHikes, true);
-                        selectedHikes = util.remove_hikes_notinlist(selectedHikes, docs);
-                        selectedHikes = util.sort_hikes(selectedHikes, true);
-                        selectedHikes = util.only_hikes_in_lang(docs, selectedHikes, true, language);
-                        memory.emptyhikes = selectedHikes.join("\n");
-                        memory.selectedhikes = selectedHikes;
-                        if (selectedHikes.length > 0) {
-                            recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
-                            var title = replies.get_conversation_string("CHOOSE_HIKE_TO_EDIT", language);
-                            recast_conversation_reply = 
-                                register.setAvailableHikesReply(recast_conversation_reply, selectedHikes, language, title);
-                        }
-                        else {
-                            delete memory.stage;
-                            delete memory.operation;
-                            recast_conversation_reply = replies.get_recast_reply("REGISTERED_NO_HIKE",language,null,memory);
-                        }
-                        res.status(200).json(recast_conversation_reply);
+                dbservices.gethikes()
+                .then(docs => {
+                    docs = util.sort_hikes(docs, false);
+                    var selectedHikes = memory.registertohikes.hikes.split("\n");
+                    selectedHikes = util.remove_past_hikes(selectedHikes, true);
+                    selectedHikes = util.remove_hikes_notinlist(selectedHikes, docs);
+                    selectedHikes = util.sort_hikes(selectedHikes, true);
+                    selectedHikes = util.only_hikes_in_lang(docs, selectedHikes, true, language);
+                    memory.emptyhikes = selectedHikes.join("\n");
+                    memory.selectedhikes = selectedHikes;
+                    if (selectedHikes.length > 0) {
+                        recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
+                        var title = replies.get_conversation_string("CHOOSE_HIKE_TO_EDIT", language);
+                        recast_conversation_reply = 
+                            register.setAvailableHikesReply(recast_conversation_reply, selectedHikes, language, title);
                     }
-                });
+                    else {
+                        delete memory.stage;
+                        delete memory.operation;
+                        recast_conversation_reply = replies.get_recast_reply("REGISTERED_NO_HIKE",language,null,memory);
+                    }
+                    res.status(200).json(recast_conversation_reply);
+                })
             }
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
 
 app.post("/api/lastregister/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!req.query.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = util.normalize_phonenumber(phonenumber);
-        db.collection(LAST_REGISTER_COLLECTION).findOne(
-            { $or: [ { 'phone number': phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, doc) {
+        dbservices.getlastregisterbyphonenumber(phonenumber)
+        .then(doc => {
             var recast_conversation_reply;
             var language = util.set_language(memory);
 
-            if (err) {
-                console.log("An error occured: " + err);
-            }
-            else if (typeof(doc) !== 'undefined' && doc != null) {
+            if (typeof(doc) !== 'undefined' && doc != null) {
                 var hiketoeditcancel = memory.hiketoeditcancel2;
                 var hikeeditdate = hiketoeditcancel.match(/\d{1,2}\.\d{1,2}\.\d{2}/g)[0].replace(/\./g,"_");
                 var thishikeobject = memory.hikeseditforms[hikeeditdate];
@@ -1284,72 +1132,64 @@ app.post("/api/lastregister/:phone", function(req, res) {
                 var affectedhikes = thishikeobject.hikes;
                 console.log("affectedhikes " + JSON.stringify(affectedhikes));
         
-                db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
-                    if (err) {
-                        handleError(res, err.message, "An error occured.");
-                    } else {
-                        docs = util.sort_hikes(docs, false);
+                dbservices.gethikes()
+                .then(docs => {
+                    docs = util.sort_hikes(docs, false);
 
-                        for (let index = 0; index < affectedhikes.length; index++) {
-                            var hike = affectedhikes[index];
-                            var hiketoeditcancelindex = hike.indexOf(hiketoeditcancel);
-                            var selectHike = null;
-                            selectHike = docs.find(function(element) {
-                                var result = false;
-                                if ((element.hikenamehebrew && 
-                                    element.hikenamehebrew.indexOf(hike) != -1) ||
-                                    (element.hikenameenglish && 
-                                    element.hikenameenglish.indexOf(hike) != -1)) {
-                                    result = true;
-                                }
-                                return result;
-                            });
-                            if (selectHike == null || hiketoeditcancelindex != -1) {
-                                affectedhikes.splice(index,1);
-                                index--;
+                    for (let index = 0; index < affectedhikes.length; index++) {
+                        var hike = affectedhikes[index];
+                        var hiketoeditcancelindex = hike.indexOf(hiketoeditcancel);
+                        var selectHike = null;
+                        selectHike = docs.find(function(element) {
+                            var result = false;
+                            if ((element.hikenamehebrew && 
+                                element.hikenamehebrew.indexOf(hike) != -1) ||
+                                (element.hikenameenglish && 
+                                element.hikenameenglish.indexOf(hike) != -1)) {
+                                result = true;
                             }
+                            return result;
+                        });
+                        if (selectHike == null || hiketoeditcancelindex != -1) {
+                            affectedhikes.splice(index,1);
+                            index--;
                         }
-                        console.log("affectedhikes2 " + JSON.stringify(affectedhikes));
-
-                        affectedhikes = affectedhikes.join("\n");
-                        var selectedHikes = memory.registertohikes.hikes.split("\n");
-                        memory.registertohikes.selectedhikes = selectedHikes;
-                        memory.emptyhikes = selectedHikes.join("\n");
-                        memory.selectedhikes = selectedHikes;
-                        if (affectedhikes.length == "") {
-                            recast_conversation_reply = 
-                                replies.get_recast_reply("NO_ANSWER",language,null,memory);    
-                        }
-                        else {
-                            recast_conversation_reply = 
-                                replies.get_recast_reply("AFFECTED_HIKES",language,[hiketoeditcancel,affectedhikes],memory);    
-                        }
-                        res.status(200).json(recast_conversation_reply);
                     }
-                });
+                    console.log("affectedhikes2 " + JSON.stringify(affectedhikes));
+
+                    affectedhikes = affectedhikes.join("\n");
+                    var selectedHikes = memory.registertohikes.hikes.split("\n");
+                    memory.registertohikes.selectedhikes = selectedHikes;
+                    memory.emptyhikes = selectedHikes.join("\n");
+                    memory.selectedhikes = selectedHikes;
+                    if (affectedhikes.length == "") {
+                        recast_conversation_reply = 
+                            replies.get_recast_reply("NO_ANSWER",language,null,memory);    
+                    }
+                    else {
+                        recast_conversation_reply = 
+                            replies.get_recast_reply("AFFECTED_HIKES",language,[hiketoeditcancel,affectedhikes],memory);    
+                    }
+                    res.status(200).json(recast_conversation_reply);
+                })
             }
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
 
 app.delete("/api/lastregister/:phone", function(req, res) {
-    if (!req.query.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = util.normalize_phonenumber(phonenumber);
-        db.collection(LAST_REGISTER_COLLECTION).deleteOne(
-            { $or: [ { 'phone number': phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, doc) {
-
-            if (err) {
-                console.log("An error occured: " + err);
-            }
+        dbservices.deleteonelastregister(phonenumber)
+        .then(doc => {
             res.status(200).json("success");
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
@@ -1360,153 +1200,146 @@ app.delete("/api/lastregister/:phone", function(req, res) {
 
 app.patch("/api/haslastregister/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!req.query.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(req.query.pwd)) {
         var phonenumber = req.params.phone;
         var language = util.set_language(memory);
 
         phonenumber = util.normalize_phonenumber(phonenumber);
         memory.phonenumber = phonenumber;
-        db.collection(LAST_REGISTER_COLLECTION).findOne(
-            { $or: [ { 'phone number': phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, doc) {
+        dbservices.getlastregisterbyphonenumber(phonenumber)
+        .then(doc => {
             var recast_conversation_reply = 
-                replies.get_recast_reply("NO_ANSWER",language,null,memory);
+            replies.get_recast_reply("NO_ANSWER",language,null,memory);
 
-            if (err) {
-                console.log("An error occured: " + err);
-            }
-            else if (typeof(doc) !== 'undefined' && doc != null) {
+            if (typeof(doc) !== 'undefined' && doc != null) {
                 memory.stage = "haslastregister_true";
                 res.status(200).json(recast_conversation_reply);
             }
             else {
-                db.collection(HIKE_COLLECTION).find({}).toArray(function(err, hikedocs) {
-                    if (err) {
-                        handleError(res, err.message, "An error occured.");
-                    } else {
-                        if (memory.operation && memory.operation != "newhike") {
-                            recast_conversation_reply = 
-                            replies.get_recast_reply("ROBOT_CONFUSED_EDITHIKE_NOT_REGISTERED_TO_HIKES",language,null,memory);
-                        }
-
-                        var stages = {
-                            "myname":"haslastregister_false",
-                            "isgay2":"registertohikes_isgay",
-                            "email2":"registertohikes_getemail",
-                            "selectedhikes":"registertohikes_selecthikes",
-                            "comefrom2":"registertohikes_comefrom",
-                            "returnto2":"registertohikes_returnto",
-                            "comewithcar2":"registertohikes_comewithcar",
-                            "availableplaces":"registertohikes_availableplaces",
-                            "savedthedate2":"registertohikes_savedthedate",
-                            "ifearof2":"registertohikes_whatyoufearof",
-                            "shareage2":"registertohikes_shareage",
-                            "age":"registertohikes_age",
-                            "dofriendsjoin2":"registertohikes_dofriendsjoin",
-                            "friendname":"registertohikes_friendsname",
-                            "friendage":"registertohikes_friendsage",
-                            "friendsavesthedate":"registertohikes_friendssavedthedate",
-                            "password":"registertohikes_createpassword",
-                            "howdidihear2":"registertohikes_howdidihear",
-                            "playson2":"registertohikes_playson",
-                            "volunteer2":"registertohikes_volunteer",
-                            "iapprove":"registertohikes_selfresponsibility",
-                        }
-
-                        var keys = {
-                            "haslastregister_false":"REGISTERTOHIKES_NAME",
-                            "registertohikes_isgay":"REGISTERTOHIKES_ISGAY",
-                            "registertohikes_getemail":"REGISTERTOHIKES_EMAIL",
-                            "registertohikes_selecthikes":"WHICH_HIKE_REGISTER",
-                            "registertohikes_comefrom":"REGISTERTOHIKES_COMEFROM",
-                            "registertohikes_returnto":"REGISTERTOHIKES_RETURNTO",
-                            "registertohikes_comewithcar":"REGISTERTOHIKES_COMEWITHCAR",
-                            "registertohikes_availableplaces":"REGISTERTOHIKES_AVAILABLEPLACES",
-                            "registertohikes_savedthedate":"REGISTERTOHIKES_SAVEDTHEDATE",
-                            "registertohikes_whatyoufearof":"REGISTERTOHIKES_FEAROF",
-                            "registertohikes_shareage":"REGISTERTOHIKES_SHAREAGE",
-                            "registertohikes_age":"REGISTERTOHIKES_AGE",
-                            "registertohikes_dofriendsjoin":"REGISTERTOHIKES_DOFRIENDSJOIN",
-                            "registertohikes_friendsname":"REGISTERTOHIKES_FRIENDSNAME",
-                            "registertohikes_friendsage":"REGISTERTOHIKES_FRIENDSAGE",
-                            "registertohikes_friendssavedthedate":"REGISTERTOHIKES_FRIENDSAVEDTHEDATE",
-                            "registertohikes_createpassword":"REGISTERTOHIKES_PASSWORD",
-                            "registertohikes_howdidihear":"REGISTERTOHIKES_HOWDIDIHEAR",
-                            "registertohikes_playson":"REGISTERTOHIKES_PLAYSON",
-                            "registertohikes_volunteer":"REGISTERTOHIKES_VOLUNTEER",
-                            "registertohikes_selfresponsibility":"REGISTERTOHIKES_SELFRESPONSIBILITY",
-                        }
-
-                        var previousvaluesdependencies = {
-                            "haslastregister_false": [],
-                            "registertohikes_isgay": [],
-                            "registertohikes_getemail": [],
-                            "registertohikes_selecthikes": [],
-                            "registertohikes_comefrom": [],
-                            "registertohikes_returnto": [],
-                            "registertohikes_comewithcar": [],
-                            "registertohikes_availableplaces": ["i come in my car", "i need a ride but i do have a car", 
-                                "i will rent a car if there will be hitchhikers", 
-                                "אני מגיע ברכב", "אני צריך טרמפ (אבל יש לי רכב)", "אשכור רכב אם יהיו טרמפיסטים"],
-                            "registertohikes_savedthedate": [],
-                            "registertohikes_whatyoufearof": ["i save the date but i do have concerns", 
-                                "אני שומר את התאריך הזה פנוי, אבל יש לי חששות לבוא לטיול"],
-                            "registertohikes_shareage": [],
-                            "registertohikes_age": ["yes", "כן"],
-                            "registertohikes_dofriendsjoin": [],
-                            "registertohikes_friendsname": ["yes", "כן"],
-                            "registertohikes_friendsage": [],
-                            "registertohikes_friendssavedthedate": [],
-                            "registertohikes_createpassword": [],
-                            "registertohikes_howdidihear": [],
-                            "registertohikes_playson": [],
-                            "registertohikes_volunteer": [],
-                            "registertohikes_selfresponsibility": [],
-                        }
-
-                        var prevvariable = "myname";
-                        console.log("memory " + JSON.stringify(memory));
-                        for (var memory_variable in stages) {
-                            console.log("memory_variable " + memory_variable + " prevvariable " + prevvariable);
-                            if (!memory[memory_variable]) {
-                                var prevvaluedependency = previousvaluesdependencies[stages[memory_variable]];
-                                if (prevvaluedependency != null && prevvaluedependency.length > 0 && 
-                                    prevvaluedependency.indexOf(memory[prevvariable].toLowerCase()) == -1) {
-                                    continue;
-                                }
-                                memory.stage = stages[memory_variable];
-                                if (memory.friendsdetails && memory.friendsdetails.length > 0 && memory_variable == "friendname") { 
-                                    continue;
-                                }
-                                else if ((memory_variable == "friendage" && !memory.friendname) ||
-                                    (memory_variable == "friendsavesthedate" && !memory.friendage)) {
-                                        continue;
-                                }
-                                var buttons = replies.get_conversation_buttons(keys[memory.stage], language);
-                                var reply_string = replies.get_conversation_string(keys[memory.stage],language);
-                                recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, reply_string, buttons);
-                                break;
-                            }
-                            else if (JSON.stringify(memory[memory_variable]) == "[]") {
-                                memory.stage = stages[memory_variable];
-                                recast_conversation_reply = 
-                                    register.setAvailableHikesReplyBut(recast_conversation_reply, hikedocs, language, memory["selectedhikes"]);
-                                break;
-                            }
-                            prevvariable = memory_variable;
-                        }
-                        memory.operation = "newhike";
-                        console.log("memory.stage " + JSON.stringify(memory.stage));
-                        res.status(200).json(recast_conversation_reply);
+                dbservices.gethikes()
+                .then(hikedocs => {
+                    if (memory.operation && memory.operation != "newhike") {
+                        recast_conversation_reply = 
+                        replies.get_recast_reply("ROBOT_CONFUSED_EDITHIKE_NOT_REGISTERED_TO_HIKES",language,null,memory);
                     }
+
+                    var stages = {
+                        "myname":"haslastregister_false",
+                        "isgay2":"registertohikes_isgay",
+                        "email2":"registertohikes_getemail",
+                        "selectedhikes":"registertohikes_selecthikes",
+                        "comefrom2":"registertohikes_comefrom",
+                        "returnto2":"registertohikes_returnto",
+                        "comewithcar2":"registertohikes_comewithcar",
+                        "availableplaces":"registertohikes_availableplaces",
+                        "savedthedate2":"registertohikes_savedthedate",
+                        "ifearof2":"registertohikes_whatyoufearof",
+                        "shareage2":"registertohikes_shareage",
+                        "age":"registertohikes_age",
+                        "dofriendsjoin2":"registertohikes_dofriendsjoin",
+                        "friendname":"registertohikes_friendsname",
+                        "friendage":"registertohikes_friendsage",
+                        "friendsavesthedate":"registertohikes_friendssavedthedate",
+                        "password":"registertohikes_createpassword",
+                        "howdidihear2":"registertohikes_howdidihear",
+                        "playson2":"registertohikes_playson",
+                        "volunteer2":"registertohikes_volunteer",
+                        "iapprove":"registertohikes_selfresponsibility",
+                    }
+
+                    var keys = {
+                        "haslastregister_false":"REGISTERTOHIKES_NAME",
+                        "registertohikes_isgay":"REGISTERTOHIKES_ISGAY",
+                        "registertohikes_getemail":"REGISTERTOHIKES_EMAIL",
+                        "registertohikes_selecthikes":"WHICH_HIKE_REGISTER",
+                        "registertohikes_comefrom":"REGISTERTOHIKES_COMEFROM",
+                        "registertohikes_returnto":"REGISTERTOHIKES_RETURNTO",
+                        "registertohikes_comewithcar":"REGISTERTOHIKES_COMEWITHCAR",
+                        "registertohikes_availableplaces":"REGISTERTOHIKES_AVAILABLEPLACES",
+                        "registertohikes_savedthedate":"REGISTERTOHIKES_SAVEDTHEDATE",
+                        "registertohikes_whatyoufearof":"REGISTERTOHIKES_FEAROF",
+                        "registertohikes_shareage":"REGISTERTOHIKES_SHAREAGE",
+                        "registertohikes_age":"REGISTERTOHIKES_AGE",
+                        "registertohikes_dofriendsjoin":"REGISTERTOHIKES_DOFRIENDSJOIN",
+                        "registertohikes_friendsname":"REGISTERTOHIKES_FRIENDSNAME",
+                        "registertohikes_friendsage":"REGISTERTOHIKES_FRIENDSAGE",
+                        "registertohikes_friendssavedthedate":"REGISTERTOHIKES_FRIENDSAVEDTHEDATE",
+                        "registertohikes_createpassword":"REGISTERTOHIKES_PASSWORD",
+                        "registertohikes_howdidihear":"REGISTERTOHIKES_HOWDIDIHEAR",
+                        "registertohikes_playson":"REGISTERTOHIKES_PLAYSON",
+                        "registertohikes_volunteer":"REGISTERTOHIKES_VOLUNTEER",
+                        "registertohikes_selfresponsibility":"REGISTERTOHIKES_SELFRESPONSIBILITY",
+                    }
+
+                    var previousvaluesdependencies = {
+                        "haslastregister_false": [],
+                        "registertohikes_isgay": [],
+                        "registertohikes_getemail": [],
+                        "registertohikes_selecthikes": [],
+                        "registertohikes_comefrom": [],
+                        "registertohikes_returnto": [],
+                        "registertohikes_comewithcar": [],
+                        "registertohikes_availableplaces": ["i come in my car", "i need a ride but i do have a car", 
+                            "i will rent a car if there will be hitchhikers", 
+                            "אני מגיע ברכב", "אני צריך טרמפ (אבל יש לי רכב)", "אשכור רכב אם יהיו טרמפיסטים"],
+                        "registertohikes_savedthedate": [],
+                        "registertohikes_whatyoufearof": ["i save the date but i do have concerns", 
+                            "אני שומר את התאריך הזה פנוי, אבל יש לי חששות לבוא לטיול"],
+                        "registertohikes_shareage": [],
+                        "registertohikes_age": ["yes", "כן"],
+                        "registertohikes_dofriendsjoin": [],
+                        "registertohikes_friendsname": ["yes", "כן"],
+                        "registertohikes_friendsage": [],
+                        "registertohikes_friendssavedthedate": [],
+                        "registertohikes_createpassword": [],
+                        "registertohikes_howdidihear": [],
+                        "registertohikes_playson": [],
+                        "registertohikes_volunteer": [],
+                        "registertohikes_selfresponsibility": [],
+                    }
+
+                    var prevvariable = "myname";
+                    console.log("memory " + JSON.stringify(memory));
+                    for (var memory_variable in stages) {
+                        console.log("memory_variable " + memory_variable + " prevvariable " + prevvariable);
+                        if (!memory[memory_variable]) {
+                            var prevvaluedependency = previousvaluesdependencies[stages[memory_variable]];
+                            if (prevvaluedependency != null && prevvaluedependency.length > 0 && 
+                                prevvaluedependency.indexOf(memory[prevvariable].toLowerCase()) == -1) {
+                                continue;
+                            }
+                            memory.stage = stages[memory_variable];
+                            if (memory.friendsdetails && memory.friendsdetails.length > 0 && memory_variable == "friendname") { 
+                                continue;
+                            }
+                            else if ((memory_variable == "friendage" && !memory.friendname) ||
+                                (memory_variable == "friendsavesthedate" && !memory.friendage)) {
+                                    continue;
+                            }
+                            var buttons = replies.get_conversation_buttons(keys[memory.stage], language);
+                            var reply_string = replies.get_conversation_string(keys[memory.stage],language);
+                            recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, reply_string, buttons);
+                            break;
+                        }
+                        else if (JSON.stringify(memory[memory_variable]) == "[]") {
+                            memory.stage = stages[memory_variable];
+                            recast_conversation_reply = 
+                                register.setAvailableHikesReplyBut(recast_conversation_reply, hikedocs, language, memory["selectedhikes"]);
+                            break;
+                        }
+                        prevvariable = memory_variable;
+                    }
+                    memory.operation = "newhike";
+                    console.log("memory.stage " + JSON.stringify(memory.stage));
+                    res.status(200).json(recast_conversation_reply);
+                })
+                .catch(rejection => {
+                    util.logRejection(rejection);
                 });
             }
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
@@ -1518,14 +1351,7 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
 
 app.post("/api/registertohikes", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!req.query.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(req.query.pwd)) {
         var language = util.set_language(memory);
         var registertohikes_lang = "עברית";
         if (language == "en") {
@@ -1587,73 +1413,47 @@ app.post("/api/registertohikes", function(req, res) {
         var phonenumber = memory.registertohikes["phone number"];
 
         phonenumber = util.normalize_phonenumber(phonenumber);
-        db.collection(LAST_REGISTER_COLLECTION).findOne(
-            { $or: [ { 'phone number': phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, doc) {
-            if (err) {
-                handleError(res, err.message, "An error occured.");
-            } else {
-                registerparams["VAR_LANGUAGE"] = registertohikes_lang;
-                for (var property in memory.registertohikes) {
-                    if (memory.registertohikes.hasOwnProperty(property) && memory.registertohikes[property] != null) {
-                        registerparams[memoryparamsheb[property]] = memory.registertohikes[property];
-                    }
+        dbservices.getlastregisterbyphonenumber(phonenumber)
+        .then(doc => {
+            registerparams["VAR_LANGUAGE"] = registertohikes_lang;
+            for (var property in memory.registertohikes) {
+                if (memory.registertohikes.hasOwnProperty(property) && memory.registertohikes[property] != null) {
+                    registerparams[memoryparamsheb[property]] = memory.registertohikes[property];
                 }
+            }
 
-                registerparams["VAR_COME_WITH_FRIENDS"] = "לא";
-                if (typeof memory.friendsdetails !== 'undefined') {
-                    for (let index = 0; index < memory.friendsdetails.length && index < 4; index++) {
-                        registerparams["VAR_COME_WITH_FRIENDS"] = "כן";
-                        const friend = memory.friendsdetails[index];
-                        var friend_index = index+1;
-                        if (friend.age) {
-                            registerparams["VAR_FRIEND"+friend_index+"_NAME"] = friend.name + " - " + friend.age;
-                        }
-                        else {
-                            registerparams["VAR_FRIEND"+friend_index+"_NAME"] = friend.name;
-                        }
-                        registerparams["VAR_FRIEND"+friend_index+"_SAVE_THE_DATE"] = 
-                            friend.savesthedate.replace("כן", "שומר את התאריך").replace("אולי הוא יבוא", "אולי יצטרף")
-                                .replace("Yes", "שומר את התאריך").replace("He may join", "אולי יצטרף");
-
+            registerparams["VAR_COME_WITH_FRIENDS"] = "לא";
+            if (typeof memory.friendsdetails !== 'undefined') {
+                for (let index = 0; index < memory.friendsdetails.length && index < 4; index++) {
+                    registerparams["VAR_COME_WITH_FRIENDS"] = "כן";
+                    const friend = memory.friendsdetails[index];
+                    var friend_index = index+1;
+                    if (friend.age) {
+                        registerparams["VAR_FRIEND"+friend_index+"_NAME"] = friend.name + " - " + friend.age;
                     }
-                    registerparams.friendsdetails = memory.friendsdetails;
-                }
-
-                var newhikes;
-                var editforms = {};
-                if (doc && doc.hikeseditforms) {
-                    newhikes = [];
-                    for (let index = 0; index < memory.selectedhikes.length; index++) {
-                        const hike = memory.selectedhikes[index];
-                        var hikedate = hike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g)[0];
-                        hikedate = hikedate.replace(/\./g,"_");
-                        if (doc.hikeseditforms[hikedate]) {
-                            editforms[hikedate] = doc.hikeseditforms[hikedate];
-                        }
-                        else {
-                            editforms[hikedate] = {
-                                "car/ride": memory.registertohikes["car/ride"],
-                                "plays on": memory.registertohikes["plays on"],
-                                "comes from": memory.registertohikes["comes from"],
-                                "returns to": memory.registertohikes["returns to"],
-                                "can organize": memory.registertohikes["can organize"],
-                                "saved the date": memory.registertohikes["saved the date"],
-                                "friends joining": memory.registertohikes["friends joining"],
-                                "available places": memory.registertohikes["available places"],
-                                friendsdetails: memory.friendsdetails,
-                                link: "",
-                                hikes: newhikes,
-                            };
-                            newhikes.push(hike);
-                        }
+                    else {
+                        registerparams["VAR_FRIEND"+friend_index+"_NAME"] = friend.name;
                     }
+                    registerparams["VAR_FRIEND"+friend_index+"_SAVE_THE_DATE"] = 
+                        friend.savesthedate.replace("כן", "שומר את התאריך").replace("אולי הוא יבוא", "אולי יצטרף")
+                            .replace("Yes", "שומר את התאריך").replace("He may join", "אולי יצטרף");
+
                 }
-                else {
-                    newhikes = memory.selectedhikes;
-                    for (let index = 0; index < memory.selectedhikes.length; index++) {
-                        const hike = memory.selectedhikes[index];
-                        var hikedate = hike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g)[0];
-                        hikedate = hikedate.replace(/\./g,"_");
+                registerparams.friendsdetails = memory.friendsdetails;
+            }
+
+            var newhikes;
+            var editforms = {};
+            if (doc && doc.hikeseditforms) {
+                newhikes = [];
+                for (let index = 0; index < memory.selectedhikes.length; index++) {
+                    const hike = memory.selectedhikes[index];
+                    var hikedate = hike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g)[0];
+                    hikedate = hikedate.replace(/\./g,"_");
+                    if (doc.hikeseditforms[hikedate]) {
+                        editforms[hikedate] = doc.hikeseditforms[hikedate];
+                    }
+                    else {
                         editforms[hikedate] = {
                             "car/ride": memory.registertohikes["car/ride"],
                             "plays on": memory.registertohikes["plays on"],
@@ -1667,111 +1467,128 @@ app.post("/api/registertohikes", function(req, res) {
                             link: "",
                             hikes: newhikes,
                         };
+                        newhikes.push(hike);
                     }
                 }
-                memory.hikeseditforms = editforms;
-
-                db.collection(HIKE_COLLECTION).find({}).toArray(function(err, hikedocs) {
-                    if (err) {
-                        handleError(res, err.message, "An error occured.");
-                    } else {
-                        var hebrewhikenames = [];
-                        for (let indexhike = 0; indexhike < newhikes.length; indexhike++) {
-                            const currhike = newhikes[indexhike];
-                            var findhike = hikedocs.find(function(element) {
-                                var result = false;
-                                if ((element.hikenamehebrew && 
-                                    element.hikenamehebrew.indexOf(currhike) != -1) ||
-                                    (element.hikenameenglish && 
-                                    element.hikenameenglish.indexOf(currhike) != -1)) {
-                                    result = true;
-                                }
-                                return result;
-                            });
-                            console.log("currhike: " + currhike + " hikehebrew: " + findhike.hikenamehebrew);
-                            if (findhike != null) {
-                                hebrewhikenames.push(findhike.hikenamehebrew);
-                            }
-                        }
-                        registerparams["VAR_NEW_HIKES_LIST"] = hebrewhikenames;
-
-                        var translations = [
-                            {
-                                paramname: "VAR_SAVED_THE_DATE",
-                                values: [
-                                    {english: "Yes", hebrew: "כן"},
-                                    {english: "I could maybe join the hike", hebrew: "אולי אוכל לבוא לטיול, לא בטוח שאני פנוי"},
-                                    {english: "I save the date but I do have concerns", 
-                                        hebrew: "אני שומר את התאריך הזה פנוי, אבל יש לי חששות לבוא לטיול"},
-                                ]
-                            },
-                            {
-                                paramname: "VAR_HAVE_A_CAR",
-                                values: [
-                                    {english: "I come in my car", hebrew: "אני מגיע ברכב"},
-                                    {english: "I need a ride", hebrew: "אני צריך טרמפ"},
-                                    {english: "I need a ride but I do have a car", hebrew: "אני צריך טרמפ (אבל יש לי רכב)"},
-                                    {english: "I already setuped with a friend I'm joining (I will write who it is in the form)", 
-                                        hebrew: "קבעתי כבר עם חבר אחר שאני מצטרף אליו (אפרט בהמשך הטופס מי זה)"},
-                                    {english: "I come in bus, a motorcycle or other", hebrew: "אני מגיע באוטובוס או אופנוע, אחר"},
-                                    {english: "I will rent a car if there will be hitchhikers", hebrew: "אשכור רכב אם יהיו טרמפיסטים"},
-                                ]
-                            }
-                        ];
-
-                        for (let indextranslate = 0; indextranslate < translations.length; indextranslate++) {
-                            const translate = translations[indextranslate];
-                            for (let indexval = 0; indexval < translate.values.length; indexval++) {
-                                const val = translate.values[indexval];
-                                if (registerparams[translate.paramname] == val.english) {
-                                    registerparams[translate.paramname] = val.hebrew;
-                                }
-                            }
-                        }
-
-                        if (memory.registertohikes.password == "" || memory.registertohikes.password == null) {
-                            memory.registertohikes.password = "APasswordThatOnlyICanEverKnow";
-                            registerparams["VAR_CHATBOT_PASSWORD"] = "APasswordThatOnlyICanEverKnow";
-                        }
-
-                        var nowdate = new Date();
-                        memory.registertohikes.selectedhikes = memory.selectedhikes;
-                        memory.registertohikes.friendsdetails = memory.friendsdetails;
-                        memory.registertohikes.hikeseditforms = memory.hikeseditforms;
-
-                        if (!memory.registertohikes.lastageupdate) {
-                            memory.registertohikes.lastageupdate = nowdate;
-                        }
-
-                        console.log("registerparams " + JSON.stringify(registerparams));
-                        console.log("memory " + JSON.stringify(memory));
-
-                        if (newhikes.length > 0) {
-                            register.register_to_hikes(language, res, registerparams, db, LAST_REGISTER_COLLECTION, memory);
-                        }
-                        else {
-                            var recast_conversation_reply = 
-                                replies.get_recast_reply("REGISTERED_TO_ALL_HIKES_CHOSEN",language,null,memory);
-                            res.status(200).json(recast_conversation_reply);
-                        }
-
-                    }
-                });
             }
+            else {
+                newhikes = memory.selectedhikes;
+                for (let index = 0; index < memory.selectedhikes.length; index++) {
+                    const hike = memory.selectedhikes[index];
+                    var hikedate = hike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g)[0];
+                    hikedate = hikedate.replace(/\./g,"_");
+                    editforms[hikedate] = {
+                        "car/ride": memory.registertohikes["car/ride"],
+                        "plays on": memory.registertohikes["plays on"],
+                        "comes from": memory.registertohikes["comes from"],
+                        "returns to": memory.registertohikes["returns to"],
+                        "can organize": memory.registertohikes["can organize"],
+                        "saved the date": memory.registertohikes["saved the date"],
+                        "friends joining": memory.registertohikes["friends joining"],
+                        "available places": memory.registertohikes["available places"],
+                        friendsdetails: memory.friendsdetails,
+                        link: "",
+                        hikes: newhikes,
+                    };
+                }
+            }
+            memory.hikeseditforms = editforms;
+
+            dbservices.gethikes()
+            .then(hikedocs => {
+                var hebrewhikenames = [];
+                for (let indexhike = 0; indexhike < newhikes.length; indexhike++) {
+                    const currhike = newhikes[indexhike];
+                    var findhike = hikedocs.find(function(element) {
+                        var result = false;
+                        if ((element.hikenamehebrew && 
+                            element.hikenamehebrew.indexOf(currhike) != -1) ||
+                            (element.hikenameenglish && 
+                            element.hikenameenglish.indexOf(currhike) != -1)) {
+                            result = true;
+                        }
+                        return result;
+                    });
+                    console.log("currhike: " + currhike + " hikehebrew: " + findhike.hikenamehebrew);
+                    if (findhike != null) {
+                        hebrewhikenames.push(findhike.hikenamehebrew);
+                    }
+                }
+                registerparams["VAR_NEW_HIKES_LIST"] = hebrewhikenames;
+
+                var translations = [
+                    {
+                        paramname: "VAR_SAVED_THE_DATE",
+                        values: [
+                            {english: "Yes", hebrew: "כן"},
+                            {english: "I could maybe join the hike", hebrew: "אולי אוכל לבוא לטיול, לא בטוח שאני פנוי"},
+                            {english: "I save the date but I do have concerns", 
+                                hebrew: "אני שומר את התאריך הזה פנוי, אבל יש לי חששות לבוא לטיול"},
+                        ]
+                    },
+                    {
+                        paramname: "VAR_HAVE_A_CAR",
+                        values: [
+                            {english: "I come in my car", hebrew: "אני מגיע ברכב"},
+                            {english: "I need a ride", hebrew: "אני צריך טרמפ"},
+                            {english: "I need a ride but I do have a car", hebrew: "אני צריך טרמפ (אבל יש לי רכב)"},
+                            {english: "I already setuped with a friend I'm joining (I will write who it is in the form)", 
+                                hebrew: "קבעתי כבר עם חבר אחר שאני מצטרף אליו (אפרט בהמשך הטופס מי זה)"},
+                            {english: "I come in bus, a motorcycle or other", hebrew: "אני מגיע באוטובוס או אופנוע, אחר"},
+                            {english: "I will rent a car if there will be hitchhikers", hebrew: "אשכור רכב אם יהיו טרמפיסטים"},
+                        ]
+                    }
+                ];
+
+                for (let indextranslate = 0; indextranslate < translations.length; indextranslate++) {
+                    const translate = translations[indextranslate];
+                    for (let indexval = 0; indexval < translate.values.length; indexval++) {
+                        const val = translate.values[indexval];
+                        if (registerparams[translate.paramname] == val.english) {
+                            registerparams[translate.paramname] = val.hebrew;
+                        }
+                    }
+                }
+
+                if (memory.registertohikes.password == "" || memory.registertohikes.password == null) {
+                    memory.registertohikes.password = "APasswordThatOnlyICanEverKnow";
+                    registerparams["VAR_CHATBOT_PASSWORD"] = "APasswordThatOnlyICanEverKnow";
+                }
+
+                var nowdate = new Date();
+                memory.registertohikes.selectedhikes = memory.selectedhikes;
+                memory.registertohikes.friendsdetails = memory.friendsdetails;
+                memory.registertohikes.hikeseditforms = memory.hikeseditforms;
+
+                if (!memory.registertohikes.lastageupdate) {
+                    memory.registertohikes.lastageupdate = nowdate;
+                }
+
+                console.log("registerparams " + JSON.stringify(registerparams));
+                console.log("memory " + JSON.stringify(memory));
+
+                if (newhikes.length > 0) {
+                    register.register_to_hikes(language, res, registerparams, memory);
+                }
+                else {
+                    var recast_conversation_reply = 
+                        replies.get_recast_reply("REGISTERED_TO_ALL_HIKES_CHOSEN",language,null,memory);
+                    res.status(200).json(recast_conversation_reply);
+                }
+            })
+            .catch(rejection => {
+                util.logRejection(rejection);
+            });
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
   });
 
   app.put("/api/registertohikes", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!memory.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (memory.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(memory.pwd)) {
         var language = util.set_language(memory);
         var registertohikes_lang = "עברית";
         if (language == "en") {
@@ -1956,68 +1773,68 @@ app.post("/api/registertohikes", function(req, res) {
             memory.registertohikes.friendsdetails = memory.friendsdetails;
             memory.registertohikes.hikeseditforms = memory.hikeseditforms;
 
-            db.collection(HIKE_COLLECTION).find({}).toArray(function(err, hikedocs) {
-                if (err) {
-                    handleError(res, err.message, "An error occured.");
-                } else {
-                    var hebrewhikenames = [];
-                    for (let indexhike = 0; indexhike < registerparams["VAR_NEW_HIKES_LIST"].length; indexhike++) {
-                        const currhike = newhikes[indexhike];
-                        var findhike = hikedocs.find(function(element) {
-                            var result = false;
-                            if ((element.hikenamehebrew && 
-                                element.hikenamehebrew.indexOf(currhike) != -1) ||
-                                (element.hikenameenglish && 
-                                element.hikenameenglish.indexOf(currhike) != -1)) {
-                                result = true;
-                            }
-                            return result;
-                        });
-                        if (findhike != null) {
-                            hebrewhikenames.push(findhike.hikenamehebrew);
+            dbservices.gethikes()
+            .then(hikedocs => {
+                var hebrewhikenames = [];
+                for (let indexhike = 0; indexhike < registerparams["VAR_NEW_HIKES_LIST"].length; indexhike++) {
+                    const currhike = newhikes[indexhike];
+                    var findhike = hikedocs.find(function(element) {
+                        var result = false;
+                        if ((element.hikenamehebrew && 
+                            element.hikenamehebrew.indexOf(currhike) != -1) ||
+                            (element.hikenameenglish && 
+                            element.hikenameenglish.indexOf(currhike) != -1)) {
+                            result = true;
                         }
+                        return result;
+                    });
+                    if (findhike != null) {
+                        hebrewhikenames.push(findhike.hikenamehebrew);
                     }
-                    registerparams["VAR_NEW_HIKES_LIST"] = hebrewhikenames;
-
-                    var translations = [
-                        {
-                            paramname: "VAR_SAVED_THE_DATE",
-                            values: [
-                                {english: "Yes", hebrew: "כן"},
-                                {english: "I could maybe join the hike", hebrew: "אולי אוכל לבוא לטיול, לא בטוח שאני פנוי"},
-                                {english: "I save the date but I do have concerns", 
-                                    hebrew: "אני שומר את התאריך הזה פנוי, אבל יש לי חששות לבוא לטיול"},
-                            ]
-                        },
-                        {
-                            paramname: "VAR_HAVE_A_CAR",
-                            values: [
-                                {english: "I come in my car", hebrew: "אני מגיע ברכב"},
-                                {english: "I need a ride", hebrew: "אני צריך טרמפ"},
-                                {english: "I need a ride but I do have a car", hebrew: "אני צריך טרמפ (אבל יש לי רכב)"},
-                                {english: "I already setuped with a friend I'm joining (I will write who it is in the form)", 
-                                    hebrew: "קבעתי כבר עם חבר אחר שאני מצטרף אליו (אפרט בהמשך הטופס מי זה)"},
-                                {english: "I come in bus, a motorcycle or other", hebrew: "אני מגיע באוטובוס או אופנוע, אחר"},
-                                {english: "I will rent a car if there will be hitchhikers", hebrew: "אשכור רכב אם יהיו טרמפיסטים"},
-                            ]
-                        }
-                    ];
-
-                    for (let indextranslate = 0; indextranslate < translations.length; indextranslate++) {
-                        const translate = translations[indextranslate];
-                        for (let indexval = 0; indexval < translate.values.length; indexval++) {
-                            const val = translate.values[indexval];
-                            if (registerparams[translate.paramname] == val.english) {
-                                registerparams[translate.paramname] = val.hebrew;
-                            }
-                        }
-                    }
-    
-                    console.log("registerparams " + JSON.stringify(registerparams));
-                    console.log("memory.registertohikes " + JSON.stringify(memory.registertohikes));
-            
-                    register.edithikes(language, res, registerparams, db, LAST_REGISTER_COLLECTION, memory);
                 }
+                registerparams["VAR_NEW_HIKES_LIST"] = hebrewhikenames;
+
+                var translations = [
+                    {
+                        paramname: "VAR_SAVED_THE_DATE",
+                        values: [
+                            {english: "Yes", hebrew: "כן"},
+                            {english: "I could maybe join the hike", hebrew: "אולי אוכל לבוא לטיול, לא בטוח שאני פנוי"},
+                            {english: "I save the date but I do have concerns", 
+                                hebrew: "אני שומר את התאריך הזה פנוי, אבל יש לי חששות לבוא לטיול"},
+                        ]
+                    },
+                    {
+                        paramname: "VAR_HAVE_A_CAR",
+                        values: [
+                            {english: "I come in my car", hebrew: "אני מגיע ברכב"},
+                            {english: "I need a ride", hebrew: "אני צריך טרמפ"},
+                            {english: "I need a ride but I do have a car", hebrew: "אני צריך טרמפ (אבל יש לי רכב)"},
+                            {english: "I already setuped with a friend I'm joining (I will write who it is in the form)", 
+                                hebrew: "קבעתי כבר עם חבר אחר שאני מצטרף אליו (אפרט בהמשך הטופס מי זה)"},
+                            {english: "I come in bus, a motorcycle or other", hebrew: "אני מגיע באוטובוס או אופנוע, אחר"},
+                            {english: "I will rent a car if there will be hitchhikers", hebrew: "אשכור רכב אם יהיו טרמפיסטים"},
+                        ]
+                    }
+                ];
+
+                for (let indextranslate = 0; indextranslate < translations.length; indextranslate++) {
+                    const translate = translations[indextranslate];
+                    for (let indexval = 0; indexval < translate.values.length; indexval++) {
+                        const val = translate.values[indexval];
+                        if (registerparams[translate.paramname] == val.english) {
+                            registerparams[translate.paramname] = val.hebrew;
+                        }
+                    }
+                }
+
+                console.log("registerparams " + JSON.stringify(registerparams));
+                console.log("memory.registertohikes " + JSON.stringify(memory.registertohikes));
+        
+                register.edithikes(language, res, registerparams, memory);
+            })
+            .catch(rejection => {
+                util.logRejection(rejection);
             });
         }
         else {
@@ -2034,14 +1851,7 @@ app.post("/api/registertohikes", function(req, res) {
 
 app.post("/api/joinupdates", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!req.query.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(req.query.pwd)) {
         var recast_conversation_reply;
         var api_key = process.env.MAILGUN_API_KEY;
         var DOMAIN = process.env.MAILGUN_DOMAIN;
@@ -2102,148 +1912,134 @@ app.post("/api/joinupdates", function(req, res) {
 
 app.patch("/api/selecthikes", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!memory.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (memory.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
-        db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
-            if (err) {
-                handleError(res, err.message, "An error occured.");
-            } else {
-                var language = util.set_language(memory);
-                docs = util.remove_past_hikes(docs, false);
-                docs = util.sort_hikes(docs, false);
-                var recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,null);    
-                recast_conversation_reply = register.setAvailableHikesReply(recast_conversation_reply, docs, language, null);
-                res.status(200).json(recast_conversation_reply);
-            }
+    if (util.checkpwd(memory.pwd)) {
+        dbservices.gethikes()
+        .then(docs => {
+            var language = util.set_language(memory);
+            docs = util.remove_past_hikes(docs, false);
+            docs = util.sort_hikes(docs, false);
+            var recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,null);    
+            recast_conversation_reply = register.setAvailableHikesReply(recast_conversation_reply, docs, language, null);
+            res.status(200).json(recast_conversation_reply);
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
 
 app.post("/api/selecthikes", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!memory.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (memory.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
-        db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
-            if (err) {
-                handleError(res, err.message, "An error occured.");
-            } else {
-                var language = util.set_language(memory);
-                docs = util.remove_past_hikes(docs, false);
-                docs = util.sort_hikes(docs, false);
-                var selectedHikes = [];
-                console.log("memory.selectedhikes " + JSON.stringify(memory.selectedhikes));
-                if (typeof memory.selectedhikes !== 'undefined' && memory.selectedhikes != null &&
-                    memory.selectedhikes != "") {
-                    selectedHikes = memory.selectedhikes;
-                    console.log("selectedHikes b4 " + JSON.stringify(selectedHikes));
-                    selectedHikes = util.remove_past_hikes(selectedHikes, true);
-                    console.log("selectedHikes removepasthikes " + JSON.stringify(selectedHikes));
-                    selectedHikes = util.remove_hikes_notinlist(selectedHikes, docs);
-                    console.log("selectedHikes removehikesnotinlist " + JSON.stringify(selectedHikes));
-                    selectedHikes = util.sort_hikes(selectedHikes, true);
-                    console.log("selectedHikes sort_hikes " + JSON.stringify(selectedHikes));
-                    selectedHikes = util.only_hikes_in_lang(docs, selectedHikes, true, language);
-                    console.log("selectedHikes only_hikes_in_lang " + JSON.stringify(selectedHikes));
+    if (util.checkpwd(memory.pwd)) {
+        dbservices.gethikes()
+        .then(docs => {
+            var language = util.set_language(memory);
+            docs = util.remove_past_hikes(docs, false);
+            docs = util.sort_hikes(docs, false);
+            var selectedHikes = [];
+            console.log("memory.selectedhikes " + JSON.stringify(memory.selectedhikes));
+            if (typeof memory.selectedhikes !== 'undefined' && memory.selectedhikes != null &&
+                memory.selectedhikes != "") {
+                selectedHikes = memory.selectedhikes;
+                console.log("selectedHikes b4 " + JSON.stringify(selectedHikes));
+                selectedHikes = util.remove_past_hikes(selectedHikes, true);
+                console.log("selectedHikes removepasthikes " + JSON.stringify(selectedHikes));
+                selectedHikes = util.remove_hikes_notinlist(selectedHikes, docs);
+                console.log("selectedHikes removehikesnotinlist " + JSON.stringify(selectedHikes));
+                selectedHikes = util.sort_hikes(selectedHikes, true);
+                console.log("selectedHikes sort_hikes " + JSON.stringify(selectedHikes));
+                selectedHikes = util.only_hikes_in_lang(docs, selectedHikes, true, language);
+                console.log("selectedHikes only_hikes_in_lang " + JSON.stringify(selectedHikes));
 
-                    memory.selectedhikes = selectedHikes;
-                }
-                var selectHike = "";
-                var dateformats = ["DD.MM.YY", "DD.MM.YYYY", "DD-MM-YYYY","DD-MM-YY","DD/MM/YYYY","DD/MM/YY",
-                    "DD.MM","DD/MM","DD-MM", "DD MM YYYY", "DD MM YY", "DD MM", "DD\\MM\\YYYY", "DD\\MM\\YY", "DD\\MM"];
-                if (typeof memory.selecthike !== 'undefined' && memory.selecthike != null) {
-                    var memorySelectHike = memory.selecthike.raw;
-                    var hikedate = memory.selecthike2.replace(/[a-zA-Zא-ת \(\)  '`\"״שׁשׂ+אַאָאּבּגּדּהּוּזּטּיּךּכּלּמּנּסּףּפּצּקּרּשּתּוֹ]/g, "").trim();
-                    var hikedate2 = hikedate.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
-                    console.log("selecthike2 replace " + hikedate);
-                    console.log("hikedate2 " + hikedate2);
-                    for (let index = 0; index < dateformats.length; index++) {
-                        const format = dateformats[index];
-                        var hikedate = moment(hikedate, format);
-                        if (typeof hikedate !== 'undefined' && hikedate != null) {
-                            hikedate = hikedate.toDate();
-                            console.log("date moment " + JSON.stringify(hikedate) + " " + hikedate);
-                            memorySelectHike = 
-                                hikedate.getDate() + "." + (hikedate.getMonth()+1) + "." + hikedate.getFullYear().toString().substr(-2);
-                            console.log("memorySelectHike moment " + memorySelectHike);
-                            break;
-                        }
-                    }
-                    console.log("last memorySelectHike " + memorySelectHike);
-                    selectHike = docs.find(function(element) {
-                        var result = false;
-                        if ((element.hikenamehebrew && 
-                            element.hikenamehebrew.indexOf(hikedate2) != -1) ||
-                            (element.hikenamehebrew && 
-                            element.hikenamehebrew.indexOf(memorySelectHike) != -1) ||
-                            (element.hikenameenglish && 
-                            element.hikenameenglish.indexOf(memorySelectHike) != -1)) {
-                            result = true;
-                        }
-                        console.log("element.hikenamehebrew " + JSON.stringify(element.hikenamehebrew) + " " + result);
-                        return result;
-                    });
-                    console.log("selectHike " + JSON.stringify(selectHike));
-
-                    if (typeof selectHike !== 'undefined' && selectHike != null && selectHike != "") {
-                        switch (language) {
-                            case "he":
-                                var indexhe = selectedHikes.indexOf(selectHike.hikenamehebrew);
-                                var indexen = selectedHikes.indexOf(selectHike.hikenameenglish);
-                                if (indexhe == -1 && indexen == -1) {
-                                    selectedHikes.push(selectHike.hikenamehebrew);
-                                }
-                                else {
-                                    selectedHikes.splice(index, 1);
-                                }
-                                break;
-                            case "en":
-                                var indexhe = selectedHikes.indexOf(selectHike.hikenamehebrew);
-                                var indexen = selectedHikes.indexOf(selectHike.hikenameenglish);
-                                if (indexhe == -1 && indexen == -1) {
-                                    selectedHikes.push(selectHike.hikenameenglish);
-                                }
-                                else {
-                                    selectedHikes.splice(index, 1);
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-                console.log("selectedHikes after change " + JSON.stringify(selectedHikes));
-                if (selectedHikes.length == 0) {
-                    memory.emptyhikes = "yes";
-                }
-                else {
-                    memory.emptyhikes = selectedHikes.join("\n");
-                }
                 memory.selectedhikes = selectedHikes;
-                var recast_conversation_reply;
-                if (typeof selectHike === 'undefined' || selectHike == null || selectHike == "") {
-                    recast_conversation_reply = replies.get_recast_reply("DIDNT_RECOGNIZE_THE_REQUESTED_HIKE",language,
-                        [selectedHikes.join("\n")],memory);                        
-                }
-                else {
-                    recast_conversation_reply = replies.get_recast_reply("HIKES_SELECTED",language,
-                        [selectedHikes.join("\n")],memory);
-                }
-                recast_conversation_reply = 
-                    register.setAvailableHikesReplyBut(recast_conversation_reply, docs, language, selectedHikes);
-                res.status(200).json(recast_conversation_reply);
             }
+            var selectHike = "";
+            var dateformats = ["DD.MM.YY", "DD.MM.YYYY", "DD-MM-YYYY","DD-MM-YY","DD/MM/YYYY","DD/MM/YY",
+                "DD.MM","DD/MM","DD-MM", "DD MM YYYY", "DD MM YY", "DD MM", "DD\\MM\\YYYY", "DD\\MM\\YY", "DD\\MM"];
+            if (typeof memory.selecthike !== 'undefined' && memory.selecthike != null) {
+                var memorySelectHike = memory.selecthike.raw;
+                var hikedate = memory.selecthike2.replace(/[a-zA-Zא-ת \(\)  '`\"״שׁשׂ+אַאָאּבּגּדּהּוּזּטּיּךּכּלּמּנּסּףּפּצּקּרּשּתּוֹ]/g, "").trim();
+                var hikedate2 = hikedate.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
+                console.log("selecthike2 replace " + hikedate);
+                console.log("hikedate2 " + hikedate2);
+                for (let index = 0; index < dateformats.length; index++) {
+                    const format = dateformats[index];
+                    var hikedate = moment(hikedate, format);
+                    if (typeof hikedate !== 'undefined' && hikedate != null) {
+                        hikedate = hikedate.toDate();
+                        console.log("date moment " + JSON.stringify(hikedate) + " " + hikedate);
+                        memorySelectHike = 
+                            hikedate.getDate() + "." + (hikedate.getMonth()+1) + "." + hikedate.getFullYear().toString().substr(-2);
+                        console.log("memorySelectHike moment " + memorySelectHike);
+                        break;
+                    }
+                }
+                console.log("last memorySelectHike " + memorySelectHike);
+                selectHike = docs.find(function(element) {
+                    var result = false;
+                    if ((element.hikenamehebrew && 
+                        element.hikenamehebrew.indexOf(hikedate2) != -1) ||
+                        (element.hikenamehebrew && 
+                        element.hikenamehebrew.indexOf(memorySelectHike) != -1) ||
+                        (element.hikenameenglish && 
+                        element.hikenameenglish.indexOf(memorySelectHike) != -1)) {
+                        result = true;
+                    }
+                    console.log("element.hikenamehebrew " + JSON.stringify(element.hikenamehebrew) + " " + result);
+                    return result;
+                });
+                console.log("selectHike " + JSON.stringify(selectHike));
+
+                if (typeof selectHike !== 'undefined' && selectHike != null && selectHike != "") {
+                    switch (language) {
+                        case "he":
+                            var indexhe = selectedHikes.indexOf(selectHike.hikenamehebrew);
+                            var indexen = selectedHikes.indexOf(selectHike.hikenameenglish);
+                            if (indexhe == -1 && indexen == -1) {
+                                selectedHikes.push(selectHike.hikenamehebrew);
+                            }
+                            else {
+                                selectedHikes.splice(index, 1);
+                            }
+                            break;
+                        case "en":
+                            var indexhe = selectedHikes.indexOf(selectHike.hikenamehebrew);
+                            var indexen = selectedHikes.indexOf(selectHike.hikenameenglish);
+                            if (indexhe == -1 && indexen == -1) {
+                                selectedHikes.push(selectHike.hikenameenglish);
+                            }
+                            else {
+                                selectedHikes.splice(index, 1);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            console.log("selectedHikes after change " + JSON.stringify(selectedHikes));
+            if (selectedHikes.length == 0) {
+                memory.emptyhikes = "yes";
+            }
+            else {
+                memory.emptyhikes = selectedHikes.join("\n");
+            }
+            memory.selectedhikes = selectedHikes;
+            var recast_conversation_reply;
+            if (typeof selectHike === 'undefined' || selectHike == null || selectHike == "") {
+                recast_conversation_reply = replies.get_recast_reply("DIDNT_RECOGNIZE_THE_REQUESTED_HIKE",language,
+                    [selectedHikes.join("\n")],memory);                        
+            }
+            else {
+                recast_conversation_reply = replies.get_recast_reply("HIKES_SELECTED",language,
+                    [selectedHikes.join("\n")],memory);
+            }
+            recast_conversation_reply = 
+                register.setAvailableHikesReplyBut(recast_conversation_reply, docs, language, selectedHikes);
+            res.status(200).json(recast_conversation_reply);
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
@@ -2251,233 +2047,90 @@ app.post("/api/selecthikes", function(req, res) {
 /*  "/api/hike"
 *    GET: gets all hike details
 *    PATCH: checks if any hike plan is in place
-*    POST: creates hike details
 *    PUT: updates hike list with a new list
-*    DELETE: deletes all hikes
 */
 
 app.get("/api/hike", function(req, res) {
-    if (!req.query.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(req.query.pwd)) {
         dbservices.gethikes()
         .then(docs => {
             res.status(200).json(docs);
         })
         .catch(rejection => {
-            console.log("something went wrong: "  + rejection);
-            if (rejection.stack) {
-                console.dir(rejection.stack);
-            }
+            util.logRejection(rejection);
         });
     }
-  });
+});
 
-  app.patch("/api/hike", function(req, res) {
+app.patch("/api/hike", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!memory.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (memory.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(memory.pwd)) {
         var language = util.set_language(memory);
-        db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
-            if (err) {
-                handleError(res, err.message, "Failed to get hike details.");
-            } else {
-                docs = util.remove_past_hikes(docs, false);
-                docs = util.sort_hikes(docs, false);
-                var recast_conversation_reply;
-                if (docs.length > 0) {
-                    if (memory.phonenumber) {
-                        recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
-                        memory.stage = "haslastregister";
-                    }
-                    else {
-                        recast_conversation_reply = replies.get_recast_reply("GET_PHONE_EMAIL",language,null,memory);                        
-                    }
+        dbservices.gethikes()
+        .then(docs => {
+            docs = util.remove_past_hikes(docs, false);
+            docs = util.sort_hikes(docs, false);
+            var recast_conversation_reply;
+            if (docs.length > 0) {
+                if (memory.phonenumber) {
+                    recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
+                    memory.stage = "haslastregister";
                 }
                 else {
-                    recast_conversation_reply = replies.get_recast_reply("NO_HIKES_PLANNED",language,null,memory);                        
-                    delete memory.stage;
+                    recast_conversation_reply = replies.get_recast_reply("GET_PHONE_EMAIL",language,null,memory);                        
                 }
-                res.status(200).json(recast_conversation_reply);
             }
+            else {
+                recast_conversation_reply = replies.get_recast_reply("NO_HIKES_PLANNED",language,null,memory);                        
+                delete memory.stage;
+            }
+            res.status(200).json(recast_conversation_reply);
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
-  });
-
-app.post("/api/hike", function(req, res) {
-  var newHike = req.body;
-  newHike.createDate = new Date();
-
-  if (!req.body.pwd) {
-    handleError(res, "Unauthorized", "Password is required.", 400);
-  }
-  else if (req.body.pwd != process.env.PSWD) {
-    handleError(res, "Unauthorized", "Password is incorrect.", 400);
-  }
-  else {
-    db.collection(HIKE_COLLECTION).insertOne(newHike, function(err, doc) {
-        if (err) {
-            handleError(res, err.message, "Failed to create new hike.");
-        } else {
-            res.status(201).json(doc.ops[0]);
-        }
-        });
-  }
 });
 
 app.put("/api/hike", function(req, res) {
-    var newHikeList = req.body;
-    if (!req.body.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.body.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
-        db.collection(HIKE_COLLECTION).deleteMany({}, function(err, result) {
-            if (err) {
-                handleError(res, err.message, "Failed to delete all hikes");
-            }
-            else {
-                db.collection(HIKE_COLLECTION).insertMany(newHikeList.hikes, function(err, docs) {
-                    if (err) {
-                        handleError(res, err.message, "Failed to insert all hikes.");
-                    } else {
-                        res.status(200).json(docs);
-                    }
-                });
-            }
+    if (util.checkpwd(req.body.pwd)) {
+        var hikes = req.body.hikes;
+        dbservices.replaceallhikes(hikes)
+        .then(() => {
+            res.status(200).json("success");
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
-
-app.delete("/api/hike", function(req, res) {
-    if (!req.query.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
-        db.collection(HIKE_COLLECTION).deleteMany({}, function(err, result) {
-            if (err) {
-            handleError(res, err.message, "Failed to delete all hikes");
-            } else {
-            res.status(200).json(req.params.id);
-            }
-        });
-    }
-});
-
 
 /*  "/api/hikers"
 *    GET: gets all hikers
-*    POST: creates a new hiker
 *    PUT: updates hiker list with a new list
-*    DELETE: delete all hikers
 */
 
 app.get("/api/hikers", function(req, res) {
-    if (!req.query.pwd || !req.query.specialpwd) {
-        handleError(res, "Unauthorized", "Password and special password are required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD || req.query.specialpwd != process.env.SPECIALPWD) {
-        handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
-    }
-    else
-    {
-        db.collection(HIKERS_COLLECTION).find({}).toArray(function(err, docs) {
-            if (err) {
-                handleError(res, err.message, "Failed to get hikers.");
-            } else {
-                res.status(200).json(docs);
-            }
+    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
+        dbservices.gethikers()
+        .then(docs => {
+            res.status(200).json(docs);
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
   });
 
-app.post("/api/hikers", function(req, res) {
-  var newHiker = req.body;
-  newHiker.createDate = new Date();
-
-  if (!req.body.pwd) {
-    handleError(res, "Unauthorized", "Password is required.", 400);
-  }
-  else if (req.body.pwd != process.env.PSWD) {
-    handleError(res, "Unauthorized", "Password is incorrect.", 400);
-  }
-  else if (!req.body.name) {
-    handleError(res, "Invalid user input", "Must provide a name.", 400);
-  } 
-  else {
-    db.collection(HIKERS_COLLECTION).insertOne(newHiker, function(err, doc) {
-      if (err) {
-        handleError(res, err.message, "Failed to create new hiker.");
-      } else {
-        res.status(201).json(doc.ops[0]);
-      }
-    });
-  }
-});
-
 app.put("/api/hikers", function(req, res) {
-    var newHikersList = req.body;
-    if (!req.body.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.body.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
-        db.collection(HIKERS_COLLECTION).deleteMany({}, function(err, result) {
-            if (err) {
-                handleError(res, err.message, "Failed to delete all hikers");
-            }
-            else if (newHikersList.hikers.length > 0) {
-                db.collection(HIKERS_COLLECTION).insertMany(newHikersList.hikers, function(err, docs) {
-                    if (err) {
-                        handleError(res, err.message, "Failed to insert all hikers.");
-                    } else {
-                        res.status(200).json(docs);
-                    }
-                });
-            }
-            else {
-                res.status(200).json("No hikers update");
-            }
-        });
-    }
-});
-
-app.delete("/api/hikers", function(req, res) {
-    if (!req.query.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
-        db.collection(HIKERS_COLLECTION).deleteMany({}, function(err, result) {
-            if (err) {
-            handleError(res, err.message, "Failed to delete all hikers");
-            } else {
-            res.status(200).json(req.params.id);
-            }
+    if (util.checkpwd(req.body.pwd)) {
+        var hikers = req.body.hikers;
+        dbservices.replaceallhikers(hikers)
+        .then(() => {
+            res.status(200).json("success");
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
@@ -2488,171 +2141,77 @@ app.delete("/api/hikers", function(req, res) {
 
 app.patch("/api/choosehike/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!memory.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (memory.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(memory.pwd)) {
         var language = util.set_language(memory);
         var reply_sent = false;
-        db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
-            if (err) {
-                handleError(res, err.message, "Failed to get last update string.");
-            } else {
-                docs = util.remove_past_hikes(docs, false);
-                var nowstring = docs[0].lastupdate;
-                
-                var phonenumber = req.params.phone;
-                phonenumber = util.normalize_phonenumber(phonenumber);
-                memory.phonenumber = phonenumber;
+        dbservices.gethikes()
+        .then(docs => {
+            docs = util.remove_past_hikes(docs, false);
+            var nowstring = docs[0].lastupdate;
+            
+            var phonenumber = req.params.phone;
+            phonenumber = util.normalize_phonenumber(phonenumber);
+            memory.phonenumber = phonenumber;
 
-                db.collection(LAST_REGISTER_COLLECTION).findOne(
-                    { $or: [ { "phone number": phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, doclast) {
-                        if (err) {
-                            handleError(res, err.message, "Failed to get last registers.");
+            dbservices.getlastregisterbyphonenumber(phonenumber)
+            .then(doclast => {
+                if (typeof doclast !== 'undefined' && doclast != null) {
+                    dbservices.gethikerswithdrivers()
+                    .then(rides => {
+                        var selectedhikes = JSON.parse(JSON.stringify(doclast.selectedhikes));
+                        reply_sent = true;
+
+                        if (doclast.password != memory.password) {
+                            delete memory.password;
+                            recast_conversation_reply = 
+                                replies.get_recast_reply("PASSWORD_INCORRECT_TRYEDIT",language,null,memory);   
+                                res.status(200).json(recast_conversation_reply);
                         }
-                        else {
-                            if (typeof doclast !== 'undefined' && doclast != null) {
-                                db.collection(HIKERS_COLLECTION).find({$or: [{mydriverfrom: {$ne:null}}, {mydriverto: {$ne: null}}] }).toArray(function(err, rides) {
-                                    if (err) {
-                                        handleError(res, err.message, "Failed to get hikers.");
-                                    } else {
-                                        var selectedhikes = JSON.parse(JSON.stringify(doclast.selectedhikes));
-                                        reply_sent = true;
-
-                                        if (doclast.password != memory.password) {
-                                            delete memory.password;
-                                            recast_conversation_reply = 
-                                                replies.get_recast_reply("PASSWORD_INCORRECT_TRYEDIT",language,null,memory);   
-                                                res.status(200).json(recast_conversation_reply);
-                                        }
-                                        else    
-                                        {
-                                            selectedhikes = util.remove_past_hikes(selectedhikes, true);
-                                            selectedhikes = util.only_hikes_in_lang(docs, selectedhikes, true, language);
-                                            var selectedrides = util.remove_hikes_notinlist(selectedhikes, rides);
-                                            
-                                            if (selectedrides.length == 1) {
-                                                memory.stage = "getridedetails";
-                                                memory.selectedhike = selectedrides[0];
-                                                ridesmodules.patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST_REGISTER_COLLECTION, replies, register, handleError);
-                                            }
-                                            else {
-                                                if (selectedrides.length > 1) {
-                                                    memory.stage = "getridedetails_choosehike";
-                                                    delete memory.selectedhike;
-                                                    var recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
-                                                    var title = replies.get_conversation_string("CHOOSE_HIKE_TO_EDIT", language);
-                                                    recast_conversation_reply = 
-                                                        register.setAvailableHikesReply(recast_conversation_reply, selectedrides, language, title); 
-                                                    res.status(200).json(recast_conversation_reply);
-                                                }
-                                                else {
-                                                    var recast_conversation_reply = 
-                                                        replies.get_recast_reply("RIDES_NOT_ARRANGED",language,
-                                                            [nowstring, selectedhikes.join("\n")],memory);  
-                                                    res.status(200).json(recast_conversation_reply);
-                                                }
-                                            }
-                                        }
-                                    }
-                                });
-                        }
-                        else {
-                            recast_conversation_reply = replies.get_recast_reply("REGISTERED_NO_HIKE",language,null,memory);
-                            res.status(200).json(recast_conversation_reply);
-                        }
-                    }
-                });
-            }
-        });
-    }
-});
-
-/*  "/api/choosehikev2/:phone"
-*    PATCH: select hike for ridedetails by phone
-*/
-
-app.patch("/api/choosehikev2/:phone", function(req, res) {
-    var memory = req.body.conversation.memory;
-    if (!memory.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (memory.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
-        var language = util.set_language(memory);
-        db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
-            if (err) {
-                handleError(res, err.message, "Failed to get last update string.");
-            } else {
-                docs = util.remove_past_hikes(docs, false);
-                var nowstring = docs[0].lastupdate;
-
-                db.collection(HIKERS_COLLECTION).find({$or: [{amidriver: true}] }).toArray(function(err, rides) {
-                    if (err) {
-                        handleError(res, err.message, "Failed to get hikers.");
-                    } else {
-                        var phonenumber = req.params.phone;
-                        phonenumber = util.normalize_phonenumber(phonenumber);
-                        memory.phonenumber = phonenumber;
-
-                        db.collection(LAST_REGISTER_COLLECTION).findOne(
-                            { $or: [ { "phone number": phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, doclast) {
-                                if (err) {
+                        else    
+                        {
+                            selectedhikes = util.remove_past_hikes(selectedhikes, true);
+                            selectedhikes = util.only_hikes_in_lang(docs, selectedhikes, true, language);
+                            var selectedrides = util.remove_hikes_notinlist(selectedhikes, rides);
+                            
+                            if (selectedrides.length == 1) {
+                                memory.stage = "getridedetails";
+                                memory.selectedhike = selectedrides[0];
+                                ridesmodules.patchridedetails(req, res, replies);
+                            }
+                            else {
+                                if (selectedrides.length > 1) {
+                                    memory.stage = "getridedetails_choosehike";
+                                    delete memory.selectedhike;
+                                    var recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
+                                    var title = replies.get_conversation_string("CHOOSE_HIKE_TO_EDIT", language);
+                                    recast_conversation_reply = 
+                                        register.setAvailableHikesReply(recast_conversation_reply, selectedrides, language, title); 
+                                    res.status(200).json(recast_conversation_reply);
                                 }
                                 else {
-                                    if (typeof doclast !== 'undefined' && doclast != null)
-                                    {
-                                        var selectedhikes = JSON.parse(JSON.stringify(doclast.selectedhikes));
-
-                                        if (doclast.password != memory.password) {
-                                            delete memory.password;
-                                            recast_conversation_reply = 
-                                                replies.get_recast_reply("PASSWORD_INCORRECT_TRYEDIT",language,null,memory);   
-                                                res.status(200).json(recast_conversation_reply);
-                                            }
-                                        else    
-                                        {
-                                            selectedhikes = util.remove_hikes_notinlist(selectedhikes, docs);
-                                            selectedhikes = util.remove_past_hikes(selectedhikes, true);
-                                            selectedhikes = util.only_hikes_in_lang(docs, selectedhikes, true, language);
-                                            
-                                            if (selectedhikes.length == 1) {
-                                                memory.stage = "getridedetails";
-                                                memory.selectedhike = selectedhikes[0];
-                                                ridesmodules.patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST_REGISTER_COLLECTION, replies, register, handleError);
-                                            }
-                                            else {
-                                                if (selectedhikes.length > 1) {
-                                                    memory.stage = "getridedetails_choosehike";
-                                                    delete memory.selectedhike;
-                                                    var recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
-                                                    var title = replies.get_conversation_string("CHOOSE_HIKE_TO_EDIT", language);
-                                                    recast_conversation_reply = 
-                                                        register.setAvailableHikesReply(recast_conversation_reply, selectedhikes, language, title); 
-                                                    res.status(200).json(recast_conversation_reply);
-                                                }
-                                                else {
-                                                    recast_conversation_reply = 
-                                                        replies.get_recast_reply("NO_DRIVERS",language,null,memory);
-                                                    delete memory.stage;
-                                                    res.status(200).json(recast_conversation_reply);
-                                                }
-                                            }
-                                        }
-                                    }
+                                    var recast_conversation_reply = 
+                                        replies.get_recast_reply("RIDES_NOT_ARRANGED",language,
+                                            [nowstring, selectedhikes.join("\n")],memory);  
+                                    res.status(200).json(recast_conversation_reply);
                                 }
-                        });
-
-                    }
-                });
-            }
+                            }
+                        }
+                    })
+                    .catch(rejection => {
+                        util.logRejection(rejection);
+                    });
+                }
+                else {
+                    recast_conversation_reply = replies.get_recast_reply("REGISTERED_NO_HIKE",language,null,memory);
+                    res.status(200).json(recast_conversation_reply);
+                }
+            })
+            .catch(rejection => {
+                util.logRejection(rejection);
+            });
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
@@ -2663,89 +2222,70 @@ app.patch("/api/choosehikev2/:phone", function(req, res) {
 */
 
 app.patch("/api/ridedetails/:phone", function(req, res) {
-    ridesmodules.patchridedetails(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST_REGISTER_COLLECTION, replies, register, handleError);
+    ridesmodules.patchridedetails(req, res, replies);
 });
 
 app.put("/api/ridedetails/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!memory.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (memory.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
-        if (err) {
-            handleError(res, err.message, "Failed to get last update string.");
-        } else {
+    if (util.checkpwd(memory.pwd)) {
+        dbservices.gethikes()
+        .then(docs => {
             var nowstring = docs[0].lastupdate;
             var phonenumber = req.params.phone;
             phonenumber = util.normalize_phonenumber(phonenumber);
             var selectedhike = memory.selectedhike;
             var hiketodate = selectedhike.match(/.*\d{1,2}\.\d{1,2}\.\d{2}/g)[0];
 
-            db.collection(HIKERS_COLLECTION).findOne(
-                { $and: [ { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
-                                   { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
-                    { $or: [ { phone: phonenumber }, { email: phonenumber.toLowerCase() } ] } ] }, function(err, doc) {
+            dbservices.gethikerbyhikedateandphonenumber(hiketodate, phonenumber)
+            .then(doc => {
                 var recast_conversation_reply;
                 var hadsetup = memory.hadsetup;
                 var language = util.set_language(memory);
 
-                if (err) {
-                    console.log("An error occured: " + err);
-                }
-                else if (typeof(doc) === 'undefined' || doc == null) {
+                if (typeof(doc) === 'undefined' || doc == null) {
                     recast_conversation_reply = 
                         replies.get_recast_reply("HIKER_NOT_REGISTERED_SPECIFIC_HIKE",language,[nowstring, selectedhike],memory);    
                         res.status(200).json(recast_conversation_reply);
                 } 
                 else
                 {
-                    db.collection(LAST_REGISTER_COLLECTION).findOne(
-                        { $or: [ { "phone number": phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, doclast) {
-                            if (err) {
-                                console.log("An error occured: " + err);
+                    dbservices.getlastregisterbyphonenumber(phonenumber)
+                    .then(doclast => {
+                        if (typeof(doclast) !== 'undefined' && doc != doclast && 
+                            typeof(doclast.password) !== 'undefined') {
+                            console.log('doc.userpassword ' + doc.userpassword + ' memory.password ' + memory.password + 
+                                ' last.password ' + doclast.password);
+                            if (doc.userpassword != memory.password && doclast.password != memory.password) {
+                                delete memory.password;
+                                recast_conversation_reply = 
+                                    replies.get_recast_reply("PASSWORD_INCORRECT_TRYEDIT",language,null,memory); 
                             }
-                            else {
-                                if (typeof(doclast) !== 'undefined' && doc != doclast && 
-                                        typeof(doclast.password) !== 'undefined') {
-                                    console.log('doc.userpassword ' + doc.userpassword + ' memory.password ' + memory.password + 
-                                        ' last.password ' + doclast.password);
-                                    if (doc.userpassword != memory.password && doclast.password != memory.password) {
-                                        delete memory.password;
-                                        recast_conversation_reply = 
-                                            replies.get_recast_reply("PASSWORD_INCORRECT_TRYEDIT",language,null,memory); 
-                                    }
-                                    else if (hadsetup)
-                                    {
-                                        recast_conversation_reply = 
-                                            replies.get_recast_reply("GREAT_FOR_UPDATE",language,null,memory); 
-                                        db.collection(HIKERS_COLLECTION).update(
-                                            { $and: [ { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
-                                                               { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
-                                                      { $or: [ { phone: phonenumber }, { email: phonenumber.toLowerCase() } ] } ] },
-                                            { $set: {status: "hadsetup" }}); 
-                                        register.sendForm("1EV8BBJfZGseTFzJo-EMcgZdPHzedRC8zTZyfyRw2LoQ", "" , "", "", res, null, null, null, "");
-                                    }
-                                }
+                            else if (hadsetup)
+                            {
+                                recast_conversation_reply = 
+                                    replies.get_recast_reply("GREAT_FOR_UPDATE",language,null,memory); 
+                                dbservices.updatehikerstatus(hiketodate, phonenumber, "hadsetup")
+                                .catch(rejection => {
+                                    util.logRejection(rejection);
+                                });
+                                register.updateCarpool();
                             }
-                            res.status(200).json(recast_conversation_reply);
                         }
-                    );
+                        res.status(200).json(recast_conversation_reply);
+                    })
+                    .catch(rejection => {
+                        util.logRejection(rejection);
+                    });
                 }
+            })
+            .catch(rejection => {
+                util.logRejection(rejection);
             });
-        }
-    });
-});
-
-/*  "/api/ridedetailsv2/:phone"
-*    PATCH: find hiker by phone
-*/
-
-app.patch("/api/ridedetailsv2/:phone", function(req, res) {
-    ridesmodules.patchridedetailsv2(req, res, db, HIKE_COLLECTION, HIKERS_COLLECTION, LAST_REGISTER_COLLECTION, replies, register, handleError);
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
+        });
+    }
 });
 
 /*  "/api/choosedriver"
@@ -2754,180 +2294,158 @@ app.patch("/api/ridedetailsv2/:phone", function(req, res) {
 
 app.post("/api/choosedriver", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (!memory.pwd) {
-        handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (memory.pwd != process.env.PSWD) {
-        handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkpwd(memory.pwd)) {
         var phonenumber = memory.phonenumber;
         phonenumber = util.normalize_phonenumber(phonenumber);
 
         var selectedhike = memory.selectedhike;
         var hiketodate = selectedhike.match(/.*\d{1,2}\.\d{1,2}\.\d{2}/g)[0];
 
-        db.collection(HIKERS_COLLECTION).findOne(
-            { $and: [ { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
-                                { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
-                { $or: [ { phone: phonenumber }, { email: phonenumber.toLowerCase() } ] } ] }, function(err, docme) {
+        dbservices.gethikerbyhikedateandphonenumber(hiketodate, phonenumber)
+        .then(docme => {
             var recast_conversation_reply;
             var language = util.set_language(memory);
 
-            if (err) {
-                console.log("An error occured: " + err);
-            }
-            else if (typeof(docme) !== 'undefined' || docme != null) {
-                db.collection(HIKERS_COLLECTION).find({ $and: [ 
-                    { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
-                             { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
-                    { $or: [ { amidriver: true } ] } ] }).toArray(function(err, drivers) {
-                    if (err) {
-                        handleError(res, err.message, "Failed to get drivers.");
-                    } else {
-                        console.log("memory.selecteddriverindex.raw " + memory.selecteddriverindex.raw);
-                        var selecteddriverindex = parseInt(memory.selecteddriverindex.raw) - 1;
-                        console.log("selecteddriverindex " + selecteddriverindex);
-                        var selecteddriver = drivers[selecteddriverindex];
-                        console.log("selecteddriver " + JSON.stringify(selecteddriver));
-                        var direction = memory.selecteddriverdirection.raw;
-                        if (direction.indexOf("הלוך") != -1 || direction.toLowerCase().indexOf("to the hike") != -1) {
-                            direction = "to";
-                        }
-                        else if (direction.indexOf("חזור") != -1 || direction.toLowerCase().indexOf("the way back") != -1) {
-                            direction = "from";
-                        }
-                        
-                        var chosendriversto = [];
-                        var chosendriversfrom = [];
-                        var chosendrivers = [];
-                        if (docme.chosendriversto) {
-                            chosendriversto = docme.chosendriversto;
-                        }
-                        if (docme.chosendriversfrom) {
-                            chosendriversfrom = docme.chosendriversfrom;
-                        }
-                        if (direction == "to") {
-                            chosendrivers = chosendriversto;
-                        }
-                        else if (direction == "from") {
-                            chosendrivers = chosendriversfrom;
-                        }
-                        var driverexists = chosendrivers.find(function(element) {
-                            var result = false;
-                            if (element.phone && element.phone == selecteddriver.phone) {
-                                result = true;
-                            }
-                            return result;
-                        });
-                        console.log("driverexists " + JSON.stringify(driverexists));
-
-                        if (driverexists == null) {
-                            chosendrivers.push(selecteddriver);
-                        }
-                        else {
-                            var index = chosendrivers.indexOf(driverexists);
-                            console.log("index " + index);
-                            
-                            chosendrivers.splice(index, 1);
-                        }
-                        if (direction == "to") {
-                            db.collection(HIKERS_COLLECTION).update(
-                                { $and: [ { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
-                                                   { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
-                                          { $or: [ { phone: phonenumber }, { email: phonenumber.toLowerCase() } ] } ] },
-                                { $set: {chosendriversto: chosendrivers }}); 
-                        }
-                        else if (direction == "from") {
-                            db.collection(HIKERS_COLLECTION).update(
-                                { $and: [ { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
-                                                   { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
-                                          { $or: [ { phone: phonenumber }, { email: phonenumber.toLowerCase() } ] } ] },
-                                { $set: {chosendriversfrom: chosendrivers }}); 
-                        }
-
-                        var selecteddriverstostring = "";
-                        var selecteddriversfromstring = "";
-                        var driversstring = "";
-
-                        switch (language) {
-                            case "he":
-                                for (let index = 0; index < drivers.length; index++) {
-                                    const driver = drivers[index];
-                                    driversstring += (index + 1) + ": מגיע מ" + 
-                                        driver.comesfrom + " וחוזר ל" + driver.returnsto + "\n";
-                                }
-                                for (let index = 0; index < chosendriversto.length; index++) {
-                                    const chosendriver = chosendriversto[index];
-                                    var driverindex = -1;
-                                    for (let j = 0; j < drivers.length; j++) {
-                                        const currdriver = drivers[j];
-                                        if (currdriver.phone == chosendriver.phone) {
-                                            driverindex = j;
-                                            break;
-                                        }
-                                    }
-                                    selecteddriverstostring += (driverindex + 1) + ": מגיע מ" + 
-                                        chosendriver.comesfrom + " וחוזר ל" + chosendriver.returnsto + "\n";
-                                }
-                                for (let index = 0; index < chosendriversfrom.length; index++) {
-                                    const chosendriver = chosendriversfrom[index];
-                                    var driverindex = -1;
-                                    for (let j = 0; j < drivers.length; j++) {
-                                        const currdriver = drivers[j];
-                                        if (currdriver.phone == chosendriver.phone) {
-                                            driverindex = j;
-                                            break;
-                                        }
-                                    }
-                                    selecteddriversfromstring += (driverindex + 1) + ": מגיע מ" + 
-                                        chosendriver.comesfrom + " וחוזר ל" + chosendriver.returnsto + "\n";
-                                }
-                                break;
-                            case "en":
-                                for (let index = 0; index < drivers.length; index++) {
-                                    const driver = drivers[index];
-                                    driversstring += (index + 1) + ": Comes from " + 
-                                        driver.comesfrom + ", returns to " + driver.returnsto + "\n";
-                                }
-                                for (let index = 0; index < chosendriversto.length; index++) {
-                                    const chosendriver = chosendriversto[index];
-                                    var driverindex = -1;
-                                    for (let j = 0; j < drivers.length; j++) {
-                                        const currdriver = drivers[j];
-                                        if (currdriver.phone == chosendriver.phone) {
-                                            driverindex = j;
-                                            break;
-                                        }
-                                    }
-                                    selecteddriverstostring += (driverindex + 1) + ": Comes from " + 
-                                        chosendriver.comesfrom + ", returns to " + chosendriver.returnsto + "\n";
-                                }
-                                for (let index = 0; index < chosendriversfrom.length; index++) {
-                                    const chosendriver = chosendriversfrom[index];
-                                    var driverindex = -1;
-                                    for (let j = 0; j < drivers.length; j++) {
-                                        const currdriver = drivers[j];
-                                        if (currdriver.phone == chosendriver.phone) {
-                                            driverindex = j;
-                                            break;
-                                        }
-                                    }
-                                    selecteddriversfromstring += (driverindex + 1) + ": Comes from " + 
-                                        chosendriver.comesfrom + ", returns to " + chosendriver.returnsto + "\n";
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-                        recast_conversation_reply = 
-                            replies.get_recast_reply("CHOOSE_ADRIVER",language,
-                                [selecteddriverstostring,selecteddriversfromstring,driversstring],memory);
-                        res.status(200).json(recast_conversation_reply);
+            if (typeof(docme) !== 'undefined' || docme != null) {
+                dbservices.getdriversforhike(hiketodate)
+                .then(drivers => {
+                    console.log("memory.selecteddriverindex.raw " + memory.selecteddriverindex.raw);
+                    var selecteddriverindex = parseInt(memory.selecteddriverindex.raw) - 1;
+                    console.log("selecteddriverindex " + selecteddriverindex);
+                    var selecteddriver = drivers[selecteddriverindex];
+                    console.log("selecteddriver " + JSON.stringify(selecteddriver));
+                    var direction = memory.selecteddriverdirection.raw;
+                    if (direction.indexOf("הלוך") != -1 || direction.toLowerCase().indexOf("to the hike") != -1) {
+                        direction = "to";
                     }
+                    else if (direction.indexOf("חזור") != -1 || direction.toLowerCase().indexOf("the way back") != -1) {
+                        direction = "from";
+                    }
+                    
+                    var chosendriversto = [];
+                    var chosendriversfrom = [];
+                    var chosendrivers = [];
+                    if (docme.chosendriversto) {
+                        chosendriversto = docme.chosendriversto;
+                    }
+                    if (docme.chosendriversfrom) {
+                        chosendriversfrom = docme.chosendriversfrom;
+                    }
+                    if (direction == "to") {
+                        chosendrivers = chosendriversto;
+                    }
+                    else if (direction == "from") {
+                        chosendrivers = chosendriversfrom;
+                    }
+                    var driverexists = chosendrivers.find(function(element) {
+                        var result = false;
+                        if (element.phone && element.phone == selecteddriver.phone) {
+                            result = true;
+                        }
+                        return result;
+                    });
+                    console.log("driverexists " + JSON.stringify(driverexists));
+
+                    if (driverexists == null) {
+                        chosendrivers.push(selecteddriver);
+                    }
+                    else {
+                        var index = chosendrivers.indexOf(driverexists);
+                        console.log("index " + index);
+                        
+                        chosendrivers.splice(index, 1);
+                    }
+                    dbservices.updatehikerchoosedrivers(direction, chosendrivers)
+                    .catch(rejection => {
+                        util.logRejection(rejection);
+                    });
+
+                    var selecteddriverstostring = "";
+                    var selecteddriversfromstring = "";
+                    var driversstring = "";
+
+                    switch (language) {
+                        case "he":
+                            for (let index = 0; index < drivers.length; index++) {
+                                const driver = drivers[index];
+                                driversstring += (index + 1) + ": מגיע מ" + 
+                                    driver.comesfrom + " וחוזר ל" + driver.returnsto + "\n";
+                            }
+                            for (let index = 0; index < chosendriversto.length; index++) {
+                                const chosendriver = chosendriversto[index];
+                                var driverindex = -1;
+                                for (let j = 0; j < drivers.length; j++) {
+                                    const currdriver = drivers[j];
+                                    if (currdriver.phone == chosendriver.phone) {
+                                        driverindex = j;
+                                        break;
+                                    }
+                                }
+                                selecteddriverstostring += (driverindex + 1) + ": מגיע מ" + 
+                                    chosendriver.comesfrom + " וחוזר ל" + chosendriver.returnsto + "\n";
+                            }
+                            for (let index = 0; index < chosendriversfrom.length; index++) {
+                                const chosendriver = chosendriversfrom[index];
+                                var driverindex = -1;
+                                for (let j = 0; j < drivers.length; j++) {
+                                    const currdriver = drivers[j];
+                                    if (currdriver.phone == chosendriver.phone) {
+                                        driverindex = j;
+                                        break;
+                                    }
+                                }
+                                selecteddriversfromstring += (driverindex + 1) + ": מגיע מ" + 
+                                    chosendriver.comesfrom + " וחוזר ל" + chosendriver.returnsto + "\n";
+                            }
+                            break;
+                        case "en":
+                            for (let index = 0; index < drivers.length; index++) {
+                                const driver = drivers[index];
+                                driversstring += (index + 1) + ": Comes from " + 
+                                    driver.comesfrom + ", returns to " + driver.returnsto + "\n";
+                            }
+                            for (let index = 0; index < chosendriversto.length; index++) {
+                                const chosendriver = chosendriversto[index];
+                                var driverindex = -1;
+                                for (let j = 0; j < drivers.length; j++) {
+                                    const currdriver = drivers[j];
+                                    if (currdriver.phone == chosendriver.phone) {
+                                        driverindex = j;
+                                        break;
+                                    }
+                                }
+                                selecteddriverstostring += (driverindex + 1) + ": Comes from " + 
+                                    chosendriver.comesfrom + ", returns to " + chosendriver.returnsto + "\n";
+                            }
+                            for (let index = 0; index < chosendriversfrom.length; index++) {
+                                const chosendriver = chosendriversfrom[index];
+                                var driverindex = -1;
+                                for (let j = 0; j < drivers.length; j++) {
+                                    const currdriver = drivers[j];
+                                    if (currdriver.phone == chosendriver.phone) {
+                                        driverindex = j;
+                                        break;
+                                    }
+                                }
+                                selecteddriversfromstring += (driverindex + 1) + ": Comes from " + 
+                                    chosendriver.comesfrom + ", returns to " + chosendriver.returnsto + "\n";
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    recast_conversation_reply = 
+                        replies.get_recast_reply("CHOOSE_ADRIVER",language,
+                            [selecteddriverstostring,selecteddriversfromstring,driversstring],memory);
+                    res.status(200).json(recast_conversation_reply);
+                })
+                .catch(rejection => {
+                    util.logRejection(rejection);
                 });
             }
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
     }
 });
@@ -2939,36 +2457,19 @@ app.post("/api/choosedriver", function(req, res) {
 */
 
 app.get("/api/ironnumber", function(req, res) {
-    if (!req.query.pwd || !req.query.specialpwd) {
-        handleError(res, "Unauthorized", "Password and special password are required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD || req.query.specialpwd != process.env.SPECIALPWD) {
-        handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
         dbservices.getironnumbers()
         .then(ironnumbers => {
             res.status(200).json(ironnumbers);
         })
         .catch(rejection => {
-            console.log("something went wrong: "  + rejection);
-            if (rejection.stack) {
-                console.dir(rejection.stack);
-            }
+            util.logRejection(rejection);
         });
     }
 });
 
 app.patch("/api/ironnumber", function(req, res) {
-    if (!req.query.pwd || !req.query.specialpwd) {
-        handleError(res, "Unauthorized", "Password and special password are required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD || req.query.specialpwd != process.env.SPECIALPWD) {
-        handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
         var selectedhike = req.query.hikename;
         if (selectedhike) {
             var hiketodate = selectedhike.match(/\d{1,2}\.\d{1,2}\.\d{2}/)[0];
@@ -3015,17 +2516,11 @@ app.patch("/api/ironnumber", function(req, res) {
                     res.status(200).json(ironnumbers);
                 })
                 .catch(rejection => {
-                    console.log("something went wrong: "  + rejection);
-                    if (rejection.stack) {
-                        console.dir(rejection.stack);
-                    }
+                    util.logRejection(rejection);
                 });
             })
             .catch(rejection => {
-                console.log("something went wrong: "  + rejection);
-                if (rejection.stack) {
-                    console.dir(rejection.stack);
-                }
+                util.logRejection(rejection);
             });
         }
         else {
@@ -3035,13 +2530,7 @@ app.patch("/api/ironnumber", function(req, res) {
 });
 
 app.post("/api/ironnumber", function(req, res) {
-    if (!req.body.pwd) {
-      handleError(res, "Unauthorized", "Password is required.", 400);
-    }
-    else if (req.body.pwd != process.env.PSWD) {
-      handleError(res, "Unauthorized", "Password is incorrect.", 400);
-    }
-    else {
+    if (util.checkpwd(req.body.pwd)) {
         var phonenumber = req.body.phone;
         if (phonenumber == process.env.SPECIALPWD) {
             phonenumber = process.env.TAL_PHONE;
@@ -3058,10 +2547,7 @@ app.post("/api/ironnumber", function(req, res) {
                     res.status(200).json("success");
                 })
                 .catch(rejection => {
-                    console.log("something went wrong: "  + rejection);
-                    if (rejection.stack) {
-                        console.dir(rejection.stack);
-                    }
+                    util.logRejection(rejection);
                 });
             }
             else {
@@ -3078,40 +2564,24 @@ app.post("/api/ironnumber", function(req, res) {
 *    PATCH: queries for lat lon locations for hikers comesfromdetailed and returnstodetailed
 */
 app.patch("/api/findhikerslocation", function(req, res) {
-    if (!req.query.pwd || !req.query.specialpwd) {
-        handleError(res, "Unauthorized", "Password and special password are required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD || req.query.specialpwd != process.env.SPECIALPWD) {
-        handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
-    }
-    else
-    {
-        db.collection(HIKERS_COLLECTION).find({}).toArray(function(err, hikers) {
-            if (err) {
-                handleError(res, err.message, "Failed to get hikers.");
-            } else {
-                ridesmodules.findhikerslocation(hikers)
-                .then(hikers => {
-                    db.collection(HIKERS_COLLECTION).deleteMany({},
-                            function(err, result) {
-                        if (err) {
-                            handleError(res, err.message, "Failed to delete hikers");
-                        } else {
-                            db.collection(HIKERS_COLLECTION).insertMany(hikers, function(err, docs) {
-                                if (err) {
-                                    handleError(res, err.message, "Failed to insert all hikers");
-                                }
-                                else {
-                                    register.sendForm("1EV8BBJfZGseTFzJo-EMcgZdPHzedRC8zTZyfyRw2LoQ", 
-                                        "" , "", "", res, null, null, null, "");
-                                }
-                            });
-                        }
-                    });
+    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
+        dbservices.gethikers()
+        .then(hikers => {
+            ridesmodules.findhikerslocation(hikers)
+            .then(hikers => {
+                dbservices.replaceallhikers(hikers)
+                .then(() => {
+                    register.updateCarpool();
+                })
+                .catch(rejection => {
+                    util.logRejection(rejection);
                 });
-            }
+            });
+            res.status(200).json("Working...");
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
-        res.status(200).json("Working...");
     }
 });
 
@@ -3123,262 +2593,264 @@ app.patch("/api/findhikerslocation", function(req, res) {
 */
 
 app.get("/api/calculaterides", function(req, res) {
-    if (!req.query.pwd || !req.query.specialpwd) {
-        handleError(res, "Unauthorized", "Password and special password are required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD || req.query.specialpwd != process.env.SPECIALPWD) {
-        handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
         res.status(200).json("OK");
     }
 });
 
 app.patch("/api/calculaterides", function(req, res) {
-    if (!req.query.pwd || !req.query.specialpwd) {
-        handleError(res, "Unauthorized", "Password and special password are required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD || req.query.specialpwd != process.env.SPECIALPWD) {
-        handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
-    }
-    else
-    {
-        db.collection(HIKE_COLLECTION).find({}).toArray(function(err, hikes) {
-            if (err) {
-                handleError(res, err.message, "Failed to get near hikes.");
-            } else {
-                var nearhikes = util.get_near_hikes(hikes);
-
-                for (let hikeindex = 0; hikeindex < nearhikes.length; hikeindex++) {
-                    const hike = nearhikes[hikeindex];
-                    db.collection(HIKERS_COLLECTION).find(
-                        {hikenamehebrew: { $regex : ".*"+hike.hikedate+".*" }}).sort({hikerindex: 1}).toArray(function(err, hikers) {
-                        if (err) {
-                            handleError(res, err.message, "Failed to get hikers for the near hikes.");
-                        } else if (hikers && hikers.length > 0){
-                            console.log("start calculation for " + hike.hikenamehebrew);
-                            ridesmodules.findhikerslocation(hikers)
-                            .then(() => {
-                                var promises = [];
-                                for (let index = 0; index < hikers.length; index++) {
-                                    const hiker = hikers[index];
-                                    if (!hiker.amidriver && hike.startlatitude && hike.endlatitude &&
-                                        (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
-                                         hiker.needaride == "I come in bus, a motorcycle or other")) {
-                                        if (!hiker.mydriverto && !hiker.routetothehike) {
-                                            console.log("publicTransport to the hike for hiker " + hiker.fullname);
-                                            promises.push(
-                                                ridesmodules.calculateroute(
-                                                    hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude,
-                                                    hike.startlongitude, "publicTransport", hike.starttime, null)
-                                                .then(route => {
-                                                    hiker.routetothehike = route;
-                                                })
-                                                .catch(rejection => {
-                                                    console.log("something went wrong: "  + rejection);
-                                                    if (rejection.stack) {
-                                                        console.dir(rejection.stack);
-                                                    }
-                                                })
-                                            );
-                                        }
-                                        if (!hiker.mydriverfrom && !hiker.routefromthehike) {
-                                            console.log("publicTransport from the hike for hiker " + hiker.fullname);
-                                            promises.push(
-                                                ridesmodules.calculateroute(
-                                                    hike.endlatitude, hike.endlongitude, hiker.returnstolocation.lat, 
-                                                    hiker.returnstolocation.lon, "publicTransport", null, hike.endtime)
-                                                .then(route => {
-                                                    hiker.routefromthehike = route;
-                                                })
-                                                .catch(rejection => {
-                                                    console.log("something went wrong: "  + rejection);
-                                                    if (rejection.stack) {
-                                                        console.dir(rejection.stack);
-                                                    }
-                                                })
-                                            );
-                                        }
+    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
+        dbservices.gethikes()
+        .then(hikes => {
+            var nearhikes = util.get_near_hikes(hikes);
+            for (let hikeindex = 0; hikeindex < nearhikes.length; hikeindex++) {
+                const hike = nearhikes[hikeindex];
+                dbservices.gethikersbyhikedate(hike.hikedate)
+                .then(hikers => {
+                    if (hikers && hikers.length > 0){
+                        console.log("start calculation for " + hike.hikenamehebrew);
+                        ridesmodules.findhikerslocation(hikers)
+                        .then(() => {
+                            var promises = [];
+                            for (let index = 0; index < hikers.length; index++) {
+                                const hiker = hikers[index];
+                                if (!hiker.amidriver && hike.startlatitude && hike.endlatitude &&
+                                    (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
+                                     hiker.needaride == "I come in bus, a motorcycle or other")) {
+                                    if (!hiker.mydriverto && !hiker.routetothehike) {
+                                        console.log("publicTransport to the hike for hiker " + hiker.fullname);
+                                        promises.push(
+                                            ridesmodules.calculateroute(
+                                                hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude,
+                                                hike.startlongitude, "publicTransport", hike.starttime, null)
+                                            .then(route => {
+                                                hiker.routetothehike = route;
+                                            })
+                                            .catch(rejection => {
+                                                util.logRejection(rejection);
+                                            })
+                                        );
+                                    }
+                                    if (!hiker.mydriverfrom && !hiker.routefromthehike) {
+                                        console.log("publicTransport from the hike for hiker " + hiker.fullname);
+                                        promises.push(
+                                            ridesmodules.calculateroute(
+                                                hike.endlatitude, hike.endlongitude, hiker.returnstolocation.lat, 
+                                                hiker.returnstolocation.lon, "publicTransport", null, hike.endtime)
+                                            .then(route => {
+                                                hiker.routefromthehike = route;
+                                            })
+                                            .catch(rejection => {
+                                                util.logRejection(rejection);
+                                            })
+                                        );
                                     }
                                 }
-                                Promise.all(promises).then(() => {
-                                })
+                            }
+                            Promise.all(promises).then(() => {
                             })
-                            .then(() => {
-                                console.log("calculaterides getDistanceMatrix");
-                                var distances = util.getDistanceMatrix(hikers);
-                                var areas = util.getHikerAreas(hikers);
-                                if (hike.startlatitude) {
-                                    var hikestartenddistance = util.distanceLatLons(
-                                        hike.startlatitude, hike.startlongitude, hike.endlatitude, hike.endlongitude);
-                                    hike.iscircular = hikestartenddistance < 500 ? true : false;
+                        })
+                        .then(() => {
+                            console.log("calculaterides getDistanceMatrix");
+                            var distances = util.getDistanceMatrix(hikers);
+                            var areas = util.getHikerAreas(hikers);
+                            if (hike.startlatitude) {
+                                var hikestartenddistance = util.distanceLatLons(
+                                    hike.startlatitude, hike.startlongitude, hike.endlatitude, hike.endlongitude);
+                                hike.iscircular = hikestartenddistance < 500 ? true : false;
+                            }
+
+                            // for (var area in ["דרום", "צפון", "ירושלים", "חיפה", "מרכז"]) {
+
+                            // }
+
+                            for (let index = 0; index < hikers.length; index++) {
+                                const hiker = hikers[index];
+                                console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
+                                    " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
+                                    " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
+
+                                if (hiker.amidriver || hiker.seatsrequired == 0) {
+                                    continue;
                                 }
 
-                                // for (var area in ["דרום", "צפון", "ירושלים", "חיפה", "מרכז"]) {
+                                if (!hiker.routetothehike && hike.startlatitude) {
+                                    for (let neardriverindex = 0; neardriverindex < distances[hiker.phone].tothehike.length; 
+                                            neardriverindex++) {
+                                        const neardriverdistanceto = distances[hiker.phone].tothehike[neardriverindex];
+                                        var neardriver = neardriverdistanceto.link;
+                                        console.log("calculaterides driver to the hike: distance " + 
+                                            neardriverdistanceto.distance + 
+                                            " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
+                                            neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
+                                            " neardriver.availableplacestothehike " + neardriver.availableplacestothehike + 
+                                            " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
+                                            neardriver.returnstodetailed);
+                                        if (neardriver.amidriver && 
+                                            neardriver.availableplacestothehike >= hiker.seatsrequiredtothehike) {
+                                            if (!hiker.mydriverto) {
+                                                neardriver.availableplacestothehike--;
+                                                hiker.seatsrequiredtothehike--;
+                                                hiker.mydriverto = {
+                                                    name: neardriver.name,
+                                                    fullname: neardriver.fullname,
+                                                    phone: neardriver.phone,
+                                                    drivercomesfrom: neardriver.comesfrom,
+                                                    driverreturnsto: neardriver.returnsto,
+                                                };
+                                                neardriver.myhitchersto.push({
+                                                    "hitchername": hiker.name,
+                                                    "hitcherfullname": hiker.fullname,
+                                                    "hitcherphone": hiker.phone,
+                                                    "hitchercomesfrom": hiker.comesfrom,
+                                                    "hitcherreturnsto": hiker.returnsto,
+                                                });
 
-                                // }
-
-                                for (let index = 0; index < hikers.length; index++) {
-                                    const hiker = hikers[index];
-                                    console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
-                                        " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
-                                        " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
-
-                                    if (hiker.amidriver || hiker.seatsrequired == 0) {
-                                        continue;
-                                    }
-
-                                    if (!hiker.routetothehike && hike.startlatitude) {
-                                        for (let neardriverindex = 0; neardriverindex < distances[hiker.phone].tothehike.length; 
-                                                neardriverindex++) {
-                                            const neardriverdistanceto = distances[hiker.phone].tothehike[neardriverindex];
-                                            var neardriver = neardriverdistanceto.link;
-                                            console.log("calculaterides driver to the hike: distance " + 
-                                                neardriverdistanceto.distance + 
-                                                " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
-                                                neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
-                                                " neardriver.availableplacestothehike " + neardriver.availableplacestothehike + 
-                                                " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
-                                                neardriver.returnstodetailed);
-                                            if (neardriver.amidriver && 
-                                                neardriver.availableplacestothehike >= hiker.seatsrequiredtothehike) {
-                                                if (!hiker.mydriverto) {
+                                                hiker.myfriendsdriversto = [];
+                                                for (let hitchhikerfriendindex = 0; 
+                                                    hiker.myfriends != null && hitchhikerfriendindex < hiker.myfriends.length; 
+                                                    hitchhikerfriendindex++) {
+                                                    const hitchhikerfriend = hiker.myfriends[hitchhikerfriendindex];
+                                                    hiker.myfriendsdriversto.push({
+                                                        "hitchername": hitchhikerfriend,
+                                                        "drivername": neardriver.name,
+                                                        "driverfullname": neardriver.fullname,
+                                                        "driverphone": neardriver.phone,
+                                                        "drivercomesfrom": neardriver.comesfrom,
+                                                        "driverreturnsto": neardriver.returnsto,
+                                                    });
+                                                    neardriver.myhitchersto.push({
+                                                        "hitchername": hitchhikerfriend,
+                                                        "hitcherphone": hiker.phone,
+                                                        "hitchercomesfrom": hiker.comesfrom,
+                                                        "hitcherreturnsto": hiker.returnsto,
+                                                    });
                                                     neardriver.availableplacestothehike--;
                                                     hiker.seatsrequiredtothehike--;
-                                                    hiker.mydriverto = {
-                                                        name: neardriver.name,
-                                                        fullname: neardriver.fullname,
-                                                        phone: neardriver.phone,
-                                                        drivercomesfrom: neardriver.comesfrom,
-                                                        driverreturnsto: neardriver.returnsto,
-                                                    };
-                                                    neardriver.myhitchersto.push({
-                                                        "hitchername": hiker.name,
-                                                        "hitcherfullname": hiker.fullname,
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (!hiker.routefromthehike && hike.startlatitude) {
+                                    for (let neardriverindex = 0; neardriverindex < distances[hiker.phone].fromthehike.length; 
+                                            neardriverindex++) {
+                                        const neardriverdistancefrom = distances[hiker.phone].fromthehike[neardriverindex];
+                                        var neardriver = neardriverdistancefrom.link;
+                                        console.log("calculaterides driver from the hike: distance " + 
+                                            neardriverdistancefrom.distance + " name " + neardriver.fullname + " isdriver " + 
+                                            neardriver.amidriver + " seats " + neardriver.seatsrequired + " availableplaces " + 
+                                            neardriver.availableplaces + " neardriver.availableplacesfromthehike " + 
+                                            neardriver.availableplacesfromthehike + " comesfrom " + 
+                                            neardriver.comesfromdetailed + " returnsto " + neardriver.returnstodetailed);
+                                        if (neardriver.amidriver && 
+                                            neardriver.availableplacesfromthehike >= hiker.seatsrequiredfromthehike) {
+                                            if (!hiker.mydriverfrom) {
+                                                neardriver.availableplacesfromthehike--;
+                                                hiker.seatsrequiredfromthehike--;
+                                                hiker.mydriverfrom = {
+                                                    name: neardriver.name,
+                                                    fullname: neardriver.fullname,
+                                                    phone: neardriver.phone,
+                                                    drivercomesfrom: neardriver.comesfrom,
+                                                    driverreturnsto: neardriver.returnsto,
+                                                };
+                                                neardriver.myhitchersfrom.push({
+                                                    "hitchername": hiker.name,
+                                                    "hitcherfullname": hiker.fullname,
+                                                    "hitcherphone": hiker.phone,
+                                                    "hitchercomesfrom": hiker.comesfrom,
+                                                    "hitcherreturnsto": hiker.returnsto,
+                                                });
+
+                                                hiker.myfriendsdriversfrom = [];
+                                                for (let hitchhikerfriendindex = 0; 
+                                                    hiker.myfriends != null && hitchhikerfriendindex < hiker.myfriends.length; 
+                                                    hitchhikerfriendindex++) {
+                                                    const hitchhikerfriend = hiker.myfriends[hitchhikerfriendindex];
+                                                    hiker.myfriendsdriversfrom.push({
+                                                        "hitchername": hitchhikerfriend,
+                                                        "drivername": neardriver.name,
+                                                        "driverfullname": neardriver.fullname,
+                                                        "driverphone": neardriver.phone,
+                                                        "drivercomesfrom": neardriver.comesfrom,
+                                                        "driverreturnsto": neardriver.returnsto,
+                                                    });
+                                                    neardriver.myhitchersfrom.push({
+                                                        "hitchername": hitchhikerfriend,
                                                         "hitcherphone": hiker.phone,
                                                         "hitchercomesfrom": hiker.comesfrom,
                                                         "hitcherreturnsto": hiker.returnsto,
                                                     });
-
-                                                    hiker.myfriendsdriversto = [];
-                                                    for (let hitchhikerfriendindex = 0; 
-                                                        hiker.myfriends != null && hitchhikerfriendindex < hiker.myfriends.length; 
-                                                        hitchhikerfriendindex++) {
-                                                        const hitchhikerfriend = hiker.myfriends[hitchhikerfriendindex];
-                                                        hiker.myfriendsdriversto.push({
-                                                            "hitchername": hitchhikerfriend,
-                                                            "drivername": neardriver.name,
-                                                            "driverfullname": neardriver.fullname,
-                                                            "driverphone": neardriver.phone,
-                                                            "drivercomesfrom": neardriver.comesfrom,
-                                                            "driverreturnsto": neardriver.returnsto,
-                                                        });
-                                                        neardriver.myhitchersto.push({
-                                                            "hitchername": hitchhikerfriend,
-                                                            "hitcherphone": hiker.phone,
-                                                            "hitchercomesfrom": hiker.comesfrom,
-                                                            "hitcherreturnsto": hiker.returnsto,
-                                                        });
-                                                        neardriver.availableplacestothehike--;
-                                                        hiker.seatsrequiredtothehike--;
-                                                    }
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    if (!hiker.routefromthehike && hike.startlatitude) {
-                                        for (let neardriverindex = 0; neardriverindex < distances[hiker.phone].fromthehike.length; 
-                                                neardriverindex++) {
-                                            const neardriverdistancefrom = distances[hiker.phone].fromthehike[neardriverindex];
-                                            var neardriver = neardriverdistancefrom.link;
-                                            console.log("calculaterides driver from the hike: distance " + 
-                                                neardriverdistancefrom.distance + " name " + neardriver.fullname + " isdriver " + 
-                                                neardriver.amidriver + " seats " + neardriver.seatsrequired + " availableplaces " + 
-                                                neardriver.availableplaces + " neardriver.availableplacesfromthehike " + 
-                                                neardriver.availableplacesfromthehike + " comesfrom " + 
-                                                neardriver.comesfromdetailed + " returnsto " + neardriver.returnstodetailed);
-                                            if (neardriver.amidriver && 
-                                                neardriver.availableplacesfromthehike >= hiker.seatsrequiredfromthehike) {
-                                                if (!hiker.mydriverfrom) {
                                                     neardriver.availableplacesfromthehike--;
                                                     hiker.seatsrequiredfromthehike--;
-                                                    hiker.mydriverfrom = {
-                                                        name: neardriver.name,
-                                                        fullname: neardriver.fullname,
-                                                        phone: neardriver.phone,
-                                                        drivercomesfrom: neardriver.comesfrom,
-                                                        driverreturnsto: neardriver.returnsto,
-                                                    };
-                                                    neardriver.myhitchersfrom.push({
-                                                        "hitchername": hiker.name,
-                                                        "hitcherfullname": hiker.fullname,
-                                                        "hitcherphone": hiker.phone,
-                                                        "hitchercomesfrom": hiker.comesfrom,
-                                                        "hitcherreturnsto": hiker.returnsto,
-                                                    });
-
-                                                    hiker.myfriendsdriversfrom = [];
-                                                    for (let hitchhikerfriendindex = 0; 
-                                                        hiker.myfriends != null && hitchhikerfriendindex < hiker.myfriends.length; 
-                                                        hitchhikerfriendindex++) {
-                                                        const hitchhikerfriend = hiker.myfriends[hitchhikerfriendindex];
-                                                        hiker.myfriendsdriversfrom.push({
-                                                            "hitchername": hitchhikerfriend,
-                                                            "drivername": neardriver.name,
-                                                            "driverfullname": neardriver.fullname,
-                                                            "driverphone": neardriver.phone,
-                                                            "drivercomesfrom": neardriver.comesfrom,
-                                                            "driverreturnsto": neardriver.returnsto,
-                                                        });
-                                                        neardriver.myhitchersfrom.push({
-                                                            "hitchername": hitchhikerfriend,
-                                                            "hitcherphone": hiker.phone,
-                                                            "hitchercomesfrom": hiker.comesfrom,
-                                                            "hitcherreturnsto": hiker.returnsto,
-                                                        });
-                                                        neardriver.availableplacesfromthehike--;
-                                                        hiker.seatsrequiredfromthehike--;
-                                                    }
                                                 }
-                                                break;
                                             }
+                                            break;
                                         }
                                     }
                                 }
+                            }
 
-                                for (let index = 0; index < hikers.length; index++) {
-                                    const hiker = hikers[index];
-                                    if (hiker.amidriver && 
-                                        (hiker.needaride == "אני צריך טרמפ (אבל יש לי רכב)" ||
-                                        hiker.needaride == "I need a ride but I do have a car")) {
-                                        
-                                    }
+                            for (let index = 0; index < hikers.length; index++) {
+                                const hiker = hikers[index];
+                                if (hiker.amidriver && 
+                                    (hiker.needaride == "אני צריך טרמפ (אבל יש לי רכב)" ||
+                                    hiker.needaride == "I need a ride but I do have a car")) {
+                                    
                                 }
+                            }
 
-                                console.log("calculaterides carpool calculation result:");
-                                for (let index = 0; index < hikers.length; index++) {
-                                    const hiker = hikers[index];
-                                    if (hiker.amidriver) {
-                                        var hitchersto = "";
-                                        var hitchersfrom = "";
-                                        for (let hitcherindex = 0; hiker.myhitchersto && hitcherindex < hiker.myhitchersto.length; 
-                                            hitcherindex++) {
-                                            var hitcher = hiker.myhitchersto[hitcherindex].hitchername;
-                                            if (hiker.myhitchersto[hitcherindex].hitcherfullname) {
-                                                hitcher = hiker.myhitchersto[hitcherindex].hitcherfullname;
-                                            }
-                                            hitchersto += hitcher + ", ";
+                            console.log("calculaterides carpool calculation result:");
+                            for (let index = 0; index < hikers.length; index++) {
+                                const hiker = hikers[index];
+                                if (hiker.amidriver) {
+                                    var hitchersto = "";
+                                    var hitchersfrom = "";
+                                    for (let hitcherindex = 0; hiker.myhitchersto && hitcherindex < hiker.myhitchersto.length; 
+                                        hitcherindex++) {
+                                        var hitcher = hiker.myhitchersto[hitcherindex].hitchername;
+                                        if (hiker.myhitchersto[hitcherindex].hitcherfullname) {
+                                            hitcher = hiker.myhitchersto[hitcherindex].hitcherfullname;
                                         }
-                                        for (let hitcherindex = 0; hiker.myhitchersfrom && hitcherindex < hiker.myhitchersfrom.length; 
-                                            hitcherindex++) {
-                                            var hitcher = hiker.myhitchersfrom[hitcherindex].hitchername;
-                                            if (hiker.myhitchersfrom[hitcherindex].hitcherfullname) {
-                                                hitcher = hiker.myhitchersfrom[hitcherindex].hitcherfullname;
-                                            }
-                                            hitchersfrom += hitcher + ", ";
+                                        hitchersto += hitcher + ", ";
+                                    }
+                                    for (let hitcherindex = 0; hiker.myhitchersfrom && hitcherindex < hiker.myhitchersfrom.length; 
+                                        hitcherindex++) {
+                                        var hitcher = hiker.myhitchersfrom[hitcherindex].hitchername;
+                                        if (hiker.myhitchersfrom[hitcherindex].hitcherfullname) {
+                                            hitcher = hiker.myhitchersfrom[hitcherindex].hitcherfullname;
+                                        }
+                                        hitchersfrom += hitcher + ", ";
+                                    }
+                                    var myfriends = "";
+                                    for (let friendindex = 0; hiker.myfriends && friendindex < hiker.myfriends.length; 
+                                        friendindex++) {
+                                        const friend = hiker.myfriends[friendindex];
+                                        myfriends +=  ", " + friend;
+                                    }
+                                    console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
+                                        " to the hike: takes " + hitchersto);                                        
+                                    console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
+                                        " from the hike: takes " + hitchersfrom);                                        
+                                }
+                                else {
+                                    if (hiker.mydriverto && hiker.mydriverfrom) {
+                                        var friendsdriversto = "";
+                                        var friendsdriversfrom = "";
+                                        for (let driverindex = 0; 
+                                            hiker.myfriendsdriversto && driverindex < hiker.myfriendsdriversto.length; 
+                                            driverindex++) {
+                                            const driver = hiker.myfriendsdriversto[driverindex].driverfullname;
+                                            friendsdriversto += ", " + driver;
+                                        }
+                                        for (let driverindex = 0; 
+                                            hiker.myfriendsdriversfrom && driverindex < hiker.myfriendsdriversfrom.length; 
+                                            driverindex++) {
+                                            const driver = hiker.myfriendsdriversfrom[driverindex].driverfullname;
+                                            friendsdriversfrom += ", " + driver;
                                         }
                                         var myfriends = "";
                                         for (let friendindex = 0; hiker.myfriends && friendindex < hiker.myfriends.length; 
@@ -3386,86 +2858,45 @@ app.patch("/api/calculaterides", function(req, res) {
                                             const friend = hiker.myfriends[friendindex];
                                             myfriends +=  ", " + friend;
                                         }
-                                        console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
-                                            " to the hike: takes " + hitchersto);                                        
-                                        console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
-                                            " from the hike: takes " + hitchersfrom);                                        
+                                        console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
+                                            " to the hike: joins " + hiker.mydriverto.fullname + friendsdriversto);
+                                        console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
+                                            " from the hike: joins " + hiker.mydriverfrom.fullname + friendsdriversfrom);
                                     }
-                                    else {
-                                        if (hiker.mydriverto && hiker.mydriverfrom) {
-                                            var friendsdriversto = "";
-                                            var friendsdriversfrom = "";
-                                            for (let driverindex = 0; 
-                                                hiker.myfriendsdriversto && driverindex < hiker.myfriendsdriversto.length; 
-                                                driverindex++) {
-                                                const driver = hiker.myfriendsdriversto[driverindex].driverfullname;
-                                                friendsdriversto += ", " + driver;
-                                            }
-                                            for (let driverindex = 0; 
-                                                hiker.myfriendsdriversfrom && driverindex < hiker.myfriendsdriversfrom.length; 
-                                                driverindex++) {
-                                                const driver = hiker.myfriendsdriversfrom[driverindex].driverfullname;
-                                                friendsdriversfrom += ", " + driver;
-                                            }
-                                            var myfriends = "";
-                                            for (let friendindex = 0; hiker.myfriends && friendindex < hiker.myfriends.length; 
-                                                friendindex++) {
-                                                const friend = hiker.myfriends[friendindex];
-                                                myfriends +=  ", " + friend;
-                                            }
-                                            console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
-                                                " to the hike: joins " + hiker.mydriverto.fullname + friendsdriversto);
-                                            console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
-                                                " from the hike: joins " + hiker.mydriverfrom.fullname + friendsdriversfrom);
-                                        }
-                                        else
-                                        {
-                                            console.log(hiker.hikerindex + " " + hiker.fullname + " no drivers");
-                                        }
+                                    else
+                                    {
+                                        console.log(hiker.hikerindex + " " + hiker.fullname + " no drivers");
                                     }
                                 }
+                            }
 
-                                db.collection(HIKERS_COLLECTION).deleteMany({hikenamehebrew: { $regex : ".*"+hike.hikedate+".*" }},
-                                        function(err, result) {
-                                    if (err) {
-                                        handleError(res, err.message, "Failed to delete hikers of " + hike.hikedate);
-                                    } else {
-                                        db.collection(HIKERS_COLLECTION).insertMany(hikers, function(err, docs) {
-                                            if (err) {
-                                                handleError(res, err.message, "Failed to insert all hikers of " + hike.hikedate);
-                                            }
-                                            else {
-                                                register.sendForm("1EV8BBJfZGseTFzJo-EMcgZdPHzedRC8zTZyfyRw2LoQ", 
-                                                    "" , "", "", res, null, null, null, "");
-                                            }
-                                        });
-                                    }
-                                });
+                            dbservices.replaceallhikersforhike(hike.hikedate, hikers)
+                            .then(() => {
+                                register.updateCarpool();
                             })
                             .catch(rejection => {
-                                console.log("something went wrong: "  + rejection);
-                                if (rejection.stack) {
-                                    console.dir(rejection.stack);
-                                }
+                                util.logRejection(rejection);
                             });
-                        };
-                    });
-                }
+                        })
+                        .catch(rejection => {
+                            util.logRejection(rejection);
+                        });
+                    };
+                })
+                .catch(rejection => {
+                    util.logRejection(rejection);
+                });
             }
+            res.status(200).json("Working...");
+        })
+        .catch(rejection => {
+            util.logRejection(rejection);
         });
-        res.status(200).json("Working...");
     }
 });
 
 app.delete("/api/calculaterides", function(req, res) {
-    if (!req.query.pwd || !req.query.specialpwd) {
-        handleError(res, "Unauthorized", "Password and special password are required.", 400);
-    }
-    else if (req.query.pwd != process.env.PSWD || req.query.specialpwd != process.env.SPECIALPWD) {
-        handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
-    }
-    else
-    {
+    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
         res.status(200).json("OK");
     }
 });

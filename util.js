@@ -1,6 +1,10 @@
 var Promise = require('promise');
 
 module.exports = {
+    handleError: handleError,
+    logRejection: logRejection,
+    checkpwd: checkpwd,
+    checkspecialpwd: checkspecialpwd,
     wait: wait,
     normalize_phonenumber: normalize_phonenumber,
     get_near_hikes: get_near_hikes, 
@@ -14,7 +18,40 @@ module.exports = {
     distanceLatLons: distanceLatLons,
     getDistanceMatrix: getDistanceMatrix,
     getHikerAreas: getHikerAreas,
-};  
+};
+
+// Generic error handler used by all endpoints.
+function handleError(res, reason, message, code) {
+    console.error("ERROR: " + reason);
+    res.status(code || 500).json({"error": message});
+}
+
+function logRejection(rejection) {
+    console.log("something went wrong: "  + rejection);
+    if (rejection.stack) {
+        console.dir(rejection.stack);
+    }
+}
+
+function checkpwd(pwd) {
+    if (!pwd) {
+        util.handleError(res, "Unauthorized", "Password is required.", 400);
+    }
+    else if (pwd != process.env.PSWD) {
+        util.handleError(res, "Unauthorized", "Password is incorrect.", 400);
+    }
+    return true;
+}
+
+function checkspecialpwd(pwd, specialpwd) {
+    if (!pwd || !specialpwd) {
+        util.handleError(res, "Unauthorized", "Password and special password are required.", 400);
+    }
+    else if (pwd != process.env.PSWD || specialpwd != process.env.SPECIALPWD) {
+        util.handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
+    }
+    return true;
+}
 
 function wait(ms)
 {
@@ -22,6 +59,7 @@ function wait(ms)
 }
 
 function normalize_phonenumber(phonenumber) {
+    phonenumber = phonenumber.toLowerCase();
     if (phonenumber.indexOf("@") == -1) {
         phonenumber = phonenumber.replace(/-/g,"");
         if (phonenumber[0] != '0') {

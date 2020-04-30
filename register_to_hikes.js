@@ -1,3 +1,4 @@
+var dbservices = require("./dbservices");
 var replies = require("./replies");
 var util = require("./util");
 
@@ -7,9 +8,10 @@ module.exports = {
     setAvailableHikesReply: setAvailableHikesReply,
     setAvailableHikesReplyBut: setAvailableHikesReplyBut,
     edithikes: edithikes,
+    updateCarpool: updateCarpool,
 };  
 
-function register_to_hikes(language, res, params, db, collection, memory)
+function register_to_hikes(language, res, params, memory)
 {
     var fs = require('fs');
     fs.readFile('./register_hikes_post_data.text', function (err, post_data) {
@@ -20,80 +22,15 @@ function register_to_hikes(language, res, params, db, collection, memory)
             if (err) return console.error(err);
             var draft_response = draft_data.toString();
 
-            var hikes = "";
-            for (let index = 0; index < params.VAR_NEW_HIKES_LIST.length; index++) {
-                const element = params.VAR_NEW_HIKES_LIST[index];
-                hikes += "&entry.362682837="+encodeURIComponent(element);
-            }
-
-            // Replace stub with params
-            form_post_data = form_post_data.replace("VAR_EMAIL", params.VAR_EMAIL);
-            draft_response = draft_response.replace("VAR_LANGUAGE", params.VAR_LANGUAGE);
-            draft_response = draft_response.replace("VAR_EMAIL", params.VAR_EMAIL);
-            draft_response = draft_response.replace("VAR_NAME", params.VAR_NAME);
-            draft_response = draft_response.replace("VAR_NEW_HIKES_LIST", JSON.stringify(params.VAR_NEW_HIKES_LIST));
-            draft_response = draft_response.replace("VAR_WHERE_FROM", params.VAR_WHERE_FROM);
-            draft_response = draft_response.replace("VAR_WHERE_TO", params.VAR_WHERE_TO);
-            draft_response = draft_response.replace("VAR_HAVE_A_CAR", params.VAR_HAVE_A_CAR);
-            draft_response = draft_response.replace("VAR_AVAILABLE_PLACES", params.VAR_AVAILABLE_PLACES);
-            draft_response = draft_response.replace("VAR_PHONENUMBER", params.VAR_PHONENUMBER);
-            draft_response = draft_response.replace("VAR_SAVED_THE_DATE", params.VAR_SAVED_THE_DATE);
-            draft_response = draft_response.replace("VAR_I_FEAR_OF", params.VAR_I_FEAR_OF);
-            draft_response = draft_response.replace("VAR_SHARE_MY_AGE", params.VAR_SHARE_MY_AGE);
-            draft_response = draft_response.replace("VAR_MY_AGE", params.VAR_MY_AGE);
-            draft_response = draft_response.replace("VAR_COME_WITH_FRIENDS", params.VAR_COME_WITH_FRIENDS);
-            draft_response = draft_response.replace("VAR_FRIEND1_NAME", params.VAR_FRIEND1_NAME);
-            draft_response = draft_response.replace("VAR_FRIEND2_NAME", params.VAR_FRIEND2_NAME);
-            draft_response = draft_response.replace("VAR_FRIEND3_NAME", params.VAR_FRIEND3_NAME);
-            draft_response = draft_response.replace("VAR_FRIEND4_NAME", params.VAR_FRIEND4_NAME);
-            draft_response = draft_response.replace("VAR_FRIEND1_SAVE_THE_DATE", params.VAR_FRIEND1_SAVE_THE_DATE);
-            draft_response = draft_response.replace("VAR_FRIEND2_SAVE_THE_DATE", params.VAR_FRIEND2_SAVE_THE_DATE);
-            draft_response = draft_response.replace("VAR_FRIEND3_SAVE_THE_DATE", params.VAR_FRIEND3_SAVE_THE_DATE);
-            draft_response = draft_response.replace("VAR_FRIEND4_SAVE_THE_DATE", params.VAR_FRIEND4_SAVE_THE_DATE);
-            draft_response = draft_response.replace("VAR_EDIT_LINK", null);
-            draft_response = draft_response.replace("VAR_CHATBOT_PASSWORD", params.VAR_CHATBOT_PASSWORD);
-            draft_response = draft_response.replace("VAR_ARE_YOU_GAY", params.VAR_ARE_YOU_GAY);
-            draft_response = draft_response.replace("VAR_BEEN_IN_HIKES", params.VAR_BEEN_IN_HIKES);
-            draft_response = draft_response.replace("VAR_PLAYSON", params.VAR_PLAYSON);
-            draft_response = draft_response.replace("VAR_ORGANIZE", params.VAR_ORGANIZE);
-            draft_response = draft_response.replace("\n","");
-            form_post_data = form_post_data.replace("VAR_LANGUAGE", encodeURIComponent(params.VAR_LANGUAGE));
-            form_post_data = form_post_data.replace("VAR_NAME", encodeURIComponent(params.VAR_NAME));
-            form_post_data = form_post_data.replace("VAR_NEW_HIKES_LIST", hikes);
-            form_post_data = form_post_data.replace("VAR_WHERE_FROM", encodeURIComponent(params.VAR_WHERE_FROM));
-            form_post_data = form_post_data.replace("VAR_WHERE_TO", encodeURIComponent(params.VAR_WHERE_TO));
-            form_post_data = form_post_data.replace("VAR_HAVE_A_CAR", encodeURIComponent(params.VAR_HAVE_A_CAR));
-            form_post_data = form_post_data.replace("VAR_AVAILABLE_PLACES", encodeURIComponent(params.VAR_AVAILABLE_PLACES));
-            form_post_data = form_post_data.replace("VAR_PHONENUMBER", encodeURIComponent(params.VAR_PHONENUMBER));
-            form_post_data = form_post_data.replace("VAR_SAVED_THE_DATE", encodeURIComponent(params.VAR_SAVED_THE_DATE));
-            form_post_data = form_post_data.replace("VAR_I_FEAR_OF", encodeURIComponent(params.VAR_I_FEAR_OF));
-            form_post_data = form_post_data.replace("VAR_SHARE_MY_AGE", encodeURIComponent(params.VAR_SHARE_MY_AGE));
-            form_post_data = form_post_data.replace("VAR_MY_AGE", encodeURIComponent(params.VAR_MY_AGE));
-            form_post_data = form_post_data.replace("VAR_COME_WITH_FRIENDS", encodeURIComponent(params.VAR_COME_WITH_FRIENDS));
-            form_post_data = form_post_data.replace("VAR_FRIEND1_NAME", encodeURIComponent(params.VAR_FRIEND1_NAME));
-            form_post_data = form_post_data.replace("VAR_FRIEND2_NAME", encodeURIComponent(params.VAR_FRIEND2_NAME));
-            form_post_data = form_post_data.replace("VAR_FRIEND3_NAME", encodeURIComponent(params.VAR_FRIEND3_NAME));
-            form_post_data = form_post_data.replace("VAR_FRIEND4_NAME", encodeURIComponent(params.VAR_FRIEND4_NAME));
-            form_post_data = form_post_data.replace("VAR_FRIEND1_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND1_SAVE_THE_DATE));
-            form_post_data = form_post_data.replace("VAR_FRIEND2_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND2_SAVE_THE_DATE));
-            form_post_data = form_post_data.replace("VAR_FRIEND3_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND3_SAVE_THE_DATE));
-            form_post_data = form_post_data.replace("VAR_FRIEND4_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND4_SAVE_THE_DATE));
-            form_post_data = form_post_data.replace("VAR_ARE_YOU_GAY", encodeURIComponent(params.VAR_ARE_YOU_GAY));
-            form_post_data = form_post_data.replace("VAR_BEEN_IN_HIKES", encodeURIComponent(params.VAR_BEEN_IN_HIKES));
-            form_post_data = form_post_data.replace("VAR_CHATBOT_PASSWORD", encodeURIComponent(params.VAR_CHATBOT_PASSWORD));        
-            form_post_data = form_post_data.replace("VAR_PLAYSON", encodeURIComponent(params.VAR_PLAYSON));
-            form_post_data = form_post_data.replace("VAR_ORGANIZE", encodeURIComponent(params.VAR_ORGANIZE));
-            form_post_data = form_post_data.replace("VAR_SELF_RESPONSIBILITY", encodeURIComponent("מבין ומקבל"));
-            form_post_data = form_post_data.replace("VAR_DRAFT_RESPONSE",encodeURIComponent(draft_response));
+            form_post_data = updatePostDataParams(form_post_data, draft_response, params);
 
             var url = "1HFMPhQsWOqF8eFNA9cEPWGwQLkG1jQDatdOra3BynSw";
-            sendForm(url, form_post_data, language, "REGISTER_TO_HIKES_SUCCESS", res,
-                     db, collection, memory,"");
+            sendForm(url, form_post_data, language, "REGISTER_TO_HIKES_SUCCESS", res, memory,"");
         });    
     });
 }
 
-function edithikes(language, res, params, db, collection, memory) 
+function edithikes(language, res, params, memory) 
 {
     var fs = require('fs');
     fs.readFile('./register_hikes_post_data.text', function (err, post_data) {
@@ -104,81 +41,16 @@ function edithikes(language, res, params, db, collection, memory)
             if (err) return console.error(err);
             var draft_response = draft_data.toString();
 
-            var hikes = "";
-            for (let index = 0; index < params.VAR_NEW_HIKES_LIST.length; index++) {
-                const element = params.VAR_NEW_HIKES_LIST[index];
-                hikes += "&entry.362682837="+encodeURIComponent(element);
-            }
-
-            // Replace stub with params
-            form_post_data = form_post_data.replace("VAR_EMAIL", params.VAR_EMAIL);
-            draft_response = draft_response.replace("VAR_LANGUAGE", params.VAR_LANGUAGE);
-            draft_response = draft_response.replace("VAR_EMAIL", params.VAR_EMAIL);
-            draft_response = draft_response.replace("VAR_NAME", params.VAR_NAME);
-            draft_response = draft_response.replace("VAR_NEW_HIKES_LIST", JSON.stringify(params.VAR_NEW_HIKES_LIST));
-            draft_response = draft_response.replace("VAR_WHERE_FROM", params.VAR_WHERE_FROM);
-            draft_response = draft_response.replace("VAR_WHERE_TO", params.VAR_WHERE_TO);
-            draft_response = draft_response.replace("VAR_HAVE_A_CAR", params.VAR_HAVE_A_CAR);
-            draft_response = draft_response.replace("VAR_AVAILABLE_PLACES", params.VAR_AVAILABLE_PLACES);
-            draft_response = draft_response.replace("VAR_PHONENUMBER", params.VAR_PHONENUMBER);
-            draft_response = draft_response.replace("VAR_SAVED_THE_DATE", params.VAR_SAVED_THE_DATE);
-            draft_response = draft_response.replace("VAR_I_FEAR_OF", params.VAR_I_FEAR_OF);
-            draft_response = draft_response.replace("VAR_SHARE_MY_AGE", params.VAR_SHARE_MY_AGE);
-            draft_response = draft_response.replace("VAR_MY_AGE", params.VAR_MY_AGE);
-            draft_response = draft_response.replace("VAR_COME_WITH_FRIENDS", params.VAR_COME_WITH_FRIENDS);
-            draft_response = draft_response.replace("VAR_FRIEND1_NAME", params.VAR_FRIEND1_NAME);
-            draft_response = draft_response.replace("VAR_FRIEND2_NAME", params.VAR_FRIEND2_NAME);
-            draft_response = draft_response.replace("VAR_FRIEND3_NAME", params.VAR_FRIEND3_NAME);
-            draft_response = draft_response.replace("VAR_FRIEND4_NAME", params.VAR_FRIEND4_NAME);
-            draft_response = draft_response.replace("VAR_FRIEND1_SAVE_THE_DATE", params.VAR_FRIEND1_SAVE_THE_DATE);
-            draft_response = draft_response.replace("VAR_FRIEND2_SAVE_THE_DATE", params.VAR_FRIEND2_SAVE_THE_DATE);
-            draft_response = draft_response.replace("VAR_FRIEND3_SAVE_THE_DATE", params.VAR_FRIEND3_SAVE_THE_DATE);
-            draft_response = draft_response.replace("VAR_FRIEND4_SAVE_THE_DATE", params.VAR_FRIEND4_SAVE_THE_DATE);
-            draft_response = draft_response.replace("VAR_EDIT_LINK", '"'+params.VAR_EDIT_LINK+'"');
-            draft_response = draft_response.replace("VAR_CHATBOT_PASSWORD", params.VAR_CHATBOT_PASSWORD);
-            draft_response = draft_response.replace("VAR_ARE_YOU_GAY", params.VAR_ARE_YOU_GAY);
-            draft_response = draft_response.replace("VAR_BEEN_IN_HIKES", params.VAR_BEEN_IN_HIKES);
-            draft_response = draft_response.replace("VAR_PLAYSON", params.VAR_PLAYSON);
-            draft_response = draft_response.replace("VAR_ORGANIZE", params.VAR_ORGANIZE);
-            draft_response = draft_response.replace("\n","");
-            form_post_data = form_post_data.replace("VAR_LANGUAGE", encodeURIComponent(params.VAR_LANGUAGE));
-            form_post_data = form_post_data.replace("VAR_NAME", encodeURIComponent(params.VAR_NAME));
-            form_post_data = form_post_data.replace("VAR_NEW_HIKES_LIST", hikes);
-            form_post_data = form_post_data.replace("VAR_WHERE_FROM", encodeURIComponent(params.VAR_WHERE_FROM));
-            form_post_data = form_post_data.replace("VAR_WHERE_TO", encodeURIComponent(params.VAR_WHERE_TO));
-            form_post_data = form_post_data.replace("VAR_HAVE_A_CAR", encodeURIComponent(params.VAR_HAVE_A_CAR));
-            form_post_data = form_post_data.replace("VAR_AVAILABLE_PLACES", encodeURIComponent(params.VAR_AVAILABLE_PLACES));
-            form_post_data = form_post_data.replace("VAR_PHONENUMBER", encodeURIComponent(params.VAR_PHONENUMBER));
-            form_post_data = form_post_data.replace("VAR_SAVED_THE_DATE", encodeURIComponent(params.VAR_SAVED_THE_DATE));
-            form_post_data = form_post_data.replace("VAR_I_FEAR_OF", encodeURIComponent(params.VAR_I_FEAR_OF));
-            form_post_data = form_post_data.replace("VAR_SHARE_MY_AGE", encodeURIComponent(params.VAR_SHARE_MY_AGE));
-            form_post_data = form_post_data.replace("VAR_MY_AGE", encodeURIComponent(params.VAR_MY_AGE));
-            form_post_data = form_post_data.replace("VAR_COME_WITH_FRIENDS", encodeURIComponent(params.VAR_COME_WITH_FRIENDS));
-            form_post_data = form_post_data.replace("VAR_FRIEND1_NAME", encodeURIComponent(params.VAR_FRIEND1_NAME));
-            form_post_data = form_post_data.replace("VAR_FRIEND2_NAME", encodeURIComponent(params.VAR_FRIEND2_NAME));
-            form_post_data = form_post_data.replace("VAR_FRIEND3_NAME", encodeURIComponent(params.VAR_FRIEND3_NAME));
-            form_post_data = form_post_data.replace("VAR_FRIEND4_NAME", encodeURIComponent(params.VAR_FRIEND4_NAME));
-            form_post_data = form_post_data.replace("VAR_FRIEND1_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND1_SAVE_THE_DATE));
-            form_post_data = form_post_data.replace("VAR_FRIEND2_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND2_SAVE_THE_DATE));
-            form_post_data = form_post_data.replace("VAR_FRIEND3_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND3_SAVE_THE_DATE));
-            form_post_data = form_post_data.replace("VAR_FRIEND4_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND4_SAVE_THE_DATE));
-            form_post_data = form_post_data.replace("VAR_ARE_YOU_GAY", encodeURIComponent(params.VAR_ARE_YOU_GAY));
-            form_post_data = form_post_data.replace("VAR_BEEN_IN_HIKES", encodeURIComponent(params.VAR_BEEN_IN_HIKES));
-            form_post_data = form_post_data.replace("VAR_CHATBOT_PASSWORD", encodeURIComponent(params.VAR_CHATBOT_PASSWORD));        
-            form_post_data = form_post_data.replace("VAR_PLAYSON", encodeURIComponent(params.VAR_PLAYSON));
-            form_post_data = form_post_data.replace("VAR_ORGANIZE", encodeURIComponent(params.VAR_ORGANIZE));
-            form_post_data = form_post_data.replace("VAR_SELF_RESPONSIBILITY", encodeURIComponent("מבין ומקבל"));
-            form_post_data = form_post_data.replace("VAR_DRAFT_RESPONSE",encodeURIComponent(draft_response));
+            form_post_data = updatePostDataParams(form_post_data, draft_response, params);
 
             var url = "e/1FAIpQLSfinqg-ZeBcDh6z3r4WFcwHNH_u7ARx5RyTjNP6n_XPMvWghQ";
             var edit = "?edit2=" + params.VAR_EDIT_LINK;
-            sendForm(url, form_post_data, language, "REGISTER_TO_HIKES_UPDATED", res,
-                     db, collection, memory, edit);
+            sendForm(url, form_post_data, language, "REGISTER_TO_HIKES_UPDATED", res, memory, edit);
         });    
     });
 }
 
-function sendForm(formId, body, language, recast_reply, res, db, collection, memory, edit)
+function sendForm(formId, body, language, recast_reply, res, memory, edit)
 {
     // An object of options to indicate where to post to
     var request = require('request');
@@ -241,18 +113,10 @@ function sendForm(formId, body, language, recast_reply, res, db, collection, mem
                     "i approve":memory.registertohikes["iapprove"],
                 };
 
-                db.collection(collection).deleteMany(
-                    { $or: [ { 'phone number': phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, result) {
-                        if (err) {
-                            handleError(res, err.message, "Failed to delete last register's details");
-                        } else {
-                            db.collection(collection).insertOne(registerObj, function(err, doc) {
-                                if (err) {
-                                    handleError(res, err.message, "Failed to create or update last register.");
-                                }
-                            });
-                        }
-                })
+                dbservices.replaceonelastregister(phonenumber, registerObj)
+                .catch(rejection => {
+                    util.logRejection(rejection);
+                });
 
                 var recast_conversation_reply;
         
@@ -298,18 +162,10 @@ function sendForm(formId, body, language, recast_reply, res, db, collection, mem
                     "i approve":memory.registertohikes["iapprove"],
                 };
 
-                db.collection(collection).deleteMany(
-                    { $or: [ { 'phone number': phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, result) {
-                        if (err) {
-                            handleError(res, err.message, "Failed to delete last register's details");
-                        } else {
-                            db.collection(collection).insertOne(registerObj, function(err, doc) {
-                                if (err) {
-                                    handleError(res, err.message, "Failed to create or update last register.");
-                                }
-                            });
-                        }
-                })
+                dbservices.replaceonelastregister(phonenumber, registerObj)
+                .catch(rejection => {
+                    util.logRejection(rejection);
+                });
 
                 var recast_conversation_reply;
 
@@ -410,4 +266,77 @@ function setAvailableHikesReplyBut(recast_conversation_reply, hikes, lang, selec
     }
     console.log("setAvailableHikesReply: " + JSON.stringify(recast_conversation_reply));
     return recast_conversation_reply;
+}
+
+function updateCarpool() {
+    sendForm("1EV8BBJfZGseTFzJo-EMcgZdPHzedRC8zTZyfyRw2LoQ", "" , "", "", res, null, "");
+}
+
+function updatePostDataParams(form_post_data, draft_response, params) {
+    var hikes = "";
+    for (let index = 0; index < params.VAR_NEW_HIKES_LIST.length; index++) {
+        const element = params.VAR_NEW_HIKES_LIST[index];
+        hikes += "&entry.362682837="+encodeURIComponent(element);
+    }
+
+    // Replace stub with params
+    form_post_data = form_post_data.replace("VAR_EMAIL", params.VAR_EMAIL);
+    draft_response = draft_response.replace("VAR_LANGUAGE", params.VAR_LANGUAGE);
+    draft_response = draft_response.replace("VAR_EMAIL", params.VAR_EMAIL);
+    draft_response = draft_response.replace("VAR_NAME", params.VAR_NAME);
+    draft_response = draft_response.replace("VAR_NEW_HIKES_LIST", JSON.stringify(params.VAR_NEW_HIKES_LIST));
+    draft_response = draft_response.replace("VAR_WHERE_FROM", params.VAR_WHERE_FROM);
+    draft_response = draft_response.replace("VAR_WHERE_TO", params.VAR_WHERE_TO);
+    draft_response = draft_response.replace("VAR_HAVE_A_CAR", params.VAR_HAVE_A_CAR);
+    draft_response = draft_response.replace("VAR_AVAILABLE_PLACES", params.VAR_AVAILABLE_PLACES);
+    draft_response = draft_response.replace("VAR_PHONENUMBER", params.VAR_PHONENUMBER);
+    draft_response = draft_response.replace("VAR_SAVED_THE_DATE", params.VAR_SAVED_THE_DATE);
+    draft_response = draft_response.replace("VAR_I_FEAR_OF", params.VAR_I_FEAR_OF);
+    draft_response = draft_response.replace("VAR_SHARE_MY_AGE", params.VAR_SHARE_MY_AGE);
+    draft_response = draft_response.replace("VAR_MY_AGE", params.VAR_MY_AGE);
+    draft_response = draft_response.replace("VAR_COME_WITH_FRIENDS", params.VAR_COME_WITH_FRIENDS);
+    draft_response = draft_response.replace("VAR_FRIEND1_NAME", params.VAR_FRIEND1_NAME);
+    draft_response = draft_response.replace("VAR_FRIEND2_NAME", params.VAR_FRIEND2_NAME);
+    draft_response = draft_response.replace("VAR_FRIEND3_NAME", params.VAR_FRIEND3_NAME);
+    draft_response = draft_response.replace("VAR_FRIEND4_NAME", params.VAR_FRIEND4_NAME);
+    draft_response = draft_response.replace("VAR_FRIEND1_SAVE_THE_DATE", params.VAR_FRIEND1_SAVE_THE_DATE);
+    draft_response = draft_response.replace("VAR_FRIEND2_SAVE_THE_DATE", params.VAR_FRIEND2_SAVE_THE_DATE);
+    draft_response = draft_response.replace("VAR_FRIEND3_SAVE_THE_DATE", params.VAR_FRIEND3_SAVE_THE_DATE);
+    draft_response = draft_response.replace("VAR_FRIEND4_SAVE_THE_DATE", params.VAR_FRIEND4_SAVE_THE_DATE);
+    draft_response = draft_response.replace("VAR_EDIT_LINK", null);
+    draft_response = draft_response.replace("VAR_CHATBOT_PASSWORD", params.VAR_CHATBOT_PASSWORD);
+    draft_response = draft_response.replace("VAR_ARE_YOU_GAY", params.VAR_ARE_YOU_GAY);
+    draft_response = draft_response.replace("VAR_BEEN_IN_HIKES", params.VAR_BEEN_IN_HIKES);
+    draft_response = draft_response.replace("VAR_PLAYSON", params.VAR_PLAYSON);
+    draft_response = draft_response.replace("VAR_ORGANIZE", params.VAR_ORGANIZE);
+    draft_response = draft_response.replace("\n","");
+    form_post_data = form_post_data.replace("VAR_LANGUAGE", encodeURIComponent(params.VAR_LANGUAGE));
+    form_post_data = form_post_data.replace("VAR_NAME", encodeURIComponent(params.VAR_NAME));
+    form_post_data = form_post_data.replace("VAR_NEW_HIKES_LIST", hikes);
+    form_post_data = form_post_data.replace("VAR_WHERE_FROM", encodeURIComponent(params.VAR_WHERE_FROM));
+    form_post_data = form_post_data.replace("VAR_WHERE_TO", encodeURIComponent(params.VAR_WHERE_TO));
+    form_post_data = form_post_data.replace("VAR_HAVE_A_CAR", encodeURIComponent(params.VAR_HAVE_A_CAR));
+    form_post_data = form_post_data.replace("VAR_AVAILABLE_PLACES", encodeURIComponent(params.VAR_AVAILABLE_PLACES));
+    form_post_data = form_post_data.replace("VAR_PHONENUMBER", encodeURIComponent(params.VAR_PHONENUMBER));
+    form_post_data = form_post_data.replace("VAR_SAVED_THE_DATE", encodeURIComponent(params.VAR_SAVED_THE_DATE));
+    form_post_data = form_post_data.replace("VAR_I_FEAR_OF", encodeURIComponent(params.VAR_I_FEAR_OF));
+    form_post_data = form_post_data.replace("VAR_SHARE_MY_AGE", encodeURIComponent(params.VAR_SHARE_MY_AGE));
+    form_post_data = form_post_data.replace("VAR_MY_AGE", encodeURIComponent(params.VAR_MY_AGE));
+    form_post_data = form_post_data.replace("VAR_COME_WITH_FRIENDS", encodeURIComponent(params.VAR_COME_WITH_FRIENDS));
+    form_post_data = form_post_data.replace("VAR_FRIEND1_NAME", encodeURIComponent(params.VAR_FRIEND1_NAME));
+    form_post_data = form_post_data.replace("VAR_FRIEND2_NAME", encodeURIComponent(params.VAR_FRIEND2_NAME));
+    form_post_data = form_post_data.replace("VAR_FRIEND3_NAME", encodeURIComponent(params.VAR_FRIEND3_NAME));
+    form_post_data = form_post_data.replace("VAR_FRIEND4_NAME", encodeURIComponent(params.VAR_FRIEND4_NAME));
+    form_post_data = form_post_data.replace("VAR_FRIEND1_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND1_SAVE_THE_DATE));
+    form_post_data = form_post_data.replace("VAR_FRIEND2_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND2_SAVE_THE_DATE));
+    form_post_data = form_post_data.replace("VAR_FRIEND3_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND3_SAVE_THE_DATE));
+    form_post_data = form_post_data.replace("VAR_FRIEND4_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND4_SAVE_THE_DATE));
+    form_post_data = form_post_data.replace("VAR_ARE_YOU_GAY", encodeURIComponent(params.VAR_ARE_YOU_GAY));
+    form_post_data = form_post_data.replace("VAR_BEEN_IN_HIKES", encodeURIComponent(params.VAR_BEEN_IN_HIKES));
+    form_post_data = form_post_data.replace("VAR_CHATBOT_PASSWORD", encodeURIComponent(params.VAR_CHATBOT_PASSWORD));        
+    form_post_data = form_post_data.replace("VAR_PLAYSON", encodeURIComponent(params.VAR_PLAYSON));
+    form_post_data = form_post_data.replace("VAR_ORGANIZE", encodeURIComponent(params.VAR_ORGANIZE));
+    form_post_data = form_post_data.replace("VAR_SELF_RESPONSIBILITY", encodeURIComponent("מבין ומקבל"));
+    form_post_data = form_post_data.replace("VAR_DRAFT_RESPONSE",encodeURIComponent(draft_response));
+    return(form_post_data);
 }
