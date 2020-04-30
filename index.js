@@ -2265,12 +2265,14 @@ app.get("/api/hike", function(req, res) {
     }
     else
     {
-        db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
-            if (err) {
-                handleError(res, err.message, "Failed to get hike details.");
-            } else {
-                docs = util.sort_hikes(docs, false);
-                res.status(200).json(docs);
+        dbservices.gethikes()
+        .then(docs => {
+            res.status(200).json(docs);
+        })
+        .catch(rejection => {
+            console.log("something went wrong: "  + rejection);
+            if (rejection.stack) {
+                console.dir(rejection.stack);
             }
         });
     }
@@ -2971,57 +2973,58 @@ app.patch("/api/ironnumber", function(req, res) {
         if (selectedhike) {
             var hiketodate = selectedhike.match(/\d{1,2}\.\d{1,2}\.\d{2}/)[0];
 
-            db.collection(HIKERS_COLLECTION).find(
-                { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
-                        { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }).toArray(function(err, docs) {
-                if (err) {
-                    handleError(res, err.message, "Failed to get hikers.");
-                } else {
-                    dbservices.getironnumbers()
-                    .then(previronnumbers => {
-                        var now = new Date();
-                        var ironnumbers = [];
-                        for (var index = 0; index < docs.length; index++) {
-                            const hiker = docs[index];
-                            console.log("hiker " + JSON.stringify(hiker));
-                            var lastseen = "";
-                            var withus = "לא";
-                            var car = "לא";
-                            if (hiker.amidriver) {
-                                car = "כן";
-                            }
-                            var previronnumber = previronnumbers.find(function(element) {
-                                var result = false;
-                                if (element.phone && element.phone == hiker.phone) {
-                                    result = true;
-                                }
-                                return result;
-                            });
-                            console.log("previronnumber " + JSON.stringify(previronnumber));
-                            if (previronnumber && previronnumber.lastseen) {
-                                lastseen = previronnumber.lastseen;
-                                var compareLastSeen = new Date(lastseen.getTime() + 30*60000);
-                                if (compareLastSeen > now) {
-                                    withus = "כן";
-                                }
-                                lastseen = lastseen.toLocaleTimeString("he-IL", {timeZone: "Asia/Jerusalem"});
-                            }
-                            ironnumbers.push({
-                                name: hiker.fullname,
-                                phone: hiker.phone,
-                                withus: withus,
-                                lastseen: lastseen,
-                                car: car,
-                            });
+            dbservices.gethikersbyhikedate(hiketodate)
+            .then(docs => {
+                dbservices.getironnumbers()
+                .then(previronnumbers => {
+                    var now = new Date();
+                    var ironnumbers = [];
+                    for (var index = 0; index < docs.length; index++) {
+                        const hiker = docs[index];
+                        console.log("hiker " + JSON.stringify(hiker));
+                        var lastseen = "";
+                        var withus = "לא";
+                        var car = "לא";
+                        if (hiker.amidriver) {
+                            car = "כן";
                         }
-                        res.status(200).json(ironnumbers);
-                    })
-                    .catch(rejection => {
-                        console.log("something went wrong: "  + rejection);
-                        if (rejection.stack) {
-                            console.dir(rejection.stack);
+                        var previronnumber = previronnumbers.find(function(element) {
+                            var result = false;
+                            if (element.phone && element.phone == hiker.phone) {
+                                result = true;
+                            }
+                            return result;
+                        });
+                        console.log("previronnumber " + JSON.stringify(previronnumber));
+                        if (previronnumber && previronnumber.lastseen) {
+                            lastseen = previronnumber.lastseen;
+                            var compareLastSeen = new Date(lastseen.getTime() + 30*60000);
+                            if (compareLastSeen > now) {
+                                withus = "כן";
+                            }
+                            lastseen = lastseen.toLocaleTimeString("he-IL", {timeZone: "Asia/Jerusalem"});
                         }
-                    });
+                        ironnumbers.push({
+                            name: hiker.fullname,
+                            phone: hiker.phone,
+                            withus: withus,
+                            lastseen: lastseen,
+                            car: car,
+                        });
+                    }
+                    res.status(200).json(ironnumbers);
+                })
+                .catch(rejection => {
+                    console.log("something went wrong: "  + rejection);
+                    if (rejection.stack) {
+                        console.dir(rejection.stack);
+                    }
+                });
+            })
+            .catch(rejection => {
+                console.log("something went wrong: "  + rejection);
+                if (rejection.stack) {
+                    console.dir(rejection.stack);
                 }
             });
         }

@@ -6,6 +6,7 @@ var util = require("./util");
 module.exports = {
     initialize: initialize,
     gethikers: gethikers,
+    gethikersbyhikedate: gethikersbyhikedate,
     gethikes: gethikes,
     getlastregisters: getlastregisters,
     getironnumbers: getironnumbers,
@@ -51,6 +52,20 @@ function initialize(app) {
 function gethikers() {
     return new Promise((resolve, reject) => {
         db.collection(HIKERS_COLLECTION).find({}).toArray(function(err, docs) {
+            if (err) {
+                return reject(res, err.message, "Failed to get hikers.");
+            } else {
+                return resolve(docs);
+            }
+        });
+    });
+}
+
+function gethikersbyhikedate(hiketodate) {
+    return new Promise((resolve, reject) => {
+        db.collection(HIKERS_COLLECTION).find(
+            { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
+                     { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }).toArray(function(err, docs) {
             if (err) {
                 return reject(res, err.message, "Failed to get hikers.");
             } else {
