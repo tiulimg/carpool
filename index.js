@@ -18,7 +18,7 @@ var ObjectID = mongodb.ObjectID;
 var HIKERS_COLLECTION = "hikers";
 var HIKE_COLLECTION = "hike";
 var LAST_REGISTER_COLLECTION = "last_register";
-var IRONNUMBERS_COLLECTION = "ironnumbers";
+//var IRONNUMBERS_COLLECTION = "ironnumbers";
 var ROUTES_COLLECTION = "routes";
 
 var app = express();
@@ -2946,13 +2946,6 @@ app.get("/api/ironnumber", function(req, res) {
                 console.dir(rejection.stack);
             }
         });
-        // db.collection(IRONNUMBERS_COLLECTION).find({}).toArray(function(err, docs) {
-        //     if (err) {
-        //         handleError(res, err.message, "Failed to get iron numbers.");
-        //     } else {
-        //         res.status(200).json(docs);
-        //     }
-        // });
     }
 });
 
@@ -2975,46 +2968,49 @@ app.patch("/api/ironnumber", function(req, res) {
                 if (err) {
                     handleError(res, err.message, "Failed to get hikers.");
                 } else {
-                    db.collection(IRONNUMBERS_COLLECTION).find({}).toArray(function(err, previronnumbers) {
-                        if (err) {
-                            handleError(res, err.message, "Failed to get ironnumbers.");
-                        } else {
-                            var now = new Date();
-                            var ironnumbers = [];
-                            for (var index = 0; index < docs.length; index++) {
-                                const hiker = docs[index];
-                                console.log("hiker " + JSON.stringify(hiker));
-                                var lastseen = "";
-                                var withus = "לא";
-                                var car = "לא";
-                                if (hiker.amidriver) {
-                                    car = "כן";
-                                }
-                                var previronnumber = previronnumbers.find(function(element) {
-                                    var result = false;
-                                    if (element.phone && element.phone == hiker.phone) {
-                                        result = true;
-                                    }
-                                    return result;
-                                });
-                                console.log("previronnumber " + JSON.stringify(previronnumber));
-                                if (previronnumber && previronnumber.lastseen) {
-                                    lastseen = previronnumber.lastseen;
-                                    var compareLastSeen = new Date(lastseen.getTime() + 30*60000);
-                                    if (compareLastSeen > now) {
-                                        withus = "כן";
-                                    }
-                                    lastseen = lastseen.toLocaleTimeString("he-IL", {timeZone: "Asia/Jerusalem"});
-                                }
-                                ironnumbers.push({
-                                    name: hiker.fullname,
-                                    phone: hiker.phone,
-                                    withus: withus,
-                                    lastseen: lastseen,
-                                    car: car,
-                                });
+                    dbservices.getironnumbers()
+                    .then(previronnumbers => {
+                        var now = new Date();
+                        var ironnumbers = [];
+                        for (var index = 0; index < docs.length; index++) {
+                            const hiker = docs[index];
+                            console.log("hiker " + JSON.stringify(hiker));
+                            var lastseen = "";
+                            var withus = "לא";
+                            var car = "לא";
+                            if (hiker.amidriver) {
+                                car = "כן";
                             }
-                            res.status(200).json(ironnumbers);
+                            var previronnumber = previronnumbers.find(function(element) {
+                                var result = false;
+                                if (element.phone && element.phone == hiker.phone) {
+                                    result = true;
+                                }
+                                return result;
+                            });
+                            console.log("previronnumber " + JSON.stringify(previronnumber));
+                            if (previronnumber && previronnumber.lastseen) {
+                                lastseen = previronnumber.lastseen;
+                                var compareLastSeen = new Date(lastseen.getTime() + 30*60000);
+                                if (compareLastSeen > now) {
+                                    withus = "כן";
+                                }
+                                lastseen = lastseen.toLocaleTimeString("he-IL", {timeZone: "Asia/Jerusalem"});
+                            }
+                            ironnumbers.push({
+                                name: hiker.fullname,
+                                phone: hiker.phone,
+                                withus: withus,
+                                lastseen: lastseen,
+                                car: car,
+                            });
+                        }
+                        res.status(200).json(ironnumbers);
+                    })
+                    .catch(rejection => {
+                        console.log("something went wrong: "  + rejection);
+                        if (rejection.stack) {
+                            console.dir(rejection.stack);
                         }
                     });
                 }
@@ -3027,8 +3023,6 @@ app.patch("/api/ironnumber", function(req, res) {
 });
 
 app.post("/api/ironnumber", function(req, res) {
-    var now = new Date();
-  
     if (!req.body.pwd) {
       handleError(res, "Unauthorized", "Password is required.", 400);
     }
@@ -3047,15 +3041,16 @@ app.post("/api/ironnumber", function(req, res) {
                 var selectedhike = req.body.hikename;
                 //var hiketodate = selectedhike.match(/\d{1,2}\.\d{1,2}\.\d{2}/)[0];
                 phonenumber = util.normalize_phonenumber(phonenumber);
-                db.collection(IRONNUMBERS_COLLECTION).update(
-                    { phone: phonenumber },
-                    {
-                        hike: selectedhike, 
-                        phone: phonenumber,
-                        lastseen: now 
-                    }, 
-                    { upsert : true });
-                res.status(200).json("success");
+                dbservices.updateironnumberbyphone(phonenumber, selectedhike)
+                .then(() => {
+                    res.status(200).json("success");
+                })
+                .catch(rejection => {
+                    console.log("something went wrong: "  + rejection);
+                    if (rejection.stack) {
+                        console.dir(rejection.stack);
+                    }
+                });
             }
             else {
                 res.status(400).json("Phone number is not 10 digits formatted");

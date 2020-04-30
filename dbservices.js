@@ -10,6 +10,7 @@ module.exports = {
     getlastregisters: getlastregisters,
     getironnumbers: getironnumbers,
     getroutes: getroutes,
+    updateironnumberbyphone: updateironnumberbyphone,
 }
 
 var ObjectID = mongodb.ObjectID;
@@ -102,5 +103,20 @@ function getroutes() {
                 return resolve(docs);
             }
         });
+    });
+}
+
+function updateironnumberbyphone(phonenumber, selectedhike) {
+    return new Promise((resolve, reject) => {
+        var now = new Date();
+        db.collection(IRONNUMBERS_COLLECTION).update(
+            { phone: phonenumber },
+            {
+                hike: selectedhike, 
+                phone: phonenumber,
+                lastseen: now 
+            }, 
+            { upsert : true });
+        resolve();
     });
 }
