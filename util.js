@@ -81,16 +81,7 @@ function only_hikes_in_lang(docs, hikelist, istext, lang) {
     if (istext) {
         for (let index = 0; index < hikelist.length; index++) {
             const hike = hikelist[index];
-            docHike = docs.find(function(element) {
-                var result = false;
-                if ((element.hikenamehebrew && 
-                    element.hikenamehebrew.indexOf(hike) != -1) ||
-                    (element.hikenameenglish && 
-                    element.hikenameenglish.indexOf(hike) != -1)) {
-                    result = true;
-                }
-                return result;
-            });
+            docHike = findhike(docs, hike);
 
             if (index + 1 < hikelist.length) {
                 var nexthike = hikelist[index + 1];
@@ -113,16 +104,7 @@ function only_hikes_in_lang(docs, hikelist, istext, lang) {
 
         for (let index = 0; index < hikelist.length; index++) {
             const hike = hikelist[index];
-            docHike = docs.find(function(element) {
-                var result = false;
-                if ((element.hikenamehebrew && 
-                    element.hikenamehebrew.indexOf(hike) != -1) ||
-                    (element.hikenameenglish && 
-                    element.hikenameenglish.indexOf(hike) != -1)) {
-                    result = true;
-                }
-                return result;
-            });
+            docHike = findhike(docs, hike);
 
             switch (lang) {
                 case "he":
@@ -205,16 +187,7 @@ function remove_hikes_notinlist(hikelist, docs) {
         var selectHike = null;
         var hikedate = hike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
         if (hikedate != null) {
-            selectHike = docs.find(function(element) {
-                var result = false;
-                if ((element.hikenamehebrew && 
-                    element.hikenamehebrew.indexOf(hikedate[0]) != -1) ||
-                    (element.hikenameenglish && 
-                    element.hikenameenglish.indexOf(hikedate[0]) != -1)) {
-                    result = true;
-                }
-                return result;
-            });
+            selectHike = findhike(docs, hikedate[0]);
         }
         if (hike == "" || selectHike == null) {
             hikelistcloned.splice(index,1);
@@ -433,7 +406,7 @@ function getHikerAreas(hikers) {
         sumtothehikeareas: {},
         sumfromthehikeareas: {},
     };
-    for (var area in ["דרום", "צפון", "ירושלים", "חיפה", "מרכז"]) {
+    for (var area in {"דרום":1, "צפון":1, "ירושלים":1, "חיפה":1, "מרכז":1}) {
         areas.driverstothehikeareas[area] = [];
         areas.driversfromthehikeareas[area] = [];
         areas.hitchhikerstothehikeareas[area] = [];
