@@ -615,7 +615,19 @@ function makecalculation(hikers, distances, hike) {
             
         }
     }
+
+    updateavailableplaces(hikers);
     return hikers;
+}
+
+function updateavailableplaces(hikers) {
+    for (let index = 0; index < hikers.length; index++) {
+        const hiker = hikers[index];
+        if (hiker.amidriver) {
+            hiker.availableplaces = hiker.availableplacestothehike < hiker.availableplacesfromthehike ? 
+                hiker.availableplacestothehike : hiker.availableplacesfromthehike;
+        }
+    }
 }
 
 function calculateridesbydistanceanddirection(hiker, hike, distances, direction) {
