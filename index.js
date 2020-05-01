@@ -871,10 +871,7 @@ app.patch("/api/lastregister/:phone", function(req, res) {
             var recast_conversation_reply;
             var language = util.set_language(memory);
 
-            if (err) {
-                console.log("An error occured: " + err);
-            }
-            else if (!doc) {
+            if (!doc) {
                 memory.stage = "haslastregister";
                 recast_conversation_reply = 
                     replies.get_recast_reply("NO_ANSWER",language,null,memory);   
