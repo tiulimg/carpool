@@ -1938,7 +1938,7 @@ app.post("/api/selecthikes", function(req, res) {
                     }
                 }
                 console.log("last memorySelectHike " + memorySelectHike);
-                selectHike = util.findhike(docs, memorySelectHike, hikedate2);
+                selectHike = util.findhike(docs, memorySelectHike, hikedate2[0]);
                 console.log("selectHike " + JSON.stringify(selectHike));
 
                 if (typeof selectHike !== 'undefined' && selectHike != null && selectHike != "") {

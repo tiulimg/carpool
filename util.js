@@ -244,6 +244,7 @@ function findhike(hikes, hikestring, hikealternatestring) {
         // console.log("findhike element.hikenamehebrew " + JSON.stringify(element.hikenamehebrew) + " " + result);
         return result;
     });
+    return selectHike;
 }
 
 function set_language(memory) {
