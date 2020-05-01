@@ -246,8 +246,7 @@ function getlastregisters(res) {
 function getlastregisterbyphonenumber(res, phonenumber) {
     return new Promise((resolve, reject) => {
         db.collection(LAST_REGISTER_COLLECTION).findOne(
-            { $or: [ { 'phone number': phonenumber }, { email: phonenumber } ]}
-        ).toArray(function(err, doc) {
+            { $or: [ { 'phone number': phonenumber }, { email: phonenumber } ]}, function(err, doc) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to get last register.");
             } else {

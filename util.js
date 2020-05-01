@@ -315,7 +315,7 @@ function getDistanceMatrix(hikers) {
             if (hiker == partner || hiker.phone == partner.phone) {
                 continue;
             }
-            else if (!partner.amidriver && !hiker.amidriver) {
+            else if (!partner.amidriver) {
                 continue;
             }
 
@@ -416,7 +416,6 @@ function getHikerAreas(hikers) {
     }
     areas.sumtothehikeareas.all = 0;
     areas.sumfromthehikeareas.all = 0;
-    console.log("areas " + JSON.stringify(areas));
 
     var phones = [];
 
