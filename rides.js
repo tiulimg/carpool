@@ -10,7 +10,9 @@ module.exports = {
     patchridedetails: patchridedetails,
     translateaddresstolocation: translateaddresstolocation,
     findhikerslocation: findhikerslocation,
-    calculateroute: calculateroute,
+    findroute: findroute,
+    findpublictransport: findpublictransport,
+    findcarroute: findcarroute,
 };
 
 const HERE_APPID = process.env.HERE_APPID;
@@ -18,6 +20,8 @@ const ALGOLIA_KEY = process.env.ALGOLIA_KEY;
 const ALGOLIA_APPID = process.env.ALGOLIA_APPID;
 
 var locationscache = {};
+var publictransportcache = {};
+var carroutecache = {};
 
 function patchridedetails(req, res, replies)
 {
@@ -457,7 +461,7 @@ function findhikerslocation(hikers) {
     });
 }
 
-function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) { // mode = car | publicTransport
+function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) { // mode = car | publicTransport
     return new Promise((resolve, reject) => {
         var arrivaldepartaddition = "";
         if (arrivaltime) {
@@ -517,5 +521,15 @@ function calculateroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departt
                 }
             }
         });
+    });
+}
+
+function findpublictransport(hikers) {
+    return new Promise((resolve, reject) => {
+    });
+}
+
+function findcarroute(hikers) {
+    return new Promise((resolve, reject) => {
     });
 }

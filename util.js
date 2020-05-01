@@ -430,7 +430,6 @@ function getHikerAreas(hikers) {
             if (hiker.comesfromarea) {
                 areas.sumtothehikeareas[hiker.comesfromarea] += hiker.availableplaces;
                 areas.sumtothehikeareas.all += hiker.availableplaces;                    
-                console.log("hiker.comesfromarea " + JSON.stringify(hiker.comesfromarea));
                 areas.driverstothehikeareas[hiker.comesfromarea].push(hiker);
                 hiker.availableplacestothehike = hiker.availableplaces;
             }
@@ -440,7 +439,6 @@ function getHikerAreas(hikers) {
             if (hiker.returnstoarea) {
                 areas.sumfromthehikeareas[hiker.returnstoarea] += hiker.availableplaces;
                 areas.sumfromthehikeareas.all += hiker.availableplaces;                    
-                console.log("hiker.returnstoarea " + JSON.stringify(hiker.returnstoarea));
                 areas.driversfromthehikeareas[hiker.returnstoarea].push(hiker);
                 hiker.availableplacesfromthehike = hiker.availableplaces;
             }
@@ -470,7 +468,7 @@ function getHikerAreas(hikers) {
         }
     }
 
-    logcalculationareas.logcalculationareas(areas); 
+    logservices.logcalculationareas(areas); 
 
     return areas;
 }

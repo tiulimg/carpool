@@ -2570,7 +2570,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                     if (!hiker.mydriverto && !hiker.routetothehike) {
                                         console.log("publicTransport to the hike for hiker " + hiker.fullname);
                                         promises.push(
-                                            ridesmodules.calculateroute(
+                                            ridesmodules.findroute(
                                                 hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude,
                                                 hike.startlongitude, "publicTransport", hike.starttime, null)
                                             .then(route => {
@@ -2584,7 +2584,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                     if (!hiker.mydriverfrom && !hiker.routefromthehike) {
                                         console.log("publicTransport from the hike for hiker " + hiker.fullname);
                                         promises.push(
-                                            ridesmodules.calculateroute(
+                                            ridesmodules.findroute(
                                                 hike.endlatitude, hike.endlongitude, hiker.returnstolocation.lat, 
                                                 hiker.returnstolocation.lon, "publicTransport", null, hike.endtime)
                                             .then(route => {
