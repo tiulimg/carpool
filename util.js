@@ -405,70 +405,31 @@ function getDistanceMatrix(hikers) {
 
     }
 
-    console.log("distances:");
-    for (var source in distances) {
-        source = distances[source];
-        for (let index = 0; index < source.tothehike.length; index++) {
-            const dest = source.tothehike[index];
-            console.log("tothehike: source " + source.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.fullname);
-        }
-
-        for (let index = 0; index < source.fromthehike.length; index++) {
-            const dest = source.fromthehike[index];
-            console.log("fromthehike: source " + source.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.fullname);
-        }
-    }
+    logservices.logcalculationdistances(distances);
 
     return distances;
 }
 
 function getHikerAreas(hikers) {
+    // Initialization
     var areas = {
-        driverstothehikeareas: {
-            "דרום": [],
-            "צפון": [],
-            "ירושלים": [],
-            "חיפה": [],
-            "מרכז": [],
-        },
-        driversfromthehikeareas: {
-            "דרום": [],
-            "צפון": [],
-            "ירושלים": [],
-            "חיפה": [],
-            "מרכז": [],
-        },
-        hitchhikerstothehikeareas: {
-            "דרום": [],
-            "צפון": [],
-            "ירושלים": [],
-            "חיפה": [],
-            "מרכז": [],
-        },
-        hitchhikersfromthehikeareas: {
-            "דרום": [],
-            "צפון": [],
-            "ירושלים": [],
-            "חיפה": [],
-            "מרכז": [],
-        },
-        sumtothehikeareas: {
-            "דרום": 0,
-            "צפון": 0,
-            "ירושלים": 0,
-            "חיפה": 0,
-            "מרכז": 0,
-            "all": 0,
-        },
-        sumfromthehikeareas: {
-            "דרום": 0,
-            "צפון": 0,
-            "ירושלים": 0,
-            "חיפה": 0,
-            "מרכז": 0,
-            "all": 0,
-        },
+        driverstothehikeareas: {},
+        driversfromthehikeareas: {},
+        hitchhikerstothehikeareas: {},
+        hitchhikersfromthehikeareas: {},
+        sumtothehikeareas: {},
+        sumfromthehikeareas: {},
     };
+    for (var area in ["דרום", "צפון", "ירושלים", "חיפה", "מרכז"]) {
+        areas.driverstothehikeareas[area] = [];
+        areas.driversfromthehikeareas[area] = [];
+        areas.hitchhikerstothehikeareas[area] = [];
+        areas.hitchhikersfromthehikeareas[area] = [];
+        areas.sumtothehikeareas[area] = 0;
+        areas.sumfromthehikeareas[area] = 0;
+    }
+    areas.sumtothehikeareas.all = 0;
+    areas.sumfromthehikeareas.all = 0;
 
     var phones = [];
 
@@ -520,34 +481,7 @@ function getHikerAreas(hikers) {
         }
     }
 
-    console.log("areas:");
-    for (var area in areas.driverstothehikeareas) {
-        console.log("area " + area);
-        for (let index = 0; index < areas.driverstothehikeareas[area].length; index++) {
-            const hiker = areas.driverstothehikeareas[area][index];
-            console.log("driverstothehikearea: " + area + " " + hiker.fullname + " available " + hiker.availableplaces + 
-                " friends " + JSON.stringify(hiker.myfriends));
-        }
-        for (let index = 0; index < areas.driversfromthehikeareas[area].length; index++) {
-            const hiker = areas.driversfromthehikeareas[area][index];
-            console.log("driversfromthehikeareas: " + area + " " + hiker.fullname + " available " + hiker.availableplaces + 
-                " friends " + JSON.stringify(hiker.myfriends));
-        }
-        for (let index = 0; index < areas.hitchhikerstothehikeareas[area].length; index++) {
-            const hiker = areas.hitchhikerstothehikeareas[area][index];
-            console.log("hitchhikerstothehikeareas: " + area + " " + hiker.fullname + " seatsrequired " + hiker.seatsrequired + 
-                " friends " + JSON.stringify(hiker.myfriends));
-        }
-        for (let index = 0; index < areas.hitchhikersfromthehikeareas[area].length; index++) {
-            const hiker = areas.hitchhikersfromthehikeareas[area][index];
-            console.log("hitchhikersfromthehikeareas: " + area + " " + hiker.fullname + " seatsrequired " + hiker.seatsrequired + 
-                " friends " + JSON.stringify(hiker.myfriends));
-        }
-        console.log("sumtothehikeareas: " + areas.sumtothehikeareas[area]);
-        console.log("sumfromthehikeareas: " + areas.sumfromthehikeareas[area]);    
-    }
-    console.log("sumtoareas all: " + areas.sumtothehikeareas.all);
-    console.log("sumfromareas all: " + areas.sumfromthehikeareas.all);    
+    logcalculationareas.logcalculationareas(areas); 
 
     return areas;
 }

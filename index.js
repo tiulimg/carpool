@@ -95,7 +95,7 @@ app.patch("/api/areridessetuped", function(req, res) {
 
 app.post("/api/wanttomodify", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(memory.pwd)) {
+    if (util.checkpwd(res, memory.pwd)) {
         console.log("memory: " + JSON.stringify(memory));
         var language = util.set_language(memory);
 
@@ -211,7 +211,7 @@ app.post("/api/wanttomodify", function(req, res) {
 
 app.put("/api/wanttomodify", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(memory.pwd)) {
+    if (util.checkpwd(res, memory.pwd)) {
         console.log("memory: " + JSON.stringify(memory));
         var language = util.set_language(memory);
 
@@ -467,7 +467,7 @@ app.put("/api/wanttomodify", function(req, res) {
 
 app.post("/api/friendsdetails", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(memory.pwd)) {
+    if (util.checkpwd(res, memory.pwd)) {
         var language = util.set_language(memory);
         if (typeof memory.friendsdetails === 'undefined' || memory.friendsdetails == null) {
             memory.friendsdetails = [];
@@ -505,7 +505,7 @@ app.post("/api/friendsdetails", function(req, res) {
 
 app.put("/api/friendsdetails", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(memory.pwd)) {
+    if (util.checkpwd(res, memory.pwd)) {
         var language = util.set_language(memory);
         delete memory.friendname;
         delete memory.friendage;
@@ -528,7 +528,7 @@ app.put("/api/friendsdetails", function(req, res) {
 */
 
 app.get("/api/lastregister", function(req, res) {
-    if (util.checkpwd(req.query.pwd)) {
+    if (util.checkpwd(res, req.query.pwd)) {
         dbservices.getlastregisters(res)
         .then(docs => {
             res.status(200).json(docs);
@@ -540,7 +540,7 @@ app.get("/api/lastregister", function(req, res) {
 });
 
 app.post("/api/lastregister", function(req, res) {
-    if (util.checkpwd(req.query.pwd)) {
+    if (util.checkpwd(res, req.query.pwd)) {
         console.log(JSON.stringify(req.body));
 
         var formParams = {
@@ -843,7 +843,7 @@ app.post("/api/lastregister", function(req, res) {
 });
 
 app.delete("/api/lastregister", function(req, res) {
-    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
+    if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         dbservices.deletealllastregisters(res)
         .then(() => {
             res.status(200).json("success");
@@ -863,7 +863,7 @@ app.delete("/api/lastregister", function(req, res) {
 
 app.patch("/api/lastregister/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(req.query.pwd)) {
+    if (util.checkpwd(res, req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = util.normalize_phonenumber(phonenumber);
         dbservices.getlastregisterbyphonenumber(res, phonenumber)
@@ -1014,7 +1014,7 @@ app.patch("/api/lastregister/:phone", function(req, res) {
 
 app.put("/api/lastregister/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(req.query.pwd)) {
+    if (util.checkpwd(res, req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = util.normalize_phonenumber(phonenumber);
         dbservices.getlastregisterbyphonenumber(res, phonenumber)
@@ -1091,7 +1091,7 @@ app.put("/api/lastregister/:phone", function(req, res) {
 
 app.post("/api/lastregister/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(req.query.pwd)) {
+    if (util.checkpwd(res, req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = util.normalize_phonenumber(phonenumber);
         dbservices.getlastregisterbyphonenumber(res, phonenumber)
@@ -1178,7 +1178,7 @@ app.post("/api/lastregister/:phone", function(req, res) {
 });
 
 app.delete("/api/lastregister/:phone", function(req, res) {
-    if (util.checkpwd(req.query.pwd)) {
+    if (util.checkpwd(res, req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = util.normalize_phonenumber(phonenumber);
         dbservices.deleteonelastregister(res, phonenumber)
@@ -1197,7 +1197,7 @@ app.delete("/api/lastregister/:phone", function(req, res) {
 
 app.patch("/api/haslastregister/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(req.query.pwd)) {
+    if (util.checkpwd(res, req.query.pwd)) {
         var phonenumber = req.params.phone;
         var language = util.set_language(memory);
 
@@ -1348,7 +1348,7 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
 
 app.post("/api/registertohikes", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(req.query.pwd)) {
+    if (util.checkpwd(res, req.query.pwd)) {
         var language = util.set_language(memory);
         var registertohikes_lang = "עברית";
         if (language == "en") {
@@ -1585,7 +1585,7 @@ app.post("/api/registertohikes", function(req, res) {
 
   app.put("/api/registertohikes", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(memory.pwd)) {
+    if (util.checkpwd(res, memory.pwd)) {
         var language = util.set_language(memory);
         var registertohikes_lang = "עברית";
         if (language == "en") {
@@ -1848,7 +1848,7 @@ app.post("/api/registertohikes", function(req, res) {
 
 app.post("/api/joinupdates", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(req.query.pwd)) {
+    if (util.checkpwd(res, req.query.pwd)) {
         var recast_conversation_reply;
         var api_key = process.env.MAILGUN_API_KEY;
         var DOMAIN = process.env.MAILGUN_DOMAIN;
@@ -1909,7 +1909,7 @@ app.post("/api/joinupdates", function(req, res) {
 
 app.patch("/api/selecthikes", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(memory.pwd)) {
+    if (util.checkpwd(res, memory.pwd)) {
         dbservices.gethikes(res)
         .then(docs => {
             var language = util.set_language(memory);
@@ -1927,7 +1927,7 @@ app.patch("/api/selecthikes", function(req, res) {
 
 app.post("/api/selecthikes", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(memory.pwd)) {
+    if (util.checkpwd(res, memory.pwd)) {
         dbservices.gethikes(res)
         .then(docs => {
             var language = util.set_language(memory);
@@ -2048,7 +2048,7 @@ app.post("/api/selecthikes", function(req, res) {
 */
 
 app.get("/api/hike", function(req, res) {
-    if (util.checkpwd(req.query.pwd)) {
+    if (util.checkpwd(res, req.query.pwd)) {
         dbservices.gethikes(res)
         .then(docs => {
             res.status(200).json(docs);
@@ -2061,7 +2061,7 @@ app.get("/api/hike", function(req, res) {
 
 app.patch("/api/hike", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(memory.pwd)) {
+    if (util.checkpwd(res, memory.pwd)) {
         var language = util.set_language(memory);
         dbservices.gethikes(res)
         .then(docs => {
@@ -2090,7 +2090,7 @@ app.patch("/api/hike", function(req, res) {
 });
 
 app.put("/api/hike", function(req, res) {
-    if (util.checkpwd(req.body.pwd)) {
+    if (util.checkpwd(res, req.body.pwd)) {
         var hikes = req.body.hikes;
         dbservices.replaceallhikes(res, hikes)
         .then(() => {
@@ -2108,7 +2108,7 @@ app.put("/api/hike", function(req, res) {
 */
 
 app.get("/api/hikers", function(req, res) {
-    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
+    if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         dbservices.gethikers(res)
         .then(docs => {
             res.status(200).json(docs);
@@ -2120,7 +2120,7 @@ app.get("/api/hikers", function(req, res) {
   });
 
 app.put("/api/hikers", function(req, res) {
-    if (util.checkpwd(req.body.pwd)) {
+    if (util.checkpwd(res, req.body.pwd)) {
         var hikers = req.body.hikers;
         dbservices.replaceallhikers(res, hikers)
         .then(() => {
@@ -2138,7 +2138,7 @@ app.put("/api/hikers", function(req, res) {
 
 app.patch("/api/choosehike/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(memory.pwd)) {
+    if (util.checkpwd(res, memory.pwd)) {
         var language = util.set_language(memory);
         var reply_sent = false;
         dbservices.gethikes(res)
@@ -2224,7 +2224,7 @@ app.patch("/api/ridedetails/:phone", function(req, res) {
 
 app.put("/api/ridedetails/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(memory.pwd)) {
+    if (util.checkpwd(res, memory.pwd)) {
         dbservices.gethikes(res)
         .then(docs => {
             var nowstring = docs[0].lastupdate;
@@ -2291,7 +2291,7 @@ app.put("/api/ridedetails/:phone", function(req, res) {
 
 app.post("/api/choosedriver", function(req, res) {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(memory.pwd)) {
+    if (util.checkpwd(res, memory.pwd)) {
         var phonenumber = memory.phonenumber;
         phonenumber = util.normalize_phonenumber(phonenumber);
 
@@ -2454,7 +2454,7 @@ app.post("/api/choosedriver", function(req, res) {
 */
 
 app.get("/api/ironnumber", function(req, res) {
-    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
+    if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         dbservices.getironnumbers(res)
         .then(ironnumbers => {
             res.status(200).json(ironnumbers);
@@ -2466,7 +2466,7 @@ app.get("/api/ironnumber", function(req, res) {
 });
 
 app.patch("/api/ironnumber", function(req, res) {
-    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
+    if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         var selectedhike = req.query.hikename;
         if (selectedhike) {
             var hiketodate = selectedhike.match(/\d{1,2}\.\d{1,2}\.\d{2}/)[0];
@@ -2527,7 +2527,7 @@ app.patch("/api/ironnumber", function(req, res) {
 });
 
 app.post("/api/ironnumber", function(req, res) {
-    if (util.checkpwd(req.body.pwd)) {
+    if (util.checkpwd(res, req.body.pwd)) {
         var phonenumber = req.body.phone;
         if (phonenumber == process.env.SPECIALPWD) {
             phonenumber = process.env.TAL_PHONE;
@@ -2561,7 +2561,7 @@ app.post("/api/ironnumber", function(req, res) {
 *    PATCH: queries for lat lon locations for hikers comesfromdetailed and returnstodetailed
 */
 app.patch("/api/findhikerslocation", function(req, res) {
-    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
+    if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         dbservices.gethikers(res)
         .then(hikers => {
             ridesmodules.findhikerslocation(hikers)
@@ -2590,13 +2590,13 @@ app.patch("/api/findhikerslocation", function(req, res) {
 */
 
 app.get("/api/calculaterides", function(req, res) {
-    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
+    if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         res.status(200).json("OK");
     }
 });
 
 app.patch("/api/calculaterides", function(req, res) {
-    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
+    if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         dbservices.gethikes(res)
         .then(hikes => {
             var nearhikes = util.get_near_hikes(hikes);
@@ -2800,72 +2800,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                 }
                             }
 
-                            console.log("calculaterides carpool calculation result:");
-                            for (let index = 0; index < hikers.length; index++) {
-                                const hiker = hikers[index];
-                                if (hiker.amidriver) {
-                                    var hitchersto = "";
-                                    var hitchersfrom = "";
-                                    for (let hitcherindex = 0; hiker.myhitchersto && hitcherindex < hiker.myhitchersto.length; 
-                                        hitcherindex++) {
-                                        var hitcher = hiker.myhitchersto[hitcherindex].hitchername;
-                                        if (hiker.myhitchersto[hitcherindex].hitcherfullname) {
-                                            hitcher = hiker.myhitchersto[hitcherindex].hitcherfullname;
-                                        }
-                                        hitchersto += hitcher + ", ";
-                                    }
-                                    for (let hitcherindex = 0; hiker.myhitchersfrom && hitcherindex < hiker.myhitchersfrom.length; 
-                                        hitcherindex++) {
-                                        var hitcher = hiker.myhitchersfrom[hitcherindex].hitchername;
-                                        if (hiker.myhitchersfrom[hitcherindex].hitcherfullname) {
-                                            hitcher = hiker.myhitchersfrom[hitcherindex].hitcherfullname;
-                                        }
-                                        hitchersfrom += hitcher + ", ";
-                                    }
-                                    var myfriends = "";
-                                    for (let friendindex = 0; hiker.myfriends && friendindex < hiker.myfriends.length; 
-                                        friendindex++) {
-                                        const friend = hiker.myfriends[friendindex];
-                                        myfriends +=  ", " + friend;
-                                    }
-                                    console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
-                                        " to the hike: takes " + hitchersto);                                        
-                                    console.log(hiker.hikerindex + " " + hiker.fullname + myfriends + 
-                                        " from the hike: takes " + hitchersfrom);                                        
-                                }
-                                else {
-                                    if (hiker.mydriverto && hiker.mydriverfrom) {
-                                        var friendsdriversto = "";
-                                        var friendsdriversfrom = "";
-                                        for (let driverindex = 0; 
-                                            hiker.myfriendsdriversto && driverindex < hiker.myfriendsdriversto.length; 
-                                            driverindex++) {
-                                            const driver = hiker.myfriendsdriversto[driverindex].driverfullname;
-                                            friendsdriversto += ", " + driver;
-                                        }
-                                        for (let driverindex = 0; 
-                                            hiker.myfriendsdriversfrom && driverindex < hiker.myfriendsdriversfrom.length; 
-                                            driverindex++) {
-                                            const driver = hiker.myfriendsdriversfrom[driverindex].driverfullname;
-                                            friendsdriversfrom += ", " + driver;
-                                        }
-                                        var myfriends = "";
-                                        for (let friendindex = 0; hiker.myfriends && friendindex < hiker.myfriends.length; 
-                                            friendindex++) {
-                                            const friend = hiker.myfriends[friendindex];
-                                            myfriends +=  ", " + friend;
-                                        }
-                                        console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
-                                            " to the hike: joins " + hiker.mydriverto.fullname + friendsdriversto);
-                                        console.log(hiker.hikerindex + " " + hiker.fullname + myfriends +
-                                            " from the hike: joins " + hiker.mydriverfrom.fullname + friendsdriversfrom);
-                                    }
-                                    else
-                                    {
-                                        console.log(hiker.hikerindex + " " + hiker.fullname + " no drivers");
-                                    }
-                                }
-                            }
+                            logservices.logcalculationresult(hikers);
 
                             dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
                             .then(() => {
@@ -2893,7 +2828,7 @@ app.patch("/api/calculaterides", function(req, res) {
 });
 
 app.delete("/api/calculaterides", function(req, res) {
-    if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
+    if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         res.status(200).json("OK");
     }
 });
