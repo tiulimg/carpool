@@ -182,7 +182,7 @@ function replaceallhikers(res, hikers) {
 
 function replaceallhikersforhike(res, hiketodate, hikers) {
     return new Promise((resolve, reject) => {
-        db.collection(HIKERS_COLLECTION).deleteMany({hikenamehebrew: { $regex : ".*"+hike.hikedate+".*" }}, function(err, result) {
+        db.collection(HIKERS_COLLECTION).deleteMany({hikenamehebrew: { $regex : ".*"+hiketodate+".*" }}, function(err, result) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to delete hikers of " + hiketodate);
             } else {
