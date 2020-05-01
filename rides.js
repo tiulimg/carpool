@@ -22,7 +22,7 @@ var locationscache = {};
 function patchridedetails(req, res, replies)
 {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(memory.pwd)) {
+    if (util.checkpwd(res, memory.pwd)) {
         var language = util.set_language(memory);
         dbservices.gethikes()
         .then(docs => {

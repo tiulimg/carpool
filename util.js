@@ -20,22 +20,22 @@ module.exports = {
     getHikerAreas: getHikerAreas,
 };
 
-function checkpwd(pwd) {
+function checkpwd(res, pwd) {
     if (!pwd) {
-        logservices.handleError("Unauthorized", "Password is required.", 400);
+        logservices.handleError(res, "Unauthorized", "Password is required.", 400);
     }
     else if (pwd != process.env.PSWD) {
-        logservices.handleError("Unauthorized", "Password is incorrect.", 400);
+        logservices.handleError(res, "Unauthorized", "Password is incorrect.", 400);
     }
     return true;
 }
 
-function checkspecialpwd(pwd, specialpwd) {
+function checkspecialpwd(res, pwd, specialpwd) {
     if (!pwd || !specialpwd) {
-        logservices.handleError("Unauthorized", "Password and special password are required.", 400);
+        logservices.handleError(res, "Unauthorized", "Password and special password are required.", 400);
     }
     else if (pwd != process.env.PSWD || specialpwd != process.env.SPECIALPWD) {
-        logservices.handleError("Unauthorized", "Password or special password are incorrect.", 400);
+        logservices.handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
     }
     return true;
 }

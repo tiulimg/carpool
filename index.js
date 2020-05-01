@@ -16,10 +16,6 @@ var wanttomodify_obj = JSON.parse(fs.readFileSync('./wanttomodifytexts.json', 'u
 
 var ObjectID = mongodb.ObjectID;
 
-var HIKERS_COLLECTION = "hikers";
-var HIKE_COLLECTION = "hike";
-var LAST_REGISTER_COLLECTION = "last_register";
-
 var app = express();
 // Serve static files from the React app
 app.use(express.static('app/build'));
@@ -42,10 +38,6 @@ dbservices.initialize(app)
 .catch(rejection => {
     logservices.logRejection(rejection);
 });
-logservices.initialize(res)
-.catch(rejection => {
-    logservices.logRejection(rejection);
-});
 
 /*  "/api/debug"
 *    POST: prints all conversation details
@@ -63,7 +55,7 @@ app.post("/api/debug", function(req, res) {
 
 app.patch("/api/areridessetuped", function(req, res) {
     var memory = req.body.conversation.memory;
-    dbservices.gethikerswithdrivers()
+    dbservices.gethikerswithdrivers(res)
     .then(docs => {
         var language = util.set_language(memory);
         var setuped = false;
@@ -403,7 +395,7 @@ app.put("/api/wanttomodify", function(req, res) {
                     needtosubmit = false;
                     recast_conversation_reply =
                         replies.get_recast_reply("HIKES_SELECTED",language,[memory.selectedhikes.join("\n")],memory);
-                    dbservices.gethikes()
+                    dbservices.gethikes(res)
                     .then(docs => {
                         docs = util.sort_hikes(docs, false);
                         recast_conversation_reply = 
@@ -537,7 +529,7 @@ app.put("/api/friendsdetails", function(req, res) {
 
 app.get("/api/lastregister", function(req, res) {
     if (util.checkpwd(req.query.pwd)) {
-        dbservices.getlastregisters()
+        dbservices.getlastregisters(res)
         .then(docs => {
             res.status(200).json(docs);
         })
@@ -680,14 +672,14 @@ app.post("/api/lastregister", function(req, res) {
 
         formObj["friends joining"] = util.friendstext_from_friendsdetails(formObj.friendsdetails);
 
-        dbservices.gethikes()
+        dbservices.gethikes(res)
         .then(docs => {
             formObj.selectedhikes = util.remove_hikes_notinlist(formObj.selectedhikes, docs);
             formObj.selectedhikes = util.remove_past_hikes(formObj.selectedhikes, true);
 
             console.log("formobj2: " + JSON.stringify(formObj));
 
-            dbservices.getlastregisterbyphonenumber(phonenumber)
+            dbservices.getlastregisterbyphonenumber(res, phonenumber)
             .then(doc => {
                 if (typeof(doc) === 'undefined' || doc == null) {
                     var nowdate = new Date();
@@ -742,7 +734,7 @@ app.post("/api/lastregister", function(req, res) {
                     };
                     console.log("registerObj: " + JSON.stringify(registerObj));
             
-                    dbservices.insertnewlastregister(registerObj)
+                    dbservices.insertnewlastregister(res, registerObj)
                     .then(() => {
                         res.status(200).json("success");
                     })
@@ -831,7 +823,7 @@ app.post("/api/lastregister", function(req, res) {
                     };
                     console.log("registerObj: " + JSON.stringify(registerObj));
 
-                    dbservices.replaceonelastregister(phonenumber, registerObj)
+                    dbservices.replaceonelastregister(res, phonenumber, registerObj)
                     .then(() => {
                         res.status(200).json("success");
                     })
@@ -852,7 +844,7 @@ app.post("/api/lastregister", function(req, res) {
 
 app.delete("/api/lastregister", function(req, res) {
     if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
-        dbservices.deletealllastregisters()
+        dbservices.deletealllastregisters(res)
         .then(() => {
             res.status(200).json("success");
         })
@@ -874,7 +866,7 @@ app.patch("/api/lastregister/:phone", function(req, res) {
     if (util.checkpwd(req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = util.normalize_phonenumber(phonenumber);
-        dbservices.getlastregisterbyphonenumber(phonenumber)
+        dbservices.getlastregisterbyphonenumber(res, phonenumber)
         .then(doc => {
             var recast_conversation_reply;
             var language = util.set_language(memory);
@@ -932,7 +924,7 @@ app.patch("/api/lastregister/:phone", function(req, res) {
                 memory.lastageupdate = memory.registertohikes.lastageupdate;
                 memory.friendstext = util.friendstext_from_friendsdetails(memory.friendsdetails);
         
-                dbservices.gethikes()
+                dbservices.gethikes(res)
                 .then(docs => {
                     docs = util.sort_hikes(docs, false);
                     var selectedHikes = [];
@@ -1025,7 +1017,7 @@ app.put("/api/lastregister/:phone", function(req, res) {
     if (util.checkpwd(req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = util.normalize_phonenumber(phonenumber);
-        dbservices.getlastregisterbyphonenumber(phonenumber)
+        dbservices.getlastregisterbyphonenumber(res, phonenumber)
         .then(doc => {
             var recast_conversation_reply;
             var language = util.set_language(memory);
@@ -1066,7 +1058,7 @@ app.put("/api/lastregister/:phone", function(req, res) {
                     }
                 }
         
-                dbservices.gethikes()
+                dbservices.gethikes(res)
                 .then(docs => {
                     docs = util.sort_hikes(docs, false);
                     var selectedHikes = memory.registertohikes.hikes.split("\n");
@@ -1102,7 +1094,7 @@ app.post("/api/lastregister/:phone", function(req, res) {
     if (util.checkpwd(req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = util.normalize_phonenumber(phonenumber);
-        dbservices.getlastregisterbyphonenumber(phonenumber)
+        dbservices.getlastregisterbyphonenumber(res, phonenumber)
         .then(doc => {
             var recast_conversation_reply;
             var language = util.set_language(memory);
@@ -1137,7 +1129,7 @@ app.post("/api/lastregister/:phone", function(req, res) {
                 var affectedhikes = thishikeobject.hikes;
                 console.log("affectedhikes " + JSON.stringify(affectedhikes));
         
-                dbservices.gethikes()
+                dbservices.gethikes(res)
                 .then(docs => {
                     docs = util.sort_hikes(docs, false);
 
@@ -1189,7 +1181,7 @@ app.delete("/api/lastregister/:phone", function(req, res) {
     if (util.checkpwd(req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = util.normalize_phonenumber(phonenumber);
-        dbservices.deleteonelastregister(phonenumber)
+        dbservices.deleteonelastregister(res, phonenumber)
         .then(doc => {
             res.status(200).json("success");
         })
@@ -1211,7 +1203,7 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
 
         phonenumber = util.normalize_phonenumber(phonenumber);
         memory.phonenumber = phonenumber;
-        dbservices.getlastregisterbyphonenumber(phonenumber)
+        dbservices.getlastregisterbyphonenumber(res, phonenumber)
         .then(doc => {
             var recast_conversation_reply = 
             replies.get_recast_reply("NO_ANSWER",language,null,memory);
@@ -1221,7 +1213,7 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                 res.status(200).json(recast_conversation_reply);
             }
             else {
-                dbservices.gethikes()
+                dbservices.gethikes(res)
                 .then(hikedocs => {
                     if (memory.operation && memory.operation != "newhike") {
                         recast_conversation_reply = 
@@ -1418,7 +1410,7 @@ app.post("/api/registertohikes", function(req, res) {
         var phonenumber = memory.registertohikes["phone number"];
 
         phonenumber = util.normalize_phonenumber(phonenumber);
-        dbservices.getlastregisterbyphonenumber(phonenumber)
+        dbservices.getlastregisterbyphonenumber(res, phonenumber)
         .then(doc => {
             registerparams["VAR_LANGUAGE"] = registertohikes_lang;
             for (var property in memory.registertohikes) {
@@ -1499,7 +1491,7 @@ app.post("/api/registertohikes", function(req, res) {
             }
             memory.hikeseditforms = editforms;
 
-            dbservices.gethikes()
+            dbservices.gethikes(res)
             .then(hikedocs => {
                 var hebrewhikenames = [];
                 for (let indexhike = 0; indexhike < newhikes.length; indexhike++) {
@@ -1778,7 +1770,7 @@ app.post("/api/registertohikes", function(req, res) {
             memory.registertohikes.friendsdetails = memory.friendsdetails;
             memory.registertohikes.hikeseditforms = memory.hikeseditforms;
 
-            dbservices.gethikes()
+            dbservices.gethikes(res)
             .then(hikedocs => {
                 var hebrewhikenames = [];
                 for (let indexhike = 0; indexhike < registerparams["VAR_NEW_HIKES_LIST"].length; indexhike++) {
@@ -1918,7 +1910,7 @@ app.post("/api/joinupdates", function(req, res) {
 app.patch("/api/selecthikes", function(req, res) {
     var memory = req.body.conversation.memory;
     if (util.checkpwd(memory.pwd)) {
-        dbservices.gethikes()
+        dbservices.gethikes(res)
         .then(docs => {
             var language = util.set_language(memory);
             docs = util.remove_past_hikes(docs, false);
@@ -1936,7 +1928,7 @@ app.patch("/api/selecthikes", function(req, res) {
 app.post("/api/selecthikes", function(req, res) {
     var memory = req.body.conversation.memory;
     if (util.checkpwd(memory.pwd)) {
-        dbservices.gethikes()
+        dbservices.gethikes(res)
         .then(docs => {
             var language = util.set_language(memory);
             docs = util.remove_past_hikes(docs, false);
@@ -2057,7 +2049,7 @@ app.post("/api/selecthikes", function(req, res) {
 
 app.get("/api/hike", function(req, res) {
     if (util.checkpwd(req.query.pwd)) {
-        dbservices.gethikes()
+        dbservices.gethikes(res)
         .then(docs => {
             res.status(200).json(docs);
         })
@@ -2071,7 +2063,7 @@ app.patch("/api/hike", function(req, res) {
     var memory = req.body.conversation.memory;
     if (util.checkpwd(memory.pwd)) {
         var language = util.set_language(memory);
-        dbservices.gethikes()
+        dbservices.gethikes(res)
         .then(docs => {
             docs = util.remove_past_hikes(docs, false);
             docs = util.sort_hikes(docs, false);
@@ -2100,7 +2092,7 @@ app.patch("/api/hike", function(req, res) {
 app.put("/api/hike", function(req, res) {
     if (util.checkpwd(req.body.pwd)) {
         var hikes = req.body.hikes;
-        dbservices.replaceallhikes(hikes)
+        dbservices.replaceallhikes(res, hikes)
         .then(() => {
             res.status(200).json("success");
         })
@@ -2117,7 +2109,7 @@ app.put("/api/hike", function(req, res) {
 
 app.get("/api/hikers", function(req, res) {
     if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
-        dbservices.gethikers()
+        dbservices.gethikers(res)
         .then(docs => {
             res.status(200).json(docs);
         })
@@ -2130,7 +2122,7 @@ app.get("/api/hikers", function(req, res) {
 app.put("/api/hikers", function(req, res) {
     if (util.checkpwd(req.body.pwd)) {
         var hikers = req.body.hikers;
-        dbservices.replaceallhikers(hikers)
+        dbservices.replaceallhikers(res, hikers)
         .then(() => {
             res.status(200).json("success");
         })
@@ -2149,7 +2141,7 @@ app.patch("/api/choosehike/:phone", function(req, res) {
     if (util.checkpwd(memory.pwd)) {
         var language = util.set_language(memory);
         var reply_sent = false;
-        dbservices.gethikes()
+        dbservices.gethikes(res)
         .then(docs => {
             docs = util.remove_past_hikes(docs, false);
             var nowstring = docs[0].lastupdate;
@@ -2158,10 +2150,10 @@ app.patch("/api/choosehike/:phone", function(req, res) {
             phonenumber = util.normalize_phonenumber(phonenumber);
             memory.phonenumber = phonenumber;
 
-            dbservices.getlastregisterbyphonenumber(phonenumber)
+            dbservices.getlastregisterbyphonenumber(res, phonenumber)
             .then(doclast => {
                 if (typeof doclast !== 'undefined' && doclast != null) {
-                    dbservices.gethikerswithdrivers()
+                    dbservices.gethikerswithdrivers(res)
                     .then(rides => {
                         var selectedhikes = JSON.parse(JSON.stringify(doclast.selectedhikes));
                         reply_sent = true;
@@ -2233,7 +2225,7 @@ app.patch("/api/ridedetails/:phone", function(req, res) {
 app.put("/api/ridedetails/:phone", function(req, res) {
     var memory = req.body.conversation.memory;
     if (util.checkpwd(memory.pwd)) {
-        dbservices.gethikes()
+        dbservices.gethikes(res)
         .then(docs => {
             var nowstring = docs[0].lastupdate;
             var phonenumber = req.params.phone;
@@ -2241,7 +2233,7 @@ app.put("/api/ridedetails/:phone", function(req, res) {
             var selectedhike = memory.selectedhike;
             var hiketodate = selectedhike.match(/.*\d{1,2}\.\d{1,2}\.\d{2}/g)[0];
 
-            dbservices.gethikerbyhikedateandphonenumber(hiketodate, phonenumber)
+            dbservices.gethikerbyhikedateandphonenumber(res, hiketodate, phonenumber)
             .then(doc => {
                 var recast_conversation_reply;
                 var hadsetup = memory.hadsetup;
@@ -2254,7 +2246,7 @@ app.put("/api/ridedetails/:phone", function(req, res) {
                 } 
                 else
                 {
-                    dbservices.getlastregisterbyphonenumber(phonenumber)
+                    dbservices.getlastregisterbyphonenumber(res, phonenumber)
                     .then(doclast => {
                         if (typeof(doclast) !== 'undefined' && doc != doclast && 
                             typeof(doclast.password) !== 'undefined') {
@@ -2269,7 +2261,7 @@ app.put("/api/ridedetails/:phone", function(req, res) {
                             {
                                 recast_conversation_reply = 
                                     replies.get_recast_reply("GREAT_FOR_UPDATE",language,null,memory); 
-                                dbservices.updatehikerstatus(hiketodate, phonenumber, "hadsetup")
+                                dbservices.updatehikerstatus(res, hiketodate, phonenumber, "hadsetup")
                                 .catch(rejection => {
                                     logservices.logRejection(rejection);
                                 });
@@ -2306,13 +2298,13 @@ app.post("/api/choosedriver", function(req, res) {
         var selectedhike = memory.selectedhike;
         var hiketodate = selectedhike.match(/.*\d{1,2}\.\d{1,2}\.\d{2}/g)[0];
 
-        dbservices.gethikerbyhikedateandphonenumber(hiketodate, phonenumber)
+        dbservices.gethikerbyhikedateandphonenumber(res, hiketodate, phonenumber)
         .then(docme => {
             var recast_conversation_reply;
             var language = util.set_language(memory);
 
             if (typeof(docme) !== 'undefined' || docme != null) {
-                dbservices.getdriversforhike(hiketodate)
+                dbservices.getdriversforhike(res, hiketodate)
                 .then(drivers => {
                     console.log("memory.selecteddriverindex.raw " + memory.selecteddriverindex.raw);
                     var selecteddriverindex = parseInt(memory.selecteddriverindex.raw) - 1;
@@ -2360,7 +2352,7 @@ app.post("/api/choosedriver", function(req, res) {
                         
                         chosendrivers.splice(index, 1);
                     }
-                    dbservices.updatehikerchoosedrivers(direction, chosendrivers)
+                    dbservices.updatehikerchoosedrivers(res, direction, chosendrivers)
                     .catch(rejection => {
                         logservices.logRejection(rejection);
                     });
@@ -2463,7 +2455,7 @@ app.post("/api/choosedriver", function(req, res) {
 
 app.get("/api/ironnumber", function(req, res) {
     if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
-        dbservices.getironnumbers()
+        dbservices.getironnumbers(res)
         .then(ironnumbers => {
             res.status(200).json(ironnumbers);
         })
@@ -2479,9 +2471,9 @@ app.patch("/api/ironnumber", function(req, res) {
         if (selectedhike) {
             var hiketodate = selectedhike.match(/\d{1,2}\.\d{1,2}\.\d{2}/)[0];
 
-            dbservices.gethikersbyhikedate(hiketodate)
+            dbservices.gethikersbyhikedate(res, hiketodate)
             .then(docs => {
-                dbservices.getironnumbers()
+                dbservices.getironnumbers(res)
                 .then(previronnumbers => {
                     var now = new Date();
                     var ironnumbers = [];
@@ -2547,7 +2539,7 @@ app.post("/api/ironnumber", function(req, res) {
                 var selectedhike = req.body.hikename;
                 //var hiketodate = selectedhike.match(/\d{1,2}\.\d{1,2}\.\d{2}/)[0];
                 phonenumber = util.normalize_phonenumber(phonenumber);
-                dbservices.updateironnumberbyphone(phonenumber, selectedhike)
+                dbservices.updateironnumberbyphone(res, phonenumber, selectedhike)
                 .then(() => {
                     res.status(200).json("success");
                 })
@@ -2570,11 +2562,11 @@ app.post("/api/ironnumber", function(req, res) {
 */
 app.patch("/api/findhikerslocation", function(req, res) {
     if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
-        dbservices.gethikers()
+        dbservices.gethikers(res)
         .then(hikers => {
             ridesmodules.findhikerslocation(hikers)
             .then(hikers => {
-                dbservices.replaceallhikers(hikers)
+                dbservices.replaceallhikers(res, hikers)
                 .then(() => {
                     register.updateCarpool();
                 })
@@ -2605,12 +2597,12 @@ app.get("/api/calculaterides", function(req, res) {
 
 app.patch("/api/calculaterides", function(req, res) {
     if (util.checkspecialpwd(req.query.pwd, req.query.specialpwd)) {
-        dbservices.gethikes()
+        dbservices.gethikes(res)
         .then(hikes => {
             var nearhikes = util.get_near_hikes(hikes);
             for (let hikeindex = 0; hikeindex < nearhikes.length; hikeindex++) {
                 const hike = nearhikes[hikeindex];
-                dbservices.gethikersbyhikedate(hike.hikedate)
+                dbservices.gethikersbyhikedate(res, hike.hikedate)
                 .then(hikers => {
                     if (hikers && hikers.length > 0){
                         console.log("start calculation for " + hike.hikenamehebrew);
@@ -2875,7 +2867,7 @@ app.patch("/api/calculaterides", function(req, res) {
                                 }
                             }
 
-                            dbservices.replaceallhikersforhike(hike.hikedate, hikers)
+                            dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
                             .then(() => {
                                 register.updateCarpool();
                             })

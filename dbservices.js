@@ -62,11 +62,11 @@ function initialize(app) {
     });
 }
 
-function gethikers() {
+function gethikers(res) {
     return new Promise((resolve, reject) => {
         db.collection(HIKERS_COLLECTION).find({}).toArray(function(err, docs) {
             if (err) {
-                logservices.handleError(err.message, "Failed to get hikers.");
+                logservices.handleError(res, err.message, "Failed to get hikers.");
             } else {
                 return resolve(docs);
             }
@@ -74,13 +74,13 @@ function gethikers() {
     });
 }
 
-function gethikersbyhikedate(hiketodate) {
+function gethikersbyhikedate(res, hiketodate) {
     return new Promise((resolve, reject) => {
         db.collection(HIKERS_COLLECTION).find(
             { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
                      { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }).sort({hikerindex: 1}).toArray(function(err, docs) {
             if (err) {
-                logservices.handleError(err.message, "Failed to get hikers.");
+                logservices.handleError(res, err.message, "Failed to get hikers.");
             } else {
                 return resolve(docs);
             }
@@ -88,14 +88,14 @@ function gethikersbyhikedate(hiketodate) {
     });
 }
 
-function gethikerbyhikedateandphonenumber(hiketodate, phonenumber) {
+function gethikerbyhikedateandphonenumber(res, hiketodate, phonenumber) {
     return new Promise((resolve, reject) => {
         db.collection(HIKERS_COLLECTION).findOne(
             { $and: [ { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
                                { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
                       { $or: [ { phone: phonenumber }, { email: phonenumber } ] } ] }, function(err, doc) {
             if (err) {
-                logservices.handleError(err.message, "Failed to get hikers.");
+                logservices.handleError(res, err.message, "Failed to get hikers.");
             } else {
                 return resolve(doc);
             }
@@ -103,12 +103,12 @@ function gethikerbyhikedateandphonenumber(hiketodate, phonenumber) {
     });
 }
 
-function gethikerswithdrivers() {
+function gethikerswithdrivers(res) {
     return new Promise((resolve, reject) => {
         db.collection(HIKERS_COLLECTION).find(
                 {$or: [{mydriverfrom: {$ne:null}}, {mydriverto: {$ne: null}}] }).toArray(function(err, docs) {
             if (err) {
-                logservices.handleError(err.message, "Failed to get hikers.");
+                logservices.handleError(res, err.message, "Failed to get hikers.");
             } else {
                 return resolve(docs);
             }
@@ -116,14 +116,14 @@ function gethikerswithdrivers() {
     });
 }
 
-function getdriversforhike(hiketodate) {
+function getdriversforhike(res, hiketodate) {
     return new Promise((resolve, reject) => {
         db.collection(HIKERS_COLLECTION).find({ $and: [ 
             { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
                      { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
             { $or: [ { amidriver: true } ] } ] }).toArray(function(err, drivers) {
             if (err) {
-                logservices.handleError(err.message, "Failed to get drivers.");
+                logservices.handleError(res, err.message, "Failed to get drivers.");
             } else {
                 return resolve(drivers);
             }
@@ -131,7 +131,7 @@ function getdriversforhike(hiketodate) {
     });
 }
 
-function updatehikerstatus(hiketodate, phonenumber, status) {
+function updatehikerstatus(res, hiketodate, phonenumber, status) {
     return new Promise((resolve, reject) => {
         db.collection(HIKERS_COLLECTION).update(
             { $and: [ { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
@@ -142,7 +142,7 @@ function updatehikerstatus(hiketodate, phonenumber, status) {
     });
 }
 
-function updatehikerchoosedrivers(direction, chosendrivers) {
+function updatehikerchoosedrivers(res, direction, chosendrivers) {
     return new Promise((resolve, reject) => {
         if (direction == "to") {
             db.collection(HIKERS_COLLECTION).update(
@@ -161,16 +161,16 @@ function updatehikerchoosedrivers(direction, chosendrivers) {
     });
 }
 
-function replaceallhikers(hikers) {
+function replaceallhikers(res, hikers) {
     return new Promise((resolve, reject) => {
         db.collection(HIKERS_COLLECTION).deleteMany({}, function(err, result) {
             if (err) {
-                logservices.handleError(err.message, "Failed to delete all hikers");
+                logservices.handleError(res, err.message, "Failed to delete all hikers");
             }
             else if (hikers && hikers.length > 0) {
                 db.collection(HIKERS_COLLECTION).insertMany(hikers, function(err, docs) {
                     if (err) {
-                        logservices.handleError(err.message, "Failed to insert all hikers.");
+                        logservices.handleError(res, err.message, "Failed to insert all hikers.");
                     } else {
                         return resolve(docs);
                     }
@@ -180,15 +180,15 @@ function replaceallhikers(hikers) {
     });
 }
 
-function replaceallhikersforhike(hiketodate, hikers) {
+function replaceallhikersforhike(res, hiketodate, hikers) {
     return new Promise((resolve, reject) => {
         db.collection(HIKERS_COLLECTION).deleteMany({hikenamehebrew: { $regex : ".*"+hike.hikedate+".*" }}, function(err, result) {
             if (err) {
-                logservices.handleError(err.message, "Failed to delete hikers of " + hiketodate);
+                logservices.handleError(res, err.message, "Failed to delete hikers of " + hiketodate);
             } else {
                 db.collection(HIKERS_COLLECTION).insertMany(hikers, function(err, docs) {
                     if (err) {
-                        logservices.handleError(err.message, "Failed to insert all hikers of " + hiketodate);
+                        logservices.handleError(res, err.message, "Failed to insert all hikers of " + hiketodate);
                     }
                     else {
                         return resolve(docs);
@@ -199,11 +199,11 @@ function replaceallhikersforhike(hiketodate, hikers) {
     });
 }
 
-function gethikes() {
+function gethikes(res) {
     return new Promise((resolve, reject) => {
         db.collection(HIKE_COLLECTION).find({}).toArray(function(err, docs) {
             if (err) {
-                logservices.handleError(err.message, "Failed to get hikes.");
+                logservices.handleError(res, err.message, "Failed to get hikes.");
             } else {
                 docs = util.sort_hikes(docs, false);
                 return resolve(docs);
@@ -212,16 +212,16 @@ function gethikes() {
     });
 }
 
-function replaceallhikes(hikes) {
+function replaceallhikes(res, hikes) {
     return new Promise((resolve, reject) => {
         db.collection(HIKE_COLLECTION).deleteMany({}, function(err, result) {
             if (err) {
-                logservices.handleError(err.message, "Failed to delete all hikes");
+                logservices.handleError(res, err.message, "Failed to delete all hikes");
             }
             else if (hikes && hikes.length > 0) {
                 db.collection(HIKE_COLLECTION).insertMany(hikes, function(err, docs) {
                     if (err) {
-                        logservices.handleError(err.message, "Failed to insert all hikes.");
+                        logservices.handleError(res, err.message, "Failed to insert all hikes.");
                     } else {
                         return resolve(docs);
                     }
@@ -231,11 +231,11 @@ function replaceallhikes(hikes) {
     });
 }
 
-function getlastregisters() {
+function getlastregisters(res) {
     return new Promise((resolve, reject) => {
         db.collection(LAST_REGISTER_COLLECTION).find({}).toArray(function(err, docs) {
             if (err) {
-                logservices.handleError(err.message, "Failed to get last registers.");
+                logservices.handleError(res, err.message, "Failed to get last registers.");
             } else {
                 return resolve(docs);
             }
@@ -243,13 +243,13 @@ function getlastregisters() {
     });
 }
 
-function getlastregisterbyphonenumber(phonenumber) {
+function getlastregisterbyphonenumber(res, phonenumber) {
     return new Promise((resolve, reject) => {
         db.collection(LAST_REGISTER_COLLECTION).findOne(
             { $or: [ { 'phone number': phonenumber }, { email: phonenumber } ]}
         ).toArray(function(err, doc) {
             if (err) {
-                logservices.handleError(err.message, "Failed to get last register.");
+                logservices.handleError(res, err.message, "Failed to get last register.");
             } else {
                 return resolve(doc);
             }
@@ -257,11 +257,11 @@ function getlastregisterbyphonenumber(phonenumber) {
     });
 }
 
-function insertnewlastregister(lastregister) {
+function insertnewlastregister(res, lastregister) {
     return new Promise((resolve, reject) => {
         db.collection(LAST_REGISTER_COLLECTION).insertOne(lastregister, function(err, doc) {
             if (err) {
-                logservices.handleError(err.message, "Failed to create or update last register.");
+                logservices.handleError(res, err.message, "Failed to create or update last register.");
             }
             else {
                 resolve();
@@ -270,13 +270,13 @@ function insertnewlastregister(lastregister) {
     });
 }
 
-function replaceonelastregister(phonenumber, lastregister) {
+function replaceonelastregister(res, phonenumber, lastregister) {
     return new Promise((resolve, reject) => {
         deleteonelastregister(phonenumber)
         .then(() => {
             db.collection(LAST_REGISTER_COLLECTION).insertOne(lastregister, function(err, doc) {
                 if (err) {
-                    logservices.handleError(err.message, "Failed to create or update last register.");
+                    logservices.handleError(res, err.message, "Failed to create or update last register.");
                 }
                 else {
                     return resolve(doc);
@@ -289,24 +289,24 @@ function replaceonelastregister(phonenumber, lastregister) {
     });
 }
 
-function deleteonelastregister(phonenumber) {
+function deleteonelastregister(res, phonenumber) {
     return new Promise((resolve, reject) => {
         db.collection(LAST_REGISTER_COLLECTION).deleteOne(
             { $or: [ { 'phone number': phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, doc) {
 
             if (err) {
-                logservices.handleError(err.message, "Failed to delete lastregister");
+                logservices.handleError(res, err.message, "Failed to delete lastregister");
             }
             resolve();
         });
     });
 }
 
-function deletealllastregisters() {
+function deletealllastregisters(res) {
     return new Promise((resolve, reject) => {
         db.collection(LAST_REGISTER_COLLECTION).deleteMany({}, function(err, docs) {
             if (err) {
-                logservices.handleError(err.message, "Failed to delete last registers' details.");
+                logservices.handleError(res, err.message, "Failed to delete last registers' details.");
             } else {
                 resolve();
             }
@@ -314,11 +314,11 @@ function deletealllastregisters() {
     });
 }
 
-function getironnumbers() {
+function getironnumbers(res) {
     return new Promise((resolve, reject) => {
         db.collection(IRONNUMBERS_COLLECTION).find({}).toArray(function(err, docs) {
             if (err) {
-                logservices.handleError(err.message, "Failed to get iron numbers.");
+                logservices.handleError(res, err.message, "Failed to get iron numbers.");
             } else {
                 return resolve(docs);
             }
@@ -326,7 +326,7 @@ function getironnumbers() {
     });
 }
 
-function updateironnumberbyphone(phonenumber, selectedhike) {
+function updateironnumberbyphone(res, phonenumber, selectedhike) {
     return new Promise((resolve, reject) => {
         var now = new Date();
         db.collection(IRONNUMBERS_COLLECTION).updateOne(
@@ -341,11 +341,11 @@ function updateironnumberbyphone(phonenumber, selectedhike) {
     });
 }
 
-function getroutes() {
+function getroutes(res) {
     return new Promise((resolve, reject) => {
         db.collection(ROUTES_COLLECTION).find({}).toArray(function(err, docs) {
             if (err) {
-                logservices.handleError(err.message, "Failed to get routes.");
+                logservices.handleError(res, err.message, "Failed to get routes.");
             } else {
                 return resolve(docs);
             }
