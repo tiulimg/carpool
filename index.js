@@ -2470,7 +2470,6 @@ app.patch("/api/ironnumber", function(req, res) {
         var selectedhike = req.query.hikename;
         if (selectedhike) {
             var hiketodate = selectedhike.match(/\d{1,2}\.\d{1,2}\.\d{2}/)[0];
-
             dbservices.gethikersbyhikedate(res, hiketodate)
             .then(docs => {
                 dbservices.getironnumbers(res)

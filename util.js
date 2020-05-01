@@ -28,7 +28,10 @@ function checkpwd(res, pwd) {
     else if (pwd != process.env.PSWD) {
         logservices.handleError(res, "Unauthorized", "Password is incorrect.", 400);
     }
-    return true;
+    else {
+        return true;
+    }
+    return false;
 }
 
 function checkspecialpwd(res, pwd, specialpwd) {
@@ -38,7 +41,10 @@ function checkspecialpwd(res, pwd, specialpwd) {
     else if (pwd != process.env.PSWD || specialpwd != process.env.SPECIALPWD) {
         logservices.handleError(res, "Unauthorized", "Password or special password are incorrect.", 400);
     }
-    return true;
+    else {
+        return true;
+    }
+    return false;
 }
 
 function wait(ms)
