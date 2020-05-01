@@ -525,7 +525,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) 
     });
 }
 
-function findpublictransport(hikers, alsohitcherswithoutdrivers) {
+function findpublictransport(hikers, alsohitcherswithoutdrivers, hike) {
     return new Promise((resolve, reject) => {
         var promises = [];
         for (let index = 0; index < hikers.length; index++) {

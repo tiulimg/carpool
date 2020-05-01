@@ -2561,7 +2561,7 @@ app.patch("/api/calculaterides", function(req, res) {
                         console.log("start calculation for " + hike.hikenamehebrew);
                         ridesmodules.findhikerslocation(hikers)
                         .then(() => {
-                            return ridesmodules.findpublictransport(hikers, false);
+                            return ridesmodules.findpublictransport(hikers, false, hike);
                         })
                         .then(() => {
                             console.log("calculaterides getDistanceMatrix");
