@@ -13,6 +13,7 @@ module.exports = {
     remove_hikes_notinlist: remove_hikes_notinlist,
     only_hikes_in_lang: only_hikes_in_lang,
     sort_hikes: sort_hikes,
+    findhike: findhike,
     set_language: set_language,
     friendstext_from_friendsdetails: friendstext_from_friendsdetails,
     toRadians: toRadians,
@@ -93,7 +94,6 @@ function only_hikes_in_lang(docs, hikelist, istext, lang) {
 
             if (index + 1 < hikelist.length) {
                 var nexthike = hikelist[index + 1];
-//                console.log("only_hikes_in_lang hike " + hike + " nexthike " + nexthike);
                 if (nexthike == docHike.hikenamehebrew || nexthike == docHike.hikenameenglish) {
                     switch (lang) {
                         case "he":
@@ -254,6 +254,22 @@ function sort_hikes(docs, istext) {
         });
     }
     return docs;
+}
+
+function findhike(hikes, hikestring, hikealternatestring) {
+    selectHike = hikes.find(function(element) {
+        var result = false;
+        if ((element.hikenamehebrew && hikealternatestring && 
+            element.hikenamehebrew.indexOf(hikealternatestring) != -1) ||
+            (element.hikenamehebrew && 
+            element.hikenamehebrew.indexOf(hikestring) != -1) ||
+            (element.hikenameenglish && 
+            element.hikenameenglish.indexOf(hikestring) != -1)) {
+            result = true;
+        }
+        // console.log("findhike element.hikenamehebrew " + JSON.stringify(element.hikenamehebrew) + " " + result);
+        return result;
+    });
 }
 
 function set_language(memory) {
@@ -427,6 +443,7 @@ function getHikerAreas(hikers) {
     }
     areas.sumtothehikeareas.all = 0;
     areas.sumfromthehikeareas.all = 0;
+    console.log("areas " + JSON.stringify(areas));
 
     var phones = [];
 
@@ -440,6 +457,7 @@ function getHikerAreas(hikers) {
             if (hiker.comesfromarea) {
                 areas.sumtothehikeareas[hiker.comesfromarea] += hiker.availableplaces;
                 areas.sumtothehikeareas.all += hiker.availableplaces;                    
+                console.log("hiker.comesfromarea " + JSON.stringify(hiker.comesfromarea));
                 areas.driverstothehikeareas[hiker.comesfromarea].push(hiker);
                 hiker.availableplacestothehike = hiker.availableplaces;
             }
@@ -449,6 +467,7 @@ function getHikerAreas(hikers) {
             if (hiker.returnstoarea) {
                 areas.sumfromthehikeareas[hiker.returnstoarea] += hiker.availableplaces;
                 areas.sumfromthehikeareas.all += hiker.availableplaces;                    
+                console.log("hiker.returnstoarea " + JSON.stringify(hiker.returnstoarea));
                 areas.driversfromthehikeareas[hiker.returnstoarea].push(hiker);
                 hiker.availableplacesfromthehike = hiker.availableplaces;
             }

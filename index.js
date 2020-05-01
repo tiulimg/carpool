@@ -943,16 +943,7 @@ app.patch("/api/lastregister/:phone", function(req, res) {
                     var selectHike = "";
                     if (typeof memory.selecthike !== 'undefined' && memory.selecthike != null ) {
                         var memorySelectHike = memory.selecthike.raw;
-                        selectHike = docs.find(function(element) {
-                            var result = false;
-                            if ((element.hikenamehebrew && 
-                                element.hikenamehebrew.indexOf(memorySelectHike) != -1) ||
-                                (element.hikenameenglish && 
-                                element.hikenameenglish.indexOf(memorySelectHike) != -1)) {
-                                result = true;
-                            }
-                            return result;
-                        });
+                        selectHike = util.findhike(docs, memorySelectHike);
     
                         if (selectHike != "") {
                             switch (language) {
@@ -1137,16 +1128,8 @@ app.post("/api/lastregister/:phone", function(req, res) {
                         var hike = affectedhikes[index];
                         var hiketoeditcancelindex = hike.indexOf(hiketoeditcancel);
                         var selectHike = null;
-                        selectHike = docs.find(function(element) {
-                            var result = false;
-                            if ((element.hikenamehebrew && 
-                                element.hikenamehebrew.indexOf(hike) != -1) ||
-                                (element.hikenameenglish && 
-                                element.hikenameenglish.indexOf(hike) != -1)) {
-                                result = true;
-                            }
-                            return result;
-                        });
+                        selectHike = util.findhike(docs, hike);
+
                         if (selectHike == null || hiketoeditcancelindex != -1) {
                             affectedhikes.splice(index,1);
                             index--;
@@ -1496,16 +1479,8 @@ app.post("/api/registertohikes", function(req, res) {
                 var hebrewhikenames = [];
                 for (let indexhike = 0; indexhike < newhikes.length; indexhike++) {
                     const currhike = newhikes[indexhike];
-                    var findhike = hikedocs.find(function(element) {
-                        var result = false;
-                        if ((element.hikenamehebrew && 
-                            element.hikenamehebrew.indexOf(currhike) != -1) ||
-                            (element.hikenameenglish && 
-                            element.hikenameenglish.indexOf(currhike) != -1)) {
-                            result = true;
-                        }
-                        return result;
-                    });
+                    findhike = util.findhike(hikedocs, currhike);
+
                     console.log("currhike: " + currhike + " hikehebrew: " + findhike.hikenamehebrew);
                     if (findhike != null) {
                         hebrewhikenames.push(findhike.hikenamehebrew);
@@ -1775,16 +1750,7 @@ app.post("/api/registertohikes", function(req, res) {
                 var hebrewhikenames = [];
                 for (let indexhike = 0; indexhike < registerparams["VAR_NEW_HIKES_LIST"].length; indexhike++) {
                     const currhike = newhikes[indexhike];
-                    var findhike = hikedocs.find(function(element) {
-                        var result = false;
-                        if ((element.hikenamehebrew && 
-                            element.hikenamehebrew.indexOf(currhike) != -1) ||
-                            (element.hikenameenglish && 
-                            element.hikenameenglish.indexOf(currhike) != -1)) {
-                            result = true;
-                        }
-                        return result;
-                    });
+                    findhike = util.findhike(hikedocs, currhike);
                     if (findhike != null) {
                         hebrewhikenames.push(findhike.hikenamehebrew);
                     }
@@ -1972,19 +1938,7 @@ app.post("/api/selecthikes", function(req, res) {
                     }
                 }
                 console.log("last memorySelectHike " + memorySelectHike);
-                selectHike = docs.find(function(element) {
-                    var result = false;
-                    if ((element.hikenamehebrew && 
-                        element.hikenamehebrew.indexOf(hikedate2) != -1) ||
-                        (element.hikenamehebrew && 
-                        element.hikenamehebrew.indexOf(memorySelectHike) != -1) ||
-                        (element.hikenameenglish && 
-                        element.hikenameenglish.indexOf(memorySelectHike) != -1)) {
-                        result = true;
-                    }
-                    console.log("element.hikenamehebrew " + JSON.stringify(element.hikenamehebrew) + " " + result);
-                    return result;
-                });
+                selectHike = util.findhike(docs, memorySelectHike, hikedate2);
                 console.log("selectHike " + JSON.stringify(selectHike));
 
                 if (typeof selectHike !== 'undefined' && selectHike != null && selectHike != "") {
