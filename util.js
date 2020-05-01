@@ -230,6 +230,7 @@ function sort_hikes(docs, istext) {
 }
 
 function findhike(hikes, hikestring, hikealternatestring) {
+    console.log("hikes, hikestring, hikealternatestring: " + JSON.stringify(hikes), hikestring, hikealternatestring);
     selectHike = hikes.find(function(element) {
         var result = false;
         if ((element.hikenamehebrew && hikealternatestring && 
