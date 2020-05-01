@@ -331,10 +331,12 @@ function updateironnumberbyphone(res, phonenumber, selectedhike) {
         var now = new Date();
         db.collection(IRONNUMBERS_COLLECTION).updateOne(
             { phone: phonenumber },
-            {
-                hike: selectedhike, 
-                phone: phonenumber,
-                lastseen: now 
+            { 
+                $set: {
+                    hike: selectedhike, 
+                    phone: phonenumber,
+                    lastseen: now 
+                }
             }, 
             { upsert : true });
         resolve();

@@ -2533,7 +2533,7 @@ app.post("/api/ironnumber", function(req, res) {
             phonenumber = process.env.TAL_PHONE;
         }
         if (phonenumber) {
-            var isPhoneNumber = phonenumber.match(/\d{10}/);
+            var isPhoneNumber = phonenumber.match(/^\d{10}$/);
             
             if (isPhoneNumber) {
                 var selectedhike = req.body.hikename;

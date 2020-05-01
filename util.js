@@ -7,6 +7,7 @@ module.exports = {
     checkspecialpwd: checkspecialpwd,
     wait: wait,
     normalize_phonenumber: normalize_phonenumber,
+    datestringtoobject: datestringtoobject,
     get_near_hikes: get_near_hikes, 
     remove_past_hikes: remove_past_hikes,
     remove_hikes_notinlist: remove_hikes_notinlist,
@@ -57,6 +58,16 @@ function normalize_phonenumber(phonenumber) {
         phonenumber = phonenumber.replace("+972","0");
     }
     return phonenumber;
+}
+
+function datestringtoobject(hikedate) {
+    var hikedate = hikedate.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
+    if (hikedate != null && hikedate.length > 0) {
+        hikedate = hikedate[0];
+        hikesplit = hikedate.split(".");
+        return(Date.parse('20' + hikesplit[2] + '/' + hikesplit[1] + '/' + hikesplit[0]));
+    }
+    return null;
 }
 
 function only_hikes_in_lang(docs, hikelist, istext, lang) {
