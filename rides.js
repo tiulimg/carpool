@@ -421,7 +421,7 @@ function findhikerslocation(hikers) {
             const hiker = hikers[hikerindex];
             if (!hiker.comesfromlocation) {
                 promises.push(
-                    util.wait(30*timer)
+                    util.wait(100*timer)
                     .then(() => {
                         return translateaddresstolocation(hiker.comesfromdetailed);
                     })
@@ -438,7 +438,7 @@ function findhikerslocation(hikers) {
             }
             if (!hiker.returnstolocation) {
                 promises.push(
-                    util.wait(30*timer)
+                    util.wait(100*timer)
                     .then(() => {
                         return translateaddresstolocation(hiker.returnstodetailed);
                     })

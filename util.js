@@ -230,7 +230,7 @@ function sort_hikes(docs, istext) {
 }
 
 function findhike(hikes, hikestring, hikealternatestring) {
-    console.log("hikes, hikestring, hikealternatestring: " + JSON.stringify(hikes), hikestring, hikealternatestring);
+    //console.log("hikes, hikestring, hikealternatestring: " + JSON.stringify(hikes), hikestring, hikealternatestring);
     selectHike = hikes.find(function(element) {
         var result = false;
         if ((element.hikenamehebrew && hikealternatestring && 
@@ -312,7 +312,7 @@ function getDistanceMatrix(hikers) {
 
     for (let index = 0; index < hikers.length; index++) {
         const hiker = hikers[index];
-        for (let indexpartner = index; indexpartner < hikers.length; indexpartner++) {
+        for (let indexpartner = 0; indexpartner < hikers.length; indexpartner++) {
             const partner = hikers[indexpartner];
             if (hiker == partner || hiker.phone == partner.phone) {
                 continue;
