@@ -2265,7 +2265,7 @@ app.put("/api/ridedetails/:phone", function(req, res) {
                                 .catch(rejection => {
                                     logservices.logRejection(rejection);
                                 });
-                                register.updateCarpool();
+                                register.updateCarpool(res);
                             }
                         }
                         res.status(200).json(recast_conversation_reply);
@@ -2567,7 +2567,7 @@ app.patch("/api/findhikerslocation", function(req, res) {
             .then(hikers => {
                 dbservices.replaceallhikers(res, hikers)
                 .then(() => {
-                    register.updateCarpool();
+                    register.updateCarpool(res);
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
@@ -2803,7 +2803,7 @@ app.patch("/api/calculaterides", function(req, res) {
 
                             dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
                             .then(() => {
-                                register.updateCarpool();
+                                register.updateCarpool(res);
                             })
                             .catch(rejection => {
                                 logservices.logRejection(rejection);

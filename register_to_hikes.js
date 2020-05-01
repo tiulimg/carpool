@@ -269,7 +269,7 @@ function setAvailableHikesReplyBut(recast_conversation_reply, hikes, lang, selec
     return recast_conversation_reply;
 }
 
-function updateCarpool() {
+function updateCarpool(res) {
     sendForm("1EV8BBJfZGseTFzJo-EMcgZdPHzedRC8zTZyfyRw2LoQ", "" , "", "", res, null, "");
 }
 

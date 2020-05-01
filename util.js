@@ -178,29 +178,18 @@ function remove_past_hikes(hikelist, istext) {
     if (istext) {
         for (let index = 0; index < hikelist.length; index++) {
             const hike = hikelist[index];
-            // console.log("remove_past_hikes hike " + hike);
-            var hikedate = hike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
-            if (hikedate != null && hikedate.length > 0) {
-                hikedate = hikedate[0];
-                // console.log("remove_past_hikes hikedate " + hikedate);
-                hikesplit = hikedate.split(".");
-                hikedate = Date.parse('20' + hikesplit[2] + '/' + hikesplit[1] + '/' + hikesplit[0]);
-                // console.log("remove_past_hikes hikedate " + hikedate + " today " + today);
-                if (today > hikedate) {
-                    hikelist.splice(index,1);
-                    index--;
-                }          
+            var hikedate = datestringtoobject(hike);
+            if (hikedate && today > hikedate) {
+                hikelist.splice(index,1);
+                index--;
             }
         }
     }
     else {
         for (let index = 0; index < hikelist.length; index++) {
             const hike = hikelist[index];
-            // console.log("remove_past_hikes hike " + JSON.stringify(hike));
-            hikesplit = hike.hikedate.split(".");
-            hikedate = Date.parse('20' + hikesplit[2] + '/' + hikesplit[1] + '/' + hikesplit[0]);
-            // console.log("remove_past_hikes hikedate " + hikedate + " today " + today);
-            if (today > hikedate) {
+            hikedate = datestringtoobject(hike.hikedate);
+            if (hikedate && today > hikedate) {
                 hikelist.splice(index,1);
                 index--;
             }
@@ -238,38 +227,29 @@ function remove_hikes_notinlist(hikelist, docs) {
 function sort_hikes(docs, istext) {
     if (istext) {
         docs.sort(function(b,a) {
-            var adate = a.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
-            var bdate = b.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
-            if (!adate && !bdate) {
+            a = datestringtoobject(a);
+            b = datestringtoobject(b);
+
+            if (!a && !b) {
                 return 0;
             }
-            else if (!bdate) {
+            else if (!b) {
                 return 1;
             }
-            else if (!adate) {
+            else if (!a) {
                 return -1;
             }
             else {
-                // console.log("sort_hikes adate " + adate + " bdate " + bdate);
-                asplit = adate[0].split(".");
-                bsplit = bdate[0].split(".");
-                a = Date.parse('20' + asplit[2] + '/' + asplit[1] + '/' + asplit[0]);
-                b = Date.parse('20' + bsplit[2] + '/' + bsplit[1] + '/' + bsplit[0]);
                 var result = a>b ? -1 : a<b ? 1 : 0;
-                // console.log("sort_hikes result " + result);
                 return result;
             }
         });
     }
     else {
         docs.sort(function(b,a){
-            // console.log("sort_hikes a " + a.hikedate + " b " + b.hikedate);
-            asplit = a.hikedate.split(".");
-            bsplit = b.hikedate.split(".");
-            a = Date.parse('20' + asplit[2] + '/' + asplit[1] + '/' + asplit[0]);
-            b = Date.parse('20' + bsplit[2] + '/' + bsplit[1] + '/' + bsplit[0]);
+            a = datestringtoobject(a.hikedate);
+            b = datestringtoobject(b.hikedate);
             result = a>b ? -1 : a<b ? 1 : 0;
-            // console.log("sort_hikes result " + result);
             return result;
         });
     }

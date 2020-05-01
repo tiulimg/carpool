@@ -255,7 +255,7 @@ function patchridedetails(req, res, replies)
                                 .catch(rejection => {
                                     logservices.logRejection(rejection);
                                 });
-                                register.updateCarpool();
+                                register.updateCarpool(res);
                             }
                         }
                         res.status(200).json(recast_conversation_reply);
