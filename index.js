@@ -2558,7 +2558,11 @@ app.patch("/api/calculaterides", function(req, res) {
                         console.log("start calculation for " + hike.hikenamehebrew);
                         ridesmodules.findhikerslocation(hikers)
                         .then(() => {
-                            return ridesmodules.findpublictransport(hikers, false, hike);
+                            // public transport for hikers that don't need a ride
+                            ridesmodules.findpublictransport(hikers, false, hike, res);
+                        })
+                        .then(() => {
+                            ridesmodules.findcarroute(hikers, hike, res);
                         })
                         .then(() => {
                             console.log("calculaterides getDistanceMatrix");
@@ -2573,7 +2577,12 @@ app.patch("/api/calculaterides", function(req, res) {
                             ridesmodules.makecalculation(hikers, distances, hike);
 
                             logservices.logcalculationresult(hikers);
-
+                        })
+                        .then(() => {
+                            // public transport for hikers that hadn't left with a ride
+                            ridesmodules.findpublictransport(hikers, true, hike, res);
+                        })
+                        .then(() => {
                             dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
                             .then(() => {
                                 register.updateCarpool(res);

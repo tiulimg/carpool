@@ -25,6 +25,9 @@ module.exports = {
     getironnumbers: getironnumbers,
     updateironnumberbyphone: updateironnumberbyphone,
     getroutes: getroutes,
+    getroutebyhikedateandphonenumber: getroutebyhikedateandphonenumber,
+    insertnewroute: insertnewroute,
+    deleteallroutesforhike: deleteallroutesforhike,
 }
 
 var ObjectID = mongodb.ObjectID;
@@ -349,6 +352,47 @@ function getroutes(res) {
                 logservices.handleError(res, err.message, "Failed to get routes.");
             } else {
                 return resolve(docs);
+            }
+        });
+    });
+}
+
+function getroutebyhikedateandphonenumber(res, hiketodate, phonenumber, direction) {
+    return new Promise((resolve, reject) => {
+        db.collection(ROUTES_COLLECTION).findOne(
+            { $and: [ { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
+                               { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
+                      { $or: [ { phone: phonenumber }, { email: phonenumber } ] }, 
+                      { direction: direction } ] }, function(err, doc) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to get routes.");
+            } else {
+                return resolve(doc);
+            }
+        });
+    });
+}
+
+function insertnewroute(res, route) {
+    return new Promise((resolve, reject) => {
+        db.collection(ROUTES_COLLECTION).insertOne(route, function(err, doc) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to create or update route.");
+            }
+            else {
+                resolve();
+            }
+        });
+    });
+}
+
+function deleteallroutesforhike(res, hiketodate) {
+    return new Promise((resolve, reject) => {
+        db.collection(HIKERS_COLLECTION).deleteMany({hikenamehebrew: { $regex : ".*"+hiketodate+".*" }}, function(err, result) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to delete routes of " + hiketodate);
+            } else {
+                return resolve();
             }
         });
     });
