@@ -1,4 +1,8 @@
-﻿function distanceLatLons(lat1,lon1,lat2,lon2) {
+﻿function toRadians(degrees) {
+  return degrees * Math.PI / 180;
+}
+
+function distanceLatLons(lat1,lon1,lat2,lon2) {
     var d = 0;
 
     var R = 6371e3; // metres
@@ -18,11 +22,12 @@
 
 function getCityName(stop_description) {
   var city = "";
-  var regex = /עיר:([0-9א-ת ]+) רציף:/g;
+  var regex = /עיר: ([0-9א-ת ]+) רציף:/;
   if (stop_description) {
-    var city_match = regex.match(stop_description);
+    var city_match = stop_description.match(regex);
+    //console.log("stop_description " + stop_description + " city_match " + JSON.stringify(city_match));
     if (city_match) {
-      city = city_match[0];
+      city = city_match[1];
     }
   }
   return city;
@@ -35,7 +40,7 @@ var csv = require("csvtojson");
 csv()
 .fromFile("./stops-areasorted.csv")
 .then(function(jsonStops){ //when parse finished, result will be emitted here.
-  console.log(jsonStops); 
+  //console.log(jsonStops); 
 
   var resultstops = [];
   var currareastop;
@@ -46,7 +51,7 @@ csv()
     const csvstop = jsonStops[index];
     if (csvstop.location_type == '1') {
       currareastop = {
-        name: csvstop.stop_name + ", " + getCityName(csvstop.stop_description),
+        name: csvstop.stop_name + ", " + getCityName(csvstop.stop_desc),
         lat: parseFloat(csvstop.stop_lat),
         lon: parseFloat(csvstop.stop_lon),
         // zone: csvstop.zone_id,
@@ -58,7 +63,7 @@ csv()
         const desc = valid_descriptions[descindex];
         if (csvstop.stop_name.indexOf(desc) != -1) {
           currareastop = {
-            name: csvstop.stop_name + ", " + getCityName(csvstop.stop_description),
+            name: csvstop.stop_name + ", " + getCityName(csvstop.stop_desc),
             lat: parseFloat(csvstop.stop_lat),
             lon: parseFloat(csvstop.stop_lon),
             // zone: csvstop.zone_id,
@@ -76,12 +81,20 @@ csv()
       var distance = distanceLatLons(stop.lat, stop.lon, otherstop.lat, otherstop.lon);
       if (distance < min_distance) {
         resultstops.splice(otherstopindex,1);
-        break;
+        otherstopindex--;
+        //console.log("near stop " + stop.name + " other " + otherstop.name + " distance " + distance);
+      }
+      else {
+        //console.log("not near stop " + stop.name + " other " + otherstop.name + " distance " + distance);
       }
     }
   }
 
+  console.log("resultstops.length " + resultstops.length);
+
   var fs = require('fs');
-  fs.writeFile("meetingpoints.json", resultstops);
+  fs.writeFile("meetingpoints.json", JSON.stringify(resultstops), function(){
+    console.log("success");
+  });
 })
 

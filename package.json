@@ -20,6 +20,7 @@
   "homepage": "https://github.com/tiulimg/carpool#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "csvtojson": "^2.0.10",
     "express": "^4.17.1",
     "https-proxy-agent": "^2.2.3",
     "lodash": "^4.17.15",
