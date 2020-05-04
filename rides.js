@@ -27,7 +27,7 @@ var publictransportcache = {};
 var carroutecache = {};
 
 var fs = require('fs');
-var meetingpoints = JSON.parse(fs.readFileSync('./stopsparser/meetingpoints.json', 'utf8'));
+var stops = JSON.parse(fs.readFileSync('./stopsparser/meetingpoints.json', 'utf8'));
 
 function patchridedetails(req, res, replies)
 {
@@ -792,4 +792,16 @@ function hikeproperties(hike, hikers) {
         hike.duration = endtime - starttime;
         hike.maximumpublictransporttime = hike.duration / 3;
     }
+}
+
+function stopsinthewaytohike(startlat, startlon, endlat, endlon) {
+    var stopsinarea = [];
+    for (let index = 0; index < stops.length; index++) {
+        const stop = stops[index];
+        if ((startlat < stop.lat < endlat || startlat > stop.lat > endlat) &&
+            (startlon < stop.lon < endlon || startlon > stop.lon > endlon)) {
+            stopsinarea.push(stop);
+        }
+    }
+    return stopsinarea;
 }
