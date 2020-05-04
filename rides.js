@@ -27,7 +27,7 @@ var publictransportcache = {};
 var carroutecache = {};
 
 var fs = require('fs');
-var meetingpoints = JSON.parse(fs.readFileSync('./meetingpoints.json', 'utf8'));
+var meetingpoints = JSON.parse(fs.readFileSync('./stopsparser/meetingpoints.json', 'utf8'));
 
 function patchridedetails(req, res, replies)
 {
