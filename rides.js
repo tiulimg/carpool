@@ -14,6 +14,8 @@ module.exports = {
     findpublictransport: findpublictransport,
     findcarroute: findcarroute,
     makecalculation: makecalculation, 
+    updateavailableplaces: updateavailableplaces,
+    hikeproperties: hikeproperties,
 };
 
 const HERE_APPID = process.env.HERE_APPID;
@@ -23,6 +25,9 @@ const ALGOLIA_APPID = process.env.ALGOLIA_APPID;
 var locationscache = {};
 var publictransportcache = {};
 var carroutecache = {};
+
+var fs = require('fs');
+var meetingpoints = JSON.parse(fs.readFileSync('./meetingpoints.json', 'utf8'));
 
 function patchridedetails(req, res, replies)
 {
@@ -583,6 +588,18 @@ function transportbydirection(hiker, hike, direction, res, mode) {
         var transportincache = transportcachearray[transportincachekey];
         if (transportincache) {
             console.log("found in cache:\n" + JSON.stringify(transportincache));
+            if (route.phone != hiker.phone) {
+                route.direction = direction;
+                route.phone = hiker.phone;
+                route.hikenamehebrew = hiker.hikenamehebrew;
+                if (route._id) {
+                    delete route._id;
+                }
+                dbservices.insertnewroute(res, route)
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                });
+            }
             return resolve(transportincache);
         }
         else {
@@ -671,7 +688,6 @@ function makecalculation(hikers, distances, hike) {
         }
     }
 
-    updateavailableplaces(hikers);
     return hikers;
 }
 
@@ -744,5 +760,29 @@ function calculateridesbydistanceanddirection(hiker, hike, distances, direction)
                 break;
             }
         }
+    }
+}
+
+function hikeproperties(hike, hikers) {
+    if (hike.startlatitude) {
+        var hikestartenddistance = util.distanceLatLons(
+            hike.startlatitude, hike.startlongitude, hike.endlatitude, hike.endlongitude);
+        hike.iscircular = hikestartenddistance < 500 ? true : false;
+        hike.minimumcarstoleave = 0;
+        if (!hike.iscircular) {
+            for (let index = 0; index < hikers.length; index++) {
+                const hiker = hikers[index];
+                if (hiker.amidriver) {
+                    hike.minimumcarstoleave++;
+                }
+            }
+            hike.minimumcarstoleave /= 3;
+        }
+    }
+    if (hike.starttime) {
+        var starttime = new Date(hike.starttime);
+        var endtime = new Date(hike.endtime);
+        hike.duration = endtime - starttime;
+        hike.maximumpublictransporttime = hike.duration / 3;
     }
 }

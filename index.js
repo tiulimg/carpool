@@ -12,6 +12,7 @@ var replies = require("./replies");
 var register = require("./register_to_hikes");
 var ridesmodules = require("./rides");
 var util = require("./util");
+var sms = require("./sms");
 var wanttomodify_obj = JSON.parse(fs.readFileSync('./wanttomodifytexts.json', 'utf8'));
 
 var ObjectID = mongodb.ObjectID;
@@ -2556,6 +2557,7 @@ app.patch("/api/calculaterides", function(req, res) {
                 .then(hikers => {
                     if (hikers && hikers.length > 0){
                         console.log("start calculation for " + hike.hikenamehebrew);
+                        ridesmodules.hikeproperties(hike, hikers);
                         ridesmodules.findhikerslocation(hikers)
                         .then(() => {
                             // public transport for hikers that don't need a ride
@@ -2568,14 +2570,9 @@ app.patch("/api/calculaterides", function(req, res) {
                             console.log("calculaterides getDistanceMatrix");
                             var distances = util.getDistanceMatrix(hikers);
                             var areas = util.getHikerAreas(hikers);
-                            if (hike.startlatitude) {
-                                var hikestartenddistance = util.distanceLatLons(
-                                    hike.startlatitude, hike.startlongitude, hike.endlatitude, hike.endlongitude);
-                                hike.iscircular = hikestartenddistance < 500 ? true : false;
-                            }
 
                             ridesmodules.makecalculation(hikers, distances, hike);
-
+                            ridesmodules.updateavailableplaces(hikers);
                             logservices.logcalculationresult(hikers);
                         })
                         .then(() => {
@@ -2584,12 +2581,9 @@ app.patch("/api/calculaterides", function(req, res) {
                         })
                         .then(() => {
                             dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
-                            .then(() => {
-                                register.updateCarpool(res);
-                            })
-                            .catch(rejection => {
-                                logservices.logRejection(rejection);
-                            });
+                        })
+                        .then(() => {
+                            register.updateCarpool(res);
                         })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
