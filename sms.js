@@ -21,7 +21,7 @@ function sendSMS() {
       "text": "נרשמת לטיול בחרמון ב-8.5, תבוא?",
         "tag": "planned",
         "responses": ["כן", "לא"],
-        "webhook": "https://yourapp.herokuapp.com/results/"
+        "webhook": "http://tiulimg-carpool.herokuapp.com/api/gotsms"
       }],
       "conclusion": "אחלה, נהיה בקשר בערב בנוגע לסידור של הטרמפים :)"
     }, function(err, res, body) {
