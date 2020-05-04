@@ -25,7 +25,7 @@ module.exports = {
     getironnumbers: getironnumbers,
     updateironnumberbyphone: updateironnumberbyphone,
     getroutes: getroutes,
-    getroutebyhikedateandphonenumber: getroutebyhikedateandphonenumber,
+//    getroutebyhikedateandphonenumber: getroutebyhikedateandphonenumber,
     getroutebylatlontime: getroutebylatlontime,
     insertnewroute: insertnewroute,
     deleteallroutesforhike: deleteallroutesforhike,
