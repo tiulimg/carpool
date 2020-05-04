@@ -2603,7 +2603,7 @@ app.patch("/api/calculaterides", function(req, res) {
 });
 
 app.delete("/api/calculaterides", function(req, res) {
-    routetostops.createroutefiles();
+    saveroutes.createroutefiles(res);
     if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         res.status(200).json("OK");
     }

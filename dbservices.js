@@ -358,32 +358,32 @@ function getroutes(res) {
     });
 }
 
-function getroutebyhikedateandphonenumber(res, hiketodate, phonenumber, direction) {
-    return new Promise((resolve, reject) => {
-        if (hiketodate && hiketodate != "") {
-            db.collection(ROUTES_COLLECTION).findOne(
-                { $and: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
-                          { phone: phonenumber }, 
-                          { direction: direction } ] }, function(err, doc) {
-                if (err) {
-                    logservices.handleError(res, err.message, "Failed to get route.");
-                } else {
-                    return resolve(doc);
-                }
-            });
-        }
-        else {
-            return null;
-        }
-    });
-}
+// function getroutebyhikedateandphonenumber(res, hiketodate, phonenumber, direction) {
+//     return new Promise((resolve, reject) => {
+//         if (hiketodate && hiketodate != "") {
+//             db.collection(ROUTES_COLLECTION).findOne(
+//                 { $and: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
+//                           { phone: phonenumber }, 
+//                           { direction: direction } ] }, function(err, doc) {
+//                 if (err) {
+//                     logservices.handleError(res, err.message, "Failed to get route.");
+//                 } else {
+//                     return resolve(doc);
+//                 }
+//             });
+//         }
+//         else {
+//             return null;
+//         }
+//     });
+// }
 
-function getroutebylatlontime(res, startlat, startlon, endlat, endlon, arrival, depart) {
+function getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart) {
     return new Promise((resolve, reject) => {
         if (arrival) {
             db.collection(ROUTES_COLLECTION).findOne(
                 { $and: [ { startlat: startlat }, { startlon: startlon }, { endlat: endlat }, { endlon: endlon },
-                          { arrival: arrival } ] }, function(err, doc) {
+                          { arrival: arrival }, { mode: mode } ] }, function(err, doc) {
                 if (err) {
                     logservices.handleError(res, err.message, "Failed to get route.");
                 } else {
@@ -394,7 +394,7 @@ function getroutebylatlontime(res, startlat, startlon, endlat, endlon, arrival, 
         else if (depart) {
             db.collection(ROUTES_COLLECTION).findOne(
                 { $and: [ { startlat: startlat }, { startlon: startlon }, { endlat: endlat }, { endlon: endlon },
-                          { depart: depart } ] }, function(err, doc) {
+                          { depart: depart }, { mode: mode } ] }, function(err, doc) {
                 if (err) {
                     logservices.handleError(res, err.message, "Failed to get route.");
                 } else {
@@ -407,37 +407,9 @@ function getroutebylatlontime(res, startlat, startlon, endlat, endlon, arrival, 
 
 function insertnewroute(res, route) {
     return new Promise((resolve, reject) => {
-        var promises = [];
-        var routefromdb;
-        if (route.hikenamehebrew) {
-            promises.push(
-                getroutebyhikedateandphonenumber(res, route.hikenamehebrew, route.phonenumber, route.direction)
-                .then(foundroute => {
-                    if (foundroute) {
-                        routefromdb = foundroute;
-                    }
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                })
-            );
-        }
-        else if (route.startlat) {
-            promises.push(
-                getroutebylatlontime(res, route.startlat, route.startlon, route.endlat, route.endlon, route.arrival, route.depart)
-                .then(foundroute => {
-                    if (foundroute) {
-                        routefromdb = foundroute;
-                    }
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                })
-            );
-        }
-        Promise.all(promises)
-        .then(() => {
-            if (!routefromdb) {
+        getroutebylatlontime(res, route.startlat, route.startlon, route.endlat, route.endlon, route.mode, route.arrival, route.depart)
+        .then(foundroute => {
+            if (!foundroute) {
                 db.collection(ROUTES_COLLECTION).insertOne(route, function(err, doc) {
                     if (err) {
                         logservices.handleError(res, err.message, "Failed to create or update route.");
@@ -446,9 +418,6 @@ function insertnewroute(res, route) {
                         resolve();
                     }
                 });
-            }
-            else {
-                resolve();
             }
         })
         .catch(rejection => {

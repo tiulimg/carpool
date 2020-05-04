@@ -588,22 +588,10 @@ function transportbydirection(hiker, hike, direction, res, mode) {
         var transportincache = transportcachearray[transportincachekey];
         if (transportincache) {
             console.log("found in cache:\n" + JSON.stringify(transportincache));
-            if (route.phone != hiker.phone) {
-                route.direction = direction;
-                route.phone = hiker.phone;
-                route.hikenamehebrew = hiker.hikenamehebrew;
-                if (route._id) {
-                    delete route._id;
-                }
-                dbservices.insertnewroute(res, route)
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
-            }
             return resolve(transportincache);
         }
         else {
-            dbservices.getroutebyhikedateandphonenumber(res, hike.hikedate, hiker.phone, direction)
+            dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart)
             .then(routefromdb => {
                 if (routefromdb) {
                     hiker["route"+direction+"thehike"] = routefromdb;
@@ -615,6 +603,13 @@ function transportbydirection(hiker, hike, direction, res, mode) {
                     .then(route => {
                         hiker["route"+direction+"thehike"] = route;
                         transportcachearray[transportincachekey] = route;
+                        route.startlat = startlat;
+                        route.startlon = startlon;
+                        route.endlat = endlat;
+                        route.endlon = endlon;
+                        route.mode = mode;
+                        route.arrival = arrival;
+                        route.depart = depart;
                         route.direction = direction;
                         route.phone = hiker.phone;
                         route.hikenamehebrew = hiker.hikenamehebrew;
