@@ -497,7 +497,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) 
                 console.log("responsebodyjson " + JSON.stringify(responsebodyjson));
                 //console.log("calculatecarroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
-                    return reject("No route found");
+                    return resolve("No route found");
                 }
                 else if (responsebodyjson.response && responsebodyjson.response.route && responsebodyjson.response.route[0] &&
                     responsebodyjson.response.route[0].leg && responsebodyjson.response.route[0].leg[0])
@@ -523,10 +523,63 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) 
                     return resolve(route);
                 }
                 else {
-                    return reject("No route found");
+                    return resolve("No route found");
                 }
             }
         });
+    });
+}
+
+function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depart) { // mode = car | publicTransport
+    return new Promise((resolve, reject) => {
+        arrivaldepart = arrival;
+        if (depart) {
+            arrivaldepart = depart;
+        }
+        var transportcachearray = publictransportcache;
+        if (mode == "car") {
+            transportcachearray = carroutecache;
+        }
+        var transportincachekey = mode+":"+startlat+","+startlon+":"+endlat+","+endlon+":"+arrivaldepart;
+        var transportincache = transportcachearray[transportincachekey];
+        if (transportincache) {
+            // console.log("found in cache:\n" + JSON.stringify(transportincache));
+            return resolve(transportincache);
+        }
+        else {
+            dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart)
+            .then(routefromdb => {
+                if (routefromdb) {
+                    hiker["route"+direction+"thehike"] = routefromdb;
+                    return resolve(routefromdb);
+                }
+                else {
+                    findroute(
+                        startlat, startlon, endlat, endlon, mode, arrival, depart)
+                    .then(route => {
+                        transportcachearray[transportincachekey] = route;
+                        route.startlat = startlat;
+                        route.startlon = startlon;
+                        route.endlat = endlat;
+                        route.endlon = endlon;
+                        route.mode = mode;
+                        route.arrival = arrival;
+                        route.depart = depart;
+                        dbservices.insertnewroute(res, route)
+                        .catch(rejection => {
+                            logservices.logRejection(rejection);
+                        });
+                        return resolve(route);
+                    })
+                    .catch(rejection => {
+                        logservices.logRejection(rejection);
+                    })
+                }
+            })
+            .catch(rejection => {
+                logservices.logRejection(rejection);
+            });
+        }
     });
 }
 
@@ -579,55 +632,14 @@ function transportbydirection(hiker, hike, direction, res, mode) {
             arrival = null;
             depart = hike.endtime;
         }
-        
-        var transportcachearray = publictransportcache;
-        if (mode == "car") {
-            transportcachearray = carroutecache;
-        }
-        var transportincachekey = startlat+","+startlon+":"+endlat+","+endlon;
-        var transportincache = transportcachearray[transportincachekey];
-        if (transportincache) {
-            console.log("found in cache:\n" + JSON.stringify(transportincache));
-            return resolve(transportincache);
-        }
-        else {
-            dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart)
-            .then(routefromdb => {
-                if (routefromdb) {
-                    hiker["route"+direction+"thehike"] = routefromdb;
-                    return resolve(routefromdb);
-                }
-                else {
-                    findroute(
-                        startlat, startlon, endlat, endlon, mode, arrival, depart)
-                    .then(route => {
-                        hiker["route"+direction+"thehike"] = route;
-                        transportcachearray[transportincachekey] = route;
-                        route.startlat = startlat;
-                        route.startlon = startlon;
-                        route.endlat = endlat;
-                        route.endlon = endlon;
-                        route.mode = mode;
-                        route.arrival = arrival;
-                        route.depart = depart;
-                        route.direction = direction;
-                        route.phone = hiker.phone;
-                        route.hikenamehebrew = hiker.hikenamehebrew;
-                        dbservices.insertnewroute(res, route)
-                        .catch(rejection => {
-                            logservices.logRejection(rejection);
-                        });
-                        return resolve(route);
-                    })
-                    .catch(rejection => {
-                        logservices.logRejection(rejection);
-                    })
-                }
-            })
-            .catch(rejection => {
-                logservices.logRejection(rejection);
-            });
-        }
+
+        findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart)
+        .then(route => {
+            return resolve(route);
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
     });
 }
 

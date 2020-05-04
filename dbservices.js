@@ -25,10 +25,9 @@ module.exports = {
     getironnumbers: getironnumbers,
     updateironnumberbyphone: updateironnumberbyphone,
     getroutes: getroutes,
-//    getroutebyhikedateandphonenumber: getroutebyhikedateandphonenumber,
     getroutebylatlontime: getroutebylatlontime,
     insertnewroute: insertnewroute,
-    deleteallroutesforhike: deleteallroutesforhike,
+    deleteallroutes: deleteallroutes,
 }
 
 var ObjectID = mongodb.ObjectID;
@@ -358,26 +357,6 @@ function getroutes(res) {
     });
 }
 
-// function getroutebyhikedateandphonenumber(res, hiketodate, phonenumber, direction) {
-//     return new Promise((resolve, reject) => {
-//         if (hiketodate && hiketodate != "") {
-//             db.collection(ROUTES_COLLECTION).findOne(
-//                 { $and: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
-//                           { phone: phonenumber }, 
-//                           { direction: direction } ] }, function(err, doc) {
-//                 if (err) {
-//                     logservices.handleError(res, err.message, "Failed to get route.");
-//                 } else {
-//                     return resolve(doc);
-//                 }
-//             });
-//         }
-//         else {
-//             return null;
-//         }
-//     });
-// }
-
 function getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart) {
     return new Promise((resolve, reject) => {
         if (arrival) {
@@ -426,11 +405,11 @@ function insertnewroute(res, route) {
     });
 }
 
-function deleteallroutesforhike(res, hiketodate) {
+function deleteallroutes(res) {
     return new Promise((resolve, reject) => {
-        db.collection(HIKERS_COLLECTION).deleteMany({hikenamehebrew: { $regex : ".*"+hiketodate+".*" }}, function(err, result) {
+        db.collection(ROUTES_COLLECTION).deleteMany({}, function(err, result) {
             if (err) {
-                logservices.handleError(res, err.message, "Failed to delete routes of " + hiketodate);
+                logservices.handleError(res, err.message, "Failed to delete all routes");
             } else {
                 return resolve();
             }

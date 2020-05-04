@@ -2535,16 +2535,8 @@ app.patch("/api/findhikerslocation", function(req, res) {
 
   
 /*  "/api/calculaterides"
-*    GET: shows the output of ride calculation if exists
 *    PATCH: starts the ride calculation process
-*    DELETE: cancels rides for all hikers
 */
-
-app.get("/api/calculaterides", function(req, res) {
-    if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
-        res.status(200).json("OK");
-    }
-});
 
 app.patch("/api/calculaterides", function(req, res) {
     if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
@@ -2602,10 +2594,19 @@ app.patch("/api/calculaterides", function(req, res) {
     }
 });
 
-app.delete("/api/calculaterides", function(req, res) {
-    routetostops.saveroutes(res);
+/*  "/api/routes"
+*    DELETE: deletes all routes
+*/
+
+app.delete("/api/routes", function(req, res) {
     if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
-        res.status(200).json("OK");
+        dbservices.deleteallroutes(res)
+        .then(() => {
+            res.status(200).json("success");
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
     }
 });
 
