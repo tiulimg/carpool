@@ -2603,6 +2603,7 @@ app.patch("/api/calculaterides", function(req, res) {
 });
 
 app.delete("/api/calculaterides", function(req, res) {
+    sms.sendSMS();
     if (util.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         res.status(200).json("OK");
     }

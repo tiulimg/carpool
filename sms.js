@@ -14,6 +14,7 @@ function sendSMS() {
       TILL_PATH += "?"+TILL_URL.query;
     }
     
+    console.log("sending SMS");
     request.createClient(TILL_BASE).post(TILL_PATH, {
       "phone": ["972534260626"],
       "questions": [{
