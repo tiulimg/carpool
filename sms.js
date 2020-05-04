@@ -25,6 +25,8 @@ function sendSMS() {
       }],
       "conclusion": "אחלה, נהיה בקשר בערב בנוגע לסידור של הטרמפים :)"
     }, function(err, res, body) {
-      return console.log(res.statusCode);
+      console.log(res.statusCode);
+      console.log(err);
+      console.log(JSON.stringify(body));
     });
 }
