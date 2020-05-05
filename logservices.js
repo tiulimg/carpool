@@ -1,7 +1,8 @@
 module.exports = {
     handleError: handleError,
     logRejection: logRejection,
-    logcalculationdistances: logcalculationdistances,
+    loghikersdistances: loghikersdistances,
+    logstopsdistances: logstopsdistances,
     logcalculationareas: logcalculationareas,
     logcalculationresult: logcalculationresult,
 }
@@ -19,7 +20,7 @@ function logRejection(rejection) {
     }
 }
 
-function logcalculationdistances(distances) {
+function loghikersdistances(distances) {
     console.log("distances:");
     for (var source in distances) {
         source = distances[source];
@@ -31,6 +32,22 @@ function logcalculationdistances(distances) {
         for (let index = 0; index < source.fromthehike.length; index++) {
             const dest = source.fromthehike[index];
             console.log("fromthehike: source " + source.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.fullname);
+        }
+    }
+}
+
+function logstopsdistances(distances) {
+    console.log("distances:");
+    for (var source in distances) {
+        source = distances[source];
+        for (let index = 0; index < source.tothehike.length; index++) {
+            const dest = source.tothehike[index];
+            console.log("tothehike: source " + source.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.name);
+        }
+
+        for (let index = 0; index < source.fromthehike.length; index++) {
+            const dest = source.fromthehike[index];
+            console.log("fromthehike: source " + source.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.name);
         }
     }
 }

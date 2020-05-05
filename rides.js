@@ -11,8 +11,8 @@ module.exports = {
     translateaddresstolocation: translateaddresstolocation,
     findhikerslocation: findhikerslocation,
     findroute: findroute,
-    findpublictransport: findpublictransport,
-    findcarroute: findcarroute,
+    bustohike: bustohike,
+    carstohike: carstohike,
     makecalculation: makecalculation, 
     updateavailableplaces: updateavailableplaces,
     hikeproperties: hikeproperties,
@@ -467,7 +467,7 @@ function findhikerslocation(hikers) {
     });
 }
 
-function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) { // mode = car | publicTransport
+function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,middlelat,middlelon) { // mode = car | publicTransport
     return new Promise((resolve, reject) => {
         var arrivaldepartaddition = "";
         if (arrivaltime) {
@@ -476,11 +476,19 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) 
         else if (departtime) {
             arrivaldepartaddition = "&depart="+departtime;
         }
-        var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID+
-            "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
-            "&combineChange=true&language=he" + arrivaldepartaddition;
-        console.log("calculatecarroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
-            " depart " + departtime + " mode " + mode);
+        var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID;
+        if (middlelat && middlelon) {
+            url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+middlelat+"%2C"+middlelon+"&waypoint2="+endlat+"%2C"+endlon + 
+                "&mode=fastest%3B" + mode + "&combineChange=true&language=he" + arrivaldepartaddition;
+            console.log("calculatecarroute here start ("+startlat+","+startlon+") middle ("+middlelat+","+middlelon+
+                ") end ("+endlat+","+endlon+") arrival " + arrivaltime + " depart " + departtime + " mode " + mode);
+        }
+        else {
+            url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
+                "&combineChange=true&language=he" + arrivaldepartaddition;
+            console.log("calculatecarroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
+                " depart " + departtime + " mode " + mode);
+        }
         console.log("url " + url);
         request({
             url: url,
@@ -507,7 +515,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) 
                     for (let index = 0; index < leg.maneuver.length; index++) {
                         const step = leg.maneuver[index];
                         var instruction = step.instruction.replace(/<[^>]+>/g, '');
-                        console.log("instruction " + instruction);
+                        //console.log("instruction " + instruction);
                         maneuver.push({
                             position: step.position,
                             length: step.length,
@@ -519,6 +527,15 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) 
                         length: leg.length,
                         traveltime: leg.travelTime,
                         maneuver: maneuver,
+                        startlat: startlat,
+                        startlon: startlon,
+                        endlat: endlat,
+                        endlon: endlon,
+                        middlelat: middlelat,
+                        middlelon: middlelon,
+                        mode: mode,
+                        arrival: arrival,
+                        depart: depart,
                     };
                     return resolve(route);
                 }
@@ -530,7 +547,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime) 
     });
 }
 
-function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depart) { // mode = car | publicTransport
+function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depart, middlelat, middlelon) { 
     return new Promise((resolve, reject) => {
         arrivaldepart = arrival;
         if (depart) {
@@ -541,13 +558,16 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
             transportcachearray = carroutecache;
         }
         var transportincachekey = mode+":"+startlat+","+startlon+":"+endlat+","+endlon+":"+arrivaldepart;
+        if (middlelat) {
+            transportincachekey = mode+":"+startlat+","+startlon+":"+middlelat+","+middlelon+":"+endlat+","+endlon+":"+arrivaldepart;
+        }
         var transportincache = transportcachearray[transportincachekey];
         if (transportincache) {
             // console.log("found in cache:\n" + JSON.stringify(transportincache));
             return resolve(transportincache);
         }
         else {
-            dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart)
+            dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon)
             .then(routefromdb => {
                 if (routefromdb) {
                     hiker["route"+direction+"thehike"] = routefromdb;
@@ -555,16 +575,9 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
                 }
                 else {
                     findroute(
-                        startlat, startlon, endlat, endlon, mode, arrival, depart)
+                        startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon)
                     .then(route => {
                         transportcachearray[transportincachekey] = route;
-                        route.startlat = startlat;
-                        route.startlon = startlon;
-                        route.endlat = endlat;
-                        route.endlon = endlon;
-                        route.mode = mode;
-                        route.arrival = arrival;
-                        route.depart = depart;
                         dbservices.insertnewroute(res, route)
                         .catch(rejection => {
                             logservices.logRejection(rejection);
@@ -583,17 +596,17 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
     });
 }
 
-function findpublictransport(hikers, alsohitcherswithoutdrivers, hike, res) {
+function bustohike(hikers, hitcherswithoutdrivers, hike, res) {
     return new Promise((resolve, reject) => {
         var promises = [];
         for (let index = 0; index < hikers.length; index++) {
             const hiker = hikers[index];
             if (!hiker.amidriver && hike.startlatitude && hike.endlatitude &&
                 (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
-                 hiker.needaride == "I come in bus, a motorcycle or other" || alsohitcherswithoutdrivers)) {
+                 hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
                 if (!hiker.mydriverto && !hiker.routetothehike) {
                     promises.push(
-                        transportbydirection(hiker, hike, "to", res, "publicTransport")
+                        transporttohikebydirection(hiker, hike, "to", res, "publicTransport")
                         .catch(rejection => {
                             logservices.logRejection(rejection);
                         })
@@ -601,7 +614,7 @@ function findpublictransport(hikers, alsohitcherswithoutdrivers, hike, res) {
                 }
                 if (!hiker.mydriverfrom && !hiker.routefromthehike) {
                     promises.push(
-                        transportbydirection(hiker, hike, "from", res, "publicTransport")
+                        transporttohikebydirection(hiker, hike, "from", res, "publicTransport")
                         .catch(rejection => {
                             logservices.logRejection(rejection);
                         })
@@ -615,7 +628,7 @@ function findpublictransport(hikers, alsohitcherswithoutdrivers, hike, res) {
     });
 }
 
-function transportbydirection(hiker, hike, direction, res, mode) {
+function transporttohikebydirection(hiker, hike, direction, res, mode) {
     return new Promise((resolve, reject) => {
         console.log(mode + " " + direction + " the hike for hiker " + hiker.fullname);
         var arrival = hike.starttime;
@@ -633,7 +646,7 @@ function transportbydirection(hiker, hike, direction, res, mode) {
             depart = hike.endtime;
         }
 
-        findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart)
+        findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null)
         .then(route => {
             return resolve(route);
         })
@@ -643,7 +656,7 @@ function transportbydirection(hiker, hike, direction, res, mode) {
     });
 }
 
-function findcarroute(hikers, hike, res) {
+function carstohike(hikers, hike, res) {
     return new Promise((resolve, reject) => {
         var promises = [];
         for (let index = 0; index < hikers.length; index++) {
@@ -651,7 +664,7 @@ function findcarroute(hikers, hike, res) {
             if (hiker.amidriver && hike.startlatitude && hike.endlatitude) {
                 if (!hiker.routetothehike) {
                     promises.push(
-                        transportbydirection(hiker, hike, "to", res, "car")
+                        transporttohikebydirection(hiker, hike, "to", res, "car")
                         .catch(rejection => {
                             logservices.logRejection(rejection);
                         })
@@ -659,7 +672,7 @@ function findcarroute(hikers, hike, res) {
                 }
                 if (!hiker.routefromthehike) {
                     promises.push(
-                        transportbydirection(hiker, hike, "from", res, "car")
+                        transporttohikebydirection(hiker, hike, "from", res, "car")
                         .catch(rejection => {
                             logservices.logRejection(rejection);
                         })
@@ -794,7 +807,25 @@ function hikeproperties(hike, hikers) {
     }
 }
 
-function stopsinthewaytohike(startlat, startlon, endlat, endlon) {
+function stopsinthewaytohike(hiker, hike, direction) {
+    if (direction == "to") {
+        if (hiker.comesfromlocation && hike.startlatitude) {
+            return stopsinrectangle(
+                hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude, hike.startlongitude
+            );
+        }
+    }
+    else if (direction == "from") {
+        if (hiker.returnstolocation && hike.startlatitude) {
+            return stopsinrectangle(
+                hiker.returnstolocation.lat, hiker.returnstolocation.lon, hike.endlatitude, hike.endlongitude
+            );
+        }
+    }
+    return [];
+}
+
+function stopsinrectangle(startlat, startlon, endlat, endlon) {
     var stopsinarea = [];
     for (let index = 0; index < stops.length; index++) {
         const stop = stops[index];

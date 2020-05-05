@@ -147,20 +147,13 @@ function updatehikerstatus(res, hiketodate, phonenumber, status) {
 
 function updatehikerchoosedrivers(res, direction, chosendrivers) {
     return new Promise((resolve, reject) => {
-        if (direction == "to") {
-            db.collection(HIKERS_COLLECTION).update(
-                { $and: [ { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
-                                   { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
-                          { $or: [ { phone: phonenumber }, { email: phonenumber } ] } ] },
-                { $set: {chosendriversto: chosendrivers }}); 
-        }
-        else if (direction == "from") {
-            db.collection(HIKERS_COLLECTION).update(
-                { $and: [ { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
-                                   { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
-                          { $or: [ { phone: phonenumber }, { email: phonenumber } ] } ] },
-                { $set: {chosendriversfrom: chosendrivers }}); 
-        }
+        var elementtoupdate = {};
+        elementtoupdate["chosendrivers"+direction] = chosendrivers;
+        db.collection(HIKERS_COLLECTION).update(
+            { $and: [ { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
+                               { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
+                      { $or: [ { phone: phonenumber }, { email: phonenumber } ] } ] },
+            { $set: elementtoupdate});
     });
 }
 
@@ -357,36 +350,35 @@ function getroutes(res) {
     });
 }
 
-function getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart) {
+function getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon) {
     return new Promise((resolve, reject) => {
+        var filter = [ { startlat: startlat }, { startlon: startlon }, { endlat: endlat }, { endlon: endlon },
+            { mode: mode } ];
         if (arrival) {
-            db.collection(ROUTES_COLLECTION).findOne(
-                { $and: [ { startlat: startlat }, { startlon: startlon }, { endlat: endlat }, { endlon: endlon },
-                          { arrival: arrival }, { mode: mode } ] }, function(err, doc) {
-                if (err) {
-                    logservices.handleError(res, err.message, "Failed to get route.");
-                } else {
-                    return resolve(doc);
-                }
-            });
+            filter.arrival = arrival;
         }
         else if (depart) {
-            db.collection(ROUTES_COLLECTION).findOne(
-                { $and: [ { startlat: startlat }, { startlon: startlon }, { endlat: endlat }, { endlon: endlon },
-                          { depart: depart }, { mode: mode } ] }, function(err, doc) {
-                if (err) {
-                    logservices.handleError(res, err.message, "Failed to get route.");
-                } else {
-                    return resolve(doc);
-                }
-            }); 
+            filter.depart = depart;
         }
+        if (middlelat && middlelon) {
+            filter.middlelat = middlelat;
+            filter.middlelon = middlelon;
+        }
+        db.collection(ROUTES_COLLECTION).findOne(
+            { $and: filter }, function(err, doc) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to get route.");
+            } else {
+                return resolve(doc);
+            }
+        }); 
     });
 }
 
 function insertnewroute(res, route) {
     return new Promise((resolve, reject) => {
-        getroutebylatlontime(res, route.startlat, route.startlon, route.endlat, route.endlon, route.mode, route.arrival, route.depart)
+        getroutebylatlontime(res, route.startlat, route.startlon, route.endlat, route.endlon, route.mode, route.arrival, route.depart,
+            route.middlelat, route.middlelon)
         .then(foundroute => {
             if (!foundroute) {
                 db.collection(ROUTES_COLLECTION).insertOne(route, function(err, doc) {

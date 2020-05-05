@@ -2552,23 +2552,23 @@ app.patch("/api/calculaterides", function(req, res) {
                         ridesmodules.findhikerslocation(hikers)
                         .then(() => {
                             // public transport for hikers that don't need a ride
-                            ridesmodules.findpublictransport(hikers, false, hike, res);
+                            ridesmodules.bustohike(hikers, false, hike, res);
                         })
                         .then(() => {
-                            ridesmodules.findcarroute(hikers, hike, res);
+                            ridesmodules.carstohike(hikers, hike, res);
                         })
                         .then(() => {
-                            console.log("calculaterides getDistanceMatrix");
-                            var distances = util.getDistanceMatrix(hikers);
-                            var areas = util.getHikerAreas(hikers);
+                            console.log("calculaterides getDistancesBetweenHikers");
+                            var hikersdistances = util.getDistancesBetweenHikers(hikers);
+                            //var areas = util.getHikerAreas(hikers);
 
-                            ridesmodules.makecalculation(hikers, distances, hike);
+                            ridesmodules.makecalculation(hikers, hikersdistances, hike);
                             ridesmodules.updateavailableplaces(hikers);
                             logservices.logcalculationresult(hikers);
                         })
                         .then(() => {
                             // public transport for hikers that hadn't left with a ride
-                            ridesmodules.findpublictransport(hikers, true, hike, res);
+                            ridesmodules.bustohike(hikers, true, hike, res);
                         })
                         .then(() => {
                             dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
