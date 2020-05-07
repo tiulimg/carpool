@@ -36,19 +36,11 @@ function loghikersdistances(distances) {
     }
 }
 
-function logstopsdistances(distances) {
+function logstopsdistances(distances, direction) {
     console.log("distances:");
-    for (var source in distances) {
-        source = distances[source];
-        for (let index = 0; index < source.tothehike.length; index++) {
-            const dest = source.tothehike[index];
-            console.log("tothehike: source " + source.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.name);
-        }
-
-        for (let index = 0; index < source.fromthehike.length; index++) {
-            const dest = source.fromthehike[index];
-            console.log("fromthehike: source " + source.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.name);
-        }
+    for (let index = 0; index < distances[direction+"stop"].length; index++) {
+        const dest = distances[direction+"stop"][index];
+        console.log("tothehike: distance " + dest.distance + " meters dest " + dest.link.name);
     }
 }
 

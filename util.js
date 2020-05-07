@@ -399,63 +399,36 @@ function getDistancesBetweenHikers(hikers) {
     return distances;
 }
 
-function getDistancesToStops(hikers, stops) {
+function getDistancesToStops(hiker, stops, direction) {
     var distances = {};
-
-    for (let index = 0; index < hikers.length; index++) {
-        const hiker = hikers[index];
-        distances[hiker.phone] = {
-            tothehike: [],
-            fromthehike: [],
-            link: hiker,
-        };
+    distances[direction+"stop"] = [];
+    var hikerlat = hiker.comesfromlocation.lat;
+    var hikerlon = hiker.comesfromlocation.lon;
+    if (direction == "from") {
+        hikerlat = hiker.returnstolocation.lat;
+        hikerlon = hiker.returnstolocation.lon;
     }
 
-    for (let index = 0; index < hikers.length; index++) {
-        const hiker = hikers[index];
-        for (let indexstop = 0; indexstop < stops.length; indexstop++) {
-            const stop = stops[indexstop];
-            if (hiker.comesfromlocation) {
-                var distancetothestop = distanceLatLons(
-                    hiker.comesfromlocation.lat, hiker.comesfromlocation.lon,
-                    stop.lat, stop.lon);
-                distances[hiker.phone].tothehike.push({
-                    distance: distancetothestop,
-                    link: stop,
-                });
+    for (let indexstop = 0; indexstop < stops.length; indexstop++) {
+        const stop = stops[indexstop];
+        var stopdistance = distanceLatLons(hikerlat, hikerlon, stop.lat, stop.lon);
+        distances[direction+"stop"].push(
+            {
+                distance: stopdistance,
+                link: stop,
             }
-            if (hiker.returnstolocation) {
-                var distancefromthestop = distanceLatLons(
-                    hiker.returnstolocation.lat, hiker.returnstolocation.lon,
-                    stop.lat, stop.lon);
-                distances[hiker.phone].fromthehike.push({
-                    distance: distancefromthestop,
-                    link: stop,
-                });
-            }
-        }
+        );
     }
 
     // Sort distances for each hiker
-    for (let index = 0; index < hikers.length; index++) {
-        const hiker = hikers[index];
-        
-        distances[hiker.phone].tothehike.sort(function(b,a){
-            adistance = a.distance;
-            bdistance = b.distance;
-            result = adistance>bdistance ? -1 : adistance<bdistance ? 1 : 0;
-            return result;
-        });
-        distances[hiker.phone].fromthehike.sort(function(b,a){
-            adistance = a.distance;
-            bdistance = b.distance;
-            result = adistance>bdistance ? -1 : adistance<bdistance ? 1 : 0;
-            return result;
-        });
+    distances[direction+"stop"].sort(function(b,a){
+        adistance = a.distance;
+        bdistance = b.distance;
+        result = adistance>bdistance ? -1 : adistance<bdistance ? 1 : 0;
+        return result;
+    });
 
-    }
-
-    logservices.logstopsdistances(distances);
+    logservices.logstopsdistances(distances, direction);
 
     return distances;
 }

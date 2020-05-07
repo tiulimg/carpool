@@ -267,7 +267,7 @@ function insertnewlastregister(res, lastregister) {
 
 function replaceonelastregister(res, phonenumber, lastregister) {
     return new Promise((resolve, reject) => {
-        deleteonelastregister(phonenumber)
+        deleteonelastregister(res, phonenumber)
         .then(() => {
             db.collection(LAST_REGISTER_COLLECTION).insertOne(lastregister, function(err, doc) {
                 if (err) {
@@ -288,7 +288,6 @@ function deleteonelastregister(res, phonenumber) {
     return new Promise((resolve, reject) => {
         db.collection(LAST_REGISTER_COLLECTION).deleteOne(
             { $or: [ { 'phone number': phonenumber }, { email: phonenumber.toLowerCase() } ]}, function(err, doc) {
-
             if (err) {
                 logservices.handleError(res, err.message, "Failed to delete lastregister");
             }

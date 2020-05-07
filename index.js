@@ -733,9 +733,10 @@ app.post("/api/lastregister", function(req, res) {
                         "i approve": formObj["i approve"],
                     };
                     console.log("registerObj: " + JSON.stringify(registerObj));
-            
+                    console.log("AAA");
                     dbservices.insertnewlastregister(res, registerObj)
                     .then(() => {
+                        console.log("AAA++");
                         res.status(200).json("success");
                     })
                     .catch(rejection => {
@@ -822,9 +823,11 @@ app.post("/api/lastregister", function(req, res) {
                         "i approve": formObj["i approve"],
                     };
                     console.log("registerObj: " + JSON.stringify(registerObj));
+                    console.log("BBB");
 
                     dbservices.replaceonelastregister(res, phonenumber, registerObj)
                     .then(() => {
+                        console.log("BBB+++");
                         res.status(200).json("success");
                     })
                     .catch(rejection => {
@@ -2552,23 +2555,39 @@ app.patch("/api/calculaterides", function(req, res) {
                         ridesmodules.findhikerslocation(hikers)
                         .then(() => {
                             // public transport for hikers that don't need a ride
-                            ridesmodules.bustohike(hikers, false, hike, res);
+                            ridesmodules.bustohike(false, hike, res);
                         })
                         .then(() => {
-                            ridesmodules.carstohike(hikers, hike, res);
+                            ridesmodules.carstohike(hike, res);
                         })
                         .then(() => {
                             console.log("calculaterides getDistancesBetweenHikers");
-                            var hikersdistances = util.getDistancesBetweenHikers(hikers);
+                            hike.hikersdistances = util.getDistancesBetweenHikers(hikers);
                             //var areas = util.getHikerAreas(hikers);
 
-                            ridesmodules.makecalculation(hikers, hikersdistances, hike);
+                            ridesmodules.makecalculation(hike);
+                        })
+                        .then(() => {
+                            ridesmodules.canhitchersreachdrivers(res, hike, "to")
+                            .then(hitchersreachdrivers => {
+                                hike.hitchersreachdriverstothehike = hitchersreachdrivers;
+                                return ridesmodules.canhitchersreachdrivers(res, hike, "from");
+                            })
+                            .then(hitchersreachdrivers => {
+                                hike.hitchersreachdriversfromthehike = hitchersreachdrivers;
+                            })
+                            .catch(rejection => {
+                                logservices.logRejection(rejection);
+                            });
+                        })
+                        .then(() => {
+                            ridesmodules.replacehitcherscannotreachdriver(res, hike);
                             ridesmodules.updateavailableplaces(hikers);
                             logservices.logcalculationresult(hikers);
                         })
                         .then(() => {
                             // public transport for hikers that hadn't left with a ride
-                            ridesmodules.bustohike(hikers, true, hike, res);
+                            ridesmodules.bustohike(true, hike, res);
                         })
                         .then(() => {
                             dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)

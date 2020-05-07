@@ -10,12 +10,14 @@ module.exports = {
     patchridedetails: patchridedetails,
     translateaddresstolocation: translateaddresstolocation,
     findhikerslocation: findhikerslocation,
-    findroute: findroute,
+    findroutecachedb: findroutecachedb,
     bustohike: bustohike,
     carstohike: carstohike,
     makecalculation: makecalculation, 
     updateavailableplaces: updateavailableplaces,
     hikeproperties: hikeproperties,
+    canhitchersreachdrivers: canhitchersreachdrivers,
+    replacehitcherscannotreachdriver: replacehitcherscannotreachdriver,
 };
 
 const HERE_APPID = process.env.HERE_APPID;
@@ -596,17 +598,20 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
     });
 }
 
-function bustohike(hikers, hitcherswithoutdrivers, hike, res) {
+function bustohike(hitcherswithoutdrivers, hike, res) {
     return new Promise((resolve, reject) => {
         var promises = [];
-        for (let index = 0; index < hikers.length; index++) {
-            const hiker = hikers[index];
-            if (!hiker.amidriver && hike.startlatitude && hike.endlatitude &&
+        for (let index = 0; index < hike.hitchers.length; index++) {
+            const hiker = hike.hitchers[index];
+            if (hike.startlatitude && hike.endlatitude &&
                 (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                  hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
                 if (!hiker.mydriverto && !hiker.routetothehike) {
                     promises.push(
                         transporttohikebydirection(hiker, hike, "to", res, "publicTransport")
+                        .then(route => {
+                            hiker.routetothehike = route;
+                        })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
                         })
@@ -615,6 +620,9 @@ function bustohike(hikers, hitcherswithoutdrivers, hike, res) {
                 if (!hiker.mydriverfrom && !hiker.routefromthehike) {
                     promises.push(
                         transporttohikebydirection(hiker, hike, "from", res, "publicTransport")
+                        .then(route => {
+                            hiker.routefromthehike = route;
+                        })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
                         })
@@ -623,7 +631,7 @@ function bustohike(hikers, hitcherswithoutdrivers, hike, res) {
             }
         }
         Promise.all(promises).then(() => {
-            return resolve(hikers);
+            resolve();
         });
     });
 }
@@ -656,15 +664,18 @@ function transporttohikebydirection(hiker, hike, direction, res, mode) {
     });
 }
 
-function carstohike(hikers, hike, res) {
+function carstohike(hike, res) {
     return new Promise((resolve, reject) => {
         var promises = [];
-        for (let index = 0; index < hikers.length; index++) {
-            const hiker = hikers[index];
-            if (hiker.amidriver && hike.startlatitude && hike.endlatitude) {
+        for (let index = 0; index < hike.drivers.length; index++) {
+            const hiker = hike.drivers[index];
+            if (hike.startlatitude && hike.endlatitude) {
                 if (!hiker.routetothehike) {
                     promises.push(
                         transporttohikebydirection(hiker, hike, "to", res, "car")
+                        .then(route => {
+                            hiker.routetothehike = route;
+                        })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
                         })
@@ -673,6 +684,9 @@ function carstohike(hikers, hike, res) {
                 if (!hiker.routefromthehike) {
                     promises.push(
                         transporttohikebydirection(hiker, hike, "from", res, "car")
+                        .then(route => {
+                            hiker.routefromthehike = route;
+                        })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
                         })
@@ -681,47 +695,35 @@ function carstohike(hikers, hike, res) {
             }
         }
         Promise.all(promises).then(() => {
-            return resolve(hikers);
+            return resolve();
         });
     });
 }
 
-function makecalculation(hikers, distances, hike) {
-    for (let index = 0; index < hikers.length; index++) {
-        const hiker = hikers[index];
+function makecalculation(hike) {
+    for (let index = 0; index < hike.hitchers.length; index++) {
+        const hiker = hike.hitchers[index];
         console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
             " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
             " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
 
-        if (!hiker.amidriver && hiker.seatsrequired > 0) {
-            calculateridesbydistanceanddirection(hiker, hike, distances, "to");
-            calculateridesbydistanceanddirection(hiker, hike, distances, "from");
-        }
-    }
-
-    for (let index = 0; index < hikers.length; index++) {
-        const hiker = hikers[index];
-        if (hiker.amidriver && 
-            (hiker.needaride == "אני צריך טרמפ (אבל יש לי רכב)" ||
-             hiker.needaride == "I need a ride but I do have a car")) {
-            
-        }
-    }
-
-    return hikers;
-}
-
-function updateavailableplaces(hikers) {
-    for (let index = 0; index < hikers.length; index++) {
-        const hiker = hikers[index];
-        if (hiker.amidriver) {
-            hiker.availableplaces = hiker.availableplacestothehike < hiker.availableplacesfromthehike ? 
-                hiker.availableplacestothehike : hiker.availableplacesfromthehike;
+        if (hiker.seatsrequired > 0) {
+            calculateridesbydistanceanddirection(hiker, hike, "to");
+            calculateridesbydistanceanddirection(hiker, hike, "from");
         }
     }
 }
 
-function calculateridesbydistanceanddirection(hiker, hike, distances, direction) {
+function updateavailableplaces(hike) {
+    for (let index = 0; index < hike.drivers.length; index++) {
+        const hiker = hike.drivers[index];
+        hiker.availableplaces = hiker.availableplacestothehike < hiker.availableplacesfromthehike ? 
+            hiker.availableplacestothehike : hiker.availableplacesfromthehike;
+    }
+}
+
+function calculateridesbydistanceanddirection(hiker, hike, direction) {
+    var distances = hike.hikersdistances;
     if (!hiker["route"+direction+"thehike"] && hike.startlatitude) {
         for (let neardriverindex = 0; neardriverindex < distances[hiker.phone][direction+"thehike"].length; 
                 neardriverindex++) {
@@ -734,48 +736,9 @@ function calculateridesbydistanceanddirection(hiker, hike, distances, direction)
                 " neardriver.availableplaces"+direction+"thehike " + neardriver["availableplaces"+direction+"thehike"] + 
                 " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
                 neardriver.returnstodetailed);
-            if (neardriver.amidriver && 
-                neardriver["availableplaces"+direction+"thehike"] >= hiker["seatsrequired"+direction+"thehike"]) {
+            if (neardriver["availableplaces"+direction+"thehike"] >= hiker["seatsrequired"+direction+"thehike"]) {
                 if (!hiker["mydriver"+direction]) {
-                    neardriver["availableplaces"+direction+"thehike"]--;
-                    hiker["seatsrequired"+direction+"thehike"]--;
-                    hiker["mydriver"+direction] = {
-                        name: neardriver.name,
-                        fullname: neardriver.fullname,
-                        phone: neardriver.phone,
-                        drivercomesfrom: neardriver.comesfrom,
-                        driverreturnsto: neardriver.returnsto,
-                    };
-                    neardriver["myhitchers"+direction].push({
-                        "hitchername": hiker.name,
-                        "hitcherfullname": hiker.fullname,
-                        "hitcherphone": hiker.phone,
-                        "hitchercomesfrom": hiker.comesfrom,
-                        "hitcherreturnsto": hiker.returnsto,
-                    });
-
-                    hiker["myfriendsdrivers"+direction] = [];
-                    for (let hitchhikerfriendindex = 0; 
-                        hiker.myfriends != null && hitchhikerfriendindex < hiker.myfriends.length; 
-                        hitchhikerfriendindex++) {
-                        const hitchhikerfriend = hiker.myfriends[hitchhikerfriendindex];
-                        hiker["myfriendsdrivers"+direction].push({
-                            "hitchername": hitchhikerfriend,
-                            "drivername": neardriver.name,
-                            "driverfullname": neardriver.fullname,
-                            "driverphone": neardriver.phone,
-                            "drivercomesfrom": neardriver.comesfrom,
-                            "driverreturnsto": neardriver.returnsto,
-                        });
-                        neardriver["myhitchers"+direction].push({
-                            "hitchername": hitchhikerfriend,
-                            "hitcherphone": hiker.phone,
-                            "hitchercomesfrom": hiker.comesfrom,
-                            "hitcherreturnsto": hiker.returnsto,
-                        });
-                        neardriver["availableplaces"+direction+"thehike"]--;
-                        hiker["seatsrequired"+direction+"thehike"]--;
-                    }
+                    addhitchertodriver(hiker, neardriver, direction);
                 }
                 break;
             }
@@ -783,20 +746,351 @@ function calculateridesbydistanceanddirection(hiker, hike, distances, direction)
     }
 }
 
+function canswitchhitchers(res, firsthitcher, firstdriver, secondhitcher, seconddriver, direction, hike) {
+    return new Promise((resolve, reject) => {
+        canhitcherreachdriver(res, firsthitcher, seconddriver, direction, hike)
+        .then(canfirsthitcherswitch => {
+            if (canfirsthitcherswitch) {
+                canhitcherreachdriver(res, secondhitcher, firstdriver, direction, hike)
+                .then(cansecondhitcherswitch => {
+                    if (cansecondhitcherswitch) {
+                        return resolve(true);
+                    }
+                    else {
+                        return resolve(false);
+                    }
+                })
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                });
+            }
+            else {
+                return resolve(false);
+            }
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
+    });
+}
+
+function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
+    return new Promise((resolve, reject) => {
+        var hikerloc;
+        var driverloc;
+        var arrival = null;
+        var depart = null;
+        if (direction == "to") {
+            hikerloc = hiker.comesfromlocation;
+            driverloc = neardriver.comesfromlocation;
+            arrival = (new Date(hike.starttime) - neardriver.routetothehike.traveltime).toLocaleString();
+            console.log("desired arrival to driver " + arrival);
+        }
+        else if (direction == "from") {
+            hikerloc = hiker.returnstolocation;
+            driverloc = neardriver.returnstolocation;
+            depart = (new Date(hike.endtime) + neardriver.routefromthehike.traveltime).toLocaleString();
+            console.log("desired depart from driver " + depart);
+        }
+        findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransport", arrival, depart)
+        .then(routetodriver => {
+            if (routetodriver.length && routetodriver.length < hike.maximumpublictransporttime) {
+                return resolve(true);
+            }
+            else {
+                var driverstops = stopsinthewaytohike(neardriver, hike, direction);
+                removestopshighdeviation(res, neardriver, driverstops, direction, hike, hitcher)
+                .then(driverandhitcherwouldstopat => {
+    //                var driverandhitcherwouldstopat = util.getDistancesToStops(neardriver, driverstops, direction);
+                    console.log("stops " + driverstops.length);
+                    if (driverandhitcherwouldstopat.length > 0) {
+                        return resolve(true);
+                    }
+                    else {
+                        return resolve(false);
+                    }
+                })
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                });
+            }
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
+    });
+}
+
+function removestopshighdeviation(res, driver, stops, direction, hike, hitcher) {
+    var stopsfairdeviation = [];
+    var promises = [];
+    for (let index = 0; index < stops.length; index++) {
+        const stop = stops[index];
+        promises.push(
+            woulddriverstop(res, driver, stop, direction, hike, hitcher)
+            .then(wouldstop => {
+                if (wouldstop) {
+                    stopsfairdeviation.push(stop);
+                }
+            })
+            .catch(rejection => {
+                logservices.logRejection(rejection);
+            })
+        );
+    }
+    Promise.all(promises).then(() => {
+        return resolve(stopsfairdeviation);
+    })
+}
+
+function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, depart, travaltimefromstop) {
+    return new Promise((resolve, reject) => {
+        var startlat = hitcher.comesfromlocation.lat;
+        var startlon = hitcher.comesfromlocation.lon;
+        var endlat = stop.lat;
+        var endlon = stop.lon;
+        if (direction == "from") {
+            startlat = stop.lat;
+            startlon = stop.lon;
+            endlat = hitcher.returnstolocation.lat;
+            endlon = hitcher.returnstolocation.lon;
+        }
+        findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart)
+        .then(routetostop => {
+            if (routetostop.traveltime) {
+                if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime) {
+                    return resolve(true);
+                }
+                else {
+                    return resolve(false);
+                }
+            }
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
+    });
+}
+
+function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
+    return new Promise((resolve, reject) => {
+        var arrival = hike.starttime;
+        var depart = null;
+        var startlat = driver.comesfromlocation.lat;
+        var startlon = driver.comesfromlocation.lon;
+        var endlat = hike.startlatitude;
+        var endlon = hike.startlongitude;
+        if (direction == "from") {
+            startlat = hike.endlatitude;
+            startlon = hike.startlongitude;
+            endlat = driver.returnstolocation.lat;
+            endlon = driver.returnstolocation.lon;
+            arrival = null;
+            depart = hike.endtime;
+        }
+        findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, stop.lat, stop.lon)
+        .then(routethroughstop => {
+            if (routethroughstop.traveltime) {
+                var additionaltime = routethroughstop.traveltime - driver["route"+direction+"thehike"].traveltime;
+                if (additionaltime <= hike.maximumcardeviation) {
+                    arrival = null;
+                    depart = null;
+                    if (direction == "to") {
+                        depart = (new Date(hike.starttime) - routethroughstop.traveltime).toLocaleString();
+                        endlat = stop.lat;
+                        endlon = stop.lon;
+                    }
+                    else if (direction == "from") {
+                        arrival = (new Date(hike.endtime) + routethroughstop.traveltime).toLocaleString();
+                        startlat = stop.lat;
+                        startlon = stop.lon;
+                    }
+                    findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart)
+                    .then(routetostop => {
+                        var travaltimefromstop = routethroughstop.traveltime - routetostop.traveltime;
+                        if (direction == "to") {
+                            arrival = (new Date(depart) + routetostop.traveltime).toLocaleString();
+                        }
+                        else if (direction == "from") {
+                            depart = (new Date(arrival) - routetostop.traveltime).toLocaleString();
+                        }
+                        wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, depart, travaltimefromstop)
+                        .then(hitcherwouldcome => {
+                            return resolve(hitcherwouldcome);
+                        })
+                        .catch(rejection => {
+                            logservices.logRejection(rejection);
+                        });
+                    })
+                    .catch(rejection => {
+                        logservices.logRejection(rejection);
+                    });
+                }
+                else {
+                    return resolve(false);
+                }
+            }
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
+    });
+}
+
+function switchhitchers(firsthitcher, firstdriver, secondhitcher, seconddriver, direction) {
+    firsthitcher["mydriver"+direction] = {
+        name: seconddriver.name,
+        fullname: seconddriver.fullname,
+        phone: seconddriver.phone,
+        drivercomesfrom: seconddriver.comesfrom,
+        driverreturnsto: seconddriver.returnsto,
+        link: seconddriver,
+    };
+    secondhitcher["mydriver"+direction] = {
+        name: firstdriver.name,
+        fullname: firstdriver.fullname,
+        phone: firstdriver.phone,
+        drivercomesfrom: firstdriver.comesfrom,
+        driverreturnsto: firstdriver.returnsto,
+        link: firstdriver,
+    };
+
+    for (let index = 0; index < firstdriver["myhitchers"+direction].length; index++) {
+        const hitcher = firstdriver["myhitchers"+direction][index];
+        if (hitcher.phone == firsthitcher.phone) {
+            firstdriver["myhitchers"+direction].splice(index, 1);
+            index--;
+        }
+    }
+    for (let index = 0; index < seconddriver["myhitchers"+direction].length; index++) {
+        const hitcher = seconddriver["myhitchers"+direction][index];
+        if (hitcher.phone == secondhitcher.phone) {
+            seconddriver["myhitchers"+direction].splice(index, 1);
+            index--;
+        }
+    }
+
+    firstdriver["myhitchers"+direction].push({
+        "hitchername": secondhitcher.name,
+        "hitcherfullname": secondhitcher.fullname,
+        "hitcherphone": secondhitcher.phone,
+        "hitchercomesfrom": secondhitcher.comesfrom,
+        "hitcherreturnsto": secondhitcher.returnsto,
+    });
+    seconddriver["myhitchers"+direction].push({
+        "hitchername": firsthitcher.name,
+        "hitcherfullname": firsthitcher.fullname,
+        "hitcherphone": firsthitcher.phone,
+        "hitchercomesfrom": firsthitcher.comesfrom,
+        "hitcherreturnsto": firsthitcher.returnsto,
+    });
+
+
+    firsthitcher["myfriendsdrivers"+direction] = [];
+    secondhitcher["myfriendsdrivers"+direction] = [];
+    for (let hitchhikerfriendindex = 0; 
+        firsthitcher.myfriends != null && hitchhikerfriendindex < firsthitcher.myfriends.length; 
+        hitchhikerfriendindex++) {
+        const hitchhikerfriend = firsthitcher.myfriends[hitchhikerfriendindex];
+        firsthitcher["myfriendsdrivers"+direction].push({
+            "hitchername": hitchhikerfriend,
+            "drivername": seconddriver.name,
+            "driverfullname": seconddriver.fullname,
+            "driverphone": seconddriver.phone,
+            "drivercomesfrom": seconddriver.comesfrom,
+            "driverreturnsto": seconddriver.returnsto,
+        });
+        seconddriver["myhitchers"+direction].push({
+            "hitchername": hitchhikerfriend,
+            "hitcherphone": firsthitcher.phone,
+            "hitchercomesfrom": firsthitcher.comesfrom,
+            "hitcherreturnsto": firsthitcher.returnsto,
+        });
+    }
+    for (let hitchhikerfriendindex = 0; 
+        secondhitcher.myfriends != null && hitchhikerfriendindex < secondhitcher.myfriends.length; 
+        hitchhikerfriendindex++) {
+        const hitchhikerfriend = secondhitcher.myfriends[hitchhikerfriendindex];
+        secondhitcher["myfriendsdrivers"+direction].push({
+            "hitchername": hitchhikerfriend,
+            "drivername": firstdriver.name,
+            "driverfullname": firstdriver.fullname,
+            "driverphone": firstdriver.phone,
+            "drivercomesfrom": firstdriver.comesfrom,
+            "driverreturnsto": firstdriver.returnsto,
+        });
+        firstdriver["myhitchers"+direction].push({
+            "hitchername": hitchhikerfriend,
+            "hitcherphone": secondhitcher.phone,
+            "hitchercomesfrom": secondhitcher.comesfrom,
+            "hitcherreturnsto": secondhitcher.returnsto,
+        });
+    }
+}
+
+function addhitchertodriver(hiker, neardriver, direction)
+{
+    neardriver["availableplaces"+direction+"thehike"]--;
+    hiker["seatsrequired"+direction+"thehike"]--;
+    hiker["mydriver"+direction] = {
+        name: neardriver.name,
+        fullname: neardriver.fullname,
+        phone: neardriver.phone,
+        drivercomesfrom: neardriver.comesfrom,
+        driverreturnsto: neardriver.returnsto,
+        link: neardriver,
+    };
+    neardriver["myhitchers"+direction].push({
+        "hitchername": hiker.name,
+        "hitcherfullname": hiker.fullname,
+        "hitcherphone": hiker.phone,
+        "hitchercomesfrom": hiker.comesfrom,
+        "hitcherreturnsto": hiker.returnsto,
+    });
+
+    hiker["myfriendsdrivers"+direction] = [];
+    for (let hitchhikerfriendindex = 0; 
+        hiker.myfriends != null && hitchhikerfriendindex < hiker.myfriends.length; 
+        hitchhikerfriendindex++) {
+        const hitchhikerfriend = hiker.myfriends[hitchhikerfriendindex];
+        hiker["myfriendsdrivers"+direction].push({
+            "hitchername": hitchhikerfriend,
+            "drivername": neardriver.name,
+            "driverfullname": neardriver.fullname,
+            "driverphone": neardriver.phone,
+            "drivercomesfrom": neardriver.comesfrom,
+            "driverreturnsto": neardriver.returnsto,
+        });
+        neardriver["myhitchers"+direction].push({
+            "hitchername": hitchhikerfriend,
+            "hitcherphone": hiker.phone,
+            "hitchercomesfrom": hiker.comesfrom,
+            "hitcherreturnsto": hiker.returnsto,
+        });
+        neardriver["availableplaces"+direction+"thehike"]--;
+        hiker["seatsrequired"+direction+"thehike"]--;
+    }
+}
+
 function hikeproperties(hike, hikers) {
+    hike.drivers = [];
+    hike.hitchers = [];
+    for (let index = 0; index < hikers.length; index++) {
+        const hiker = hikers[index];
+        if (hiker.amidriver) {
+            hike.drivers.push(hike);
+        }
+        else {
+            hike.hitchers.push(hike);
+        }
+    }
     if (hike.startlatitude) {
         var hikestartenddistance = util.distanceLatLons(
             hike.startlatitude, hike.startlongitude, hike.endlatitude, hike.endlongitude);
         hike.iscircular = hikestartenddistance < 500 ? true : false;
         hike.minimumcarstoleave = 0;
         if (!hike.iscircular) {
-            for (let index = 0; index < hikers.length; index++) {
-                const hiker = hikers[index];
-                if (hiker.amidriver) {
-                    hike.minimumcarstoleave++;
-                }
-            }
-            hike.minimumcarstoleave /= 3;
+            hike.minimumcarstoleave = hike.drivers.length / 3;
         }
     }
     if (hike.starttime) {
@@ -805,32 +1099,80 @@ function hikeproperties(hike, hikers) {
         hike.duration = endtime - starttime;
         hike.maximumpublictransporttime = hike.duration / 3;
     }
+    hike.maximumcardeviation = 15;
 }
 
-function stopsinthewaytohike(hiker, hike, direction) {
+function canhitchersreachdrivers(res, hike, direction) {
+    return new Promise((resolve, reject) => {
+        var hitchersreachdrivers = {
+            can: [],
+            cant: [],
+        };
+        var promises = [];
+        for (let index = 0; index < hike.hitchers.length; index++) {
+            const hiker = hike.hitchers[index];
+            if (hiker["mydriver" + direction]) {
+                promises.push(
+                    canhitcherreachdriver(res, hiker, hiker["mydriver" + direction].link, direction, hike)
+                    .then(resultcanreachdriver => {
+                        if (resultcanreachdriver) {
+                            hitchersreachdrivers.can.push(hiker);
+                        }
+                        else {
+                            hitchersreachdrivers.cant.push(hiker);
+                        }
+                    })
+                    .catch(rejection => {
+                        logservices.logRejection(rejection);
+                    })
+                );
+            }
+        }
+        Promise.all(promises).then(() => {
+            return resolve(hitchersreachdrivers);
+        });
+    });
+}
+
+function replacehitcherscannotreachdriver(res, hike) {
+    return new Promise((resolve, reject) => {
+        if (hitchersreachdriver && hitchersreachdriver.can.length == hike.hitchers.length) {
+            return resolve();
+        }
+        else if (hitchersreachdriver.nooption.length + hitchersreachdriver.can.length == hike.hitchers.length) {
+            return resolve();
+        }
+        canhitchersreachdrivers(res, hike, "to")
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
+    });
+}
+
+function stopsinthewaytohike(driver, hike, direction) {
     if (direction == "to") {
-        if (hiker.comesfromlocation && hike.startlatitude) {
+        if (driver.comesfromlocation && hike.startlatitude) {
             return stopsinrectangle(
-                hiker.comesfromlocation.lat, hiker.comesfromlocation.lon, hike.startlatitude, hike.startlongitude
+                driver.comesfromlocation.lat, driver.comesfromlocation.lon, hike.startlatitude, hike.startlongitude
             );
         }
     }
     else if (direction == "from") {
-        if (hiker.returnstolocation && hike.startlatitude) {
+        if (driver.returnstolocation && hike.startlatitude) {
             return stopsinrectangle(
-                hiker.returnstolocation.lat, hiker.returnstolocation.lon, hike.endlatitude, hike.endlongitude
+                driver.returnstolocation.lat, driver.returnstolocation.lon, hike.endlatitude, hike.endlongitude
             );
         }
     }
-    return [];
+    return null;
 }
 
-function stopsinrectangle(startlat, startlon, endlat, endlon) {
+function stopsinrectangle(driverlat, driverlon, hikelat, hikelon) {
     var stopsinarea = [];
     for (let index = 0; index < stops.length; index++) {
         const stop = stops[index];
-        if ((startlat < stop.lat < endlat || startlat > stop.lat > endlat) &&
-            (startlon < stop.lon < endlon || startlon > stop.lon > endlon)) {
+        if ((driverlat < stop.lat < hikelat || driverlat > stop.lat > hikelat) &&
+            (driverlon < stop.lon < hikelon || driverlon > stop.lon > hikelon)) {
             stopsinarea.push(stop);
         }
     }
