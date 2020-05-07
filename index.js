@@ -733,10 +733,8 @@ app.post("/api/lastregister", function(req, res) {
                         "i approve": formObj["i approve"],
                     };
                     console.log("registerObj: " + JSON.stringify(registerObj));
-                    console.log("AAA");
                     dbservices.insertnewlastregister(res, registerObj)
                     .then(() => {
-                        console.log("AAA++");
                         res.status(200).json("success");
                     })
                     .catch(rejection => {
@@ -823,11 +821,9 @@ app.post("/api/lastregister", function(req, res) {
                         "i approve": formObj["i approve"],
                     };
                     console.log("registerObj: " + JSON.stringify(registerObj));
-                    console.log("BBB");
 
                     dbservices.replaceonelastregister(res, phonenumber, registerObj)
                     .then(() => {
-                        console.log("BBB+++");
                         res.status(200).json("success");
                     })
                     .catch(rejection => {
