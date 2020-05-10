@@ -19,7 +19,10 @@ class Queue {
               resolve,
               reject,
           });
-          this.dequeue();
+          this.dequeue()
+          .catch(rejection => {
+            logservices.logRejection(rejection);
+          });
       });
     }
   
