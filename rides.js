@@ -676,7 +676,7 @@ function carstohike(hike, res) {
             if (hike.startlatitude && hike.endlatitude) {
                 console.log("carstohike hiker.routetothehike " + hiker.routetothehike);
                 console.log("carstohike hiker.routefromthehike " + hiker.routefromthehike);
-                if (!hiker.routetothehike) {
+                if (!hiker.routetothehike && hiker.comesfromlocation) {
                     promises.push(
                         transporttohikebydirection(hiker, hike, "to", res, "car")
                         .then(route => {
@@ -687,7 +687,7 @@ function carstohike(hike, res) {
                         })
                     );
                 }
-                if (!hiker.routefromthehike) {
+                if (!hiker.routefromthehike && hiker.returnstolocation) {
                     promises.push(
                         transporttohikebydirection(hiker, hike, "from", res, "car")
                         .then(route => {
