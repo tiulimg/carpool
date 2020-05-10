@@ -639,6 +639,7 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
 
 function transporttohikebydirection(hiker, hike, direction, res, mode) {
     return new Promise((resolve, reject) => {
+        console.log("transporttohikebydirection hiker " + JSON.stringify(hiker));
         console.log(mode + " " + direction + " the hike for hiker " + hiker.fullname);
         var arrival = hike.starttime;
         var depart = null;
@@ -668,14 +669,9 @@ function transporttohikebydirection(hiker, hike, direction, res, mode) {
 function carstohike(hike, res) {
     return new Promise((resolve, reject) => {
         var promises = [];
-        console.log("carstohike hike.drivers.length " + hike.drivers.length);
-        console.log("carstohike hike.startlatitude && hike.endlatitude " + hike.startlatitude + " " + hike.endlatitude);
-
         for (let index = 0; index < hike.drivers.length; index++) {
             const hiker = hike.drivers[index];
             if (hike.startlatitude && hike.endlatitude) {
-                console.log("carstohike hiker.routetothehike " + hiker.routetothehike);
-                console.log("carstohike hiker.routefromthehike " + hiker.routefromthehike);
                 if (!hiker.routetothehike && hiker.comesfromlocation) {
                     promises.push(
                         transporttohikebydirection(hiker, hike, "to", res, "car")

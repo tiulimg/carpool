@@ -2548,8 +2548,6 @@ app.patch("/api/calculaterides", function(req, res) {
                     if (hikers && hikers.length > 0){
                         console.log("start calculation for " + hike.hikenamehebrew);
                         ridesmodules.hikeproperties(hike, hikers);
-                        console.log("index hike.drivers.length " + hike.drivers.length);
-                        console.log("index hike.hitchers.length " + hike.hitchers.length);
                         ridesmodules.findhikerslocation(hikers)
                         .then(() => {
                             // public transport for hikers that don't need a ride
