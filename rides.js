@@ -1116,10 +1116,10 @@ function hikeproperties(hike, hikers) {
     for (let index = 0; index < hikers.length; index++) {
         const hiker = hikers[index];
         if (hiker.amidriver) {
-            hike.drivers.push(hike);
+            hike.drivers.push(hiker);
         }
         else {
-            hike.hitchers.push(hike);
+            hike.hitchers.push(hiker);
         }
     }
     if (hike.startlatitude) {
