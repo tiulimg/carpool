@@ -394,7 +394,7 @@ function getDistancesBetweenHikers(hikers) {
 
     }
 
-    logservices.loghikersdistances(distances);
+    //logservices.loghikersdistances(distances);
 
     return distances;
 }

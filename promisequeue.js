@@ -1,3 +1,5 @@
+var logservices = require("./logservices");
+
 module.exports = {
     enqueue: enqueue,
 };
@@ -44,6 +46,7 @@ class Queue {
           })
       } catch (err) {
         this.workingOnPromise = false;
+        logservices.logRejection(rejection);
         item.reject(err);
         this.dequeue();
       }

@@ -2548,14 +2548,15 @@ app.patch("/api/calculaterides", function(req, res) {
                     if (hikers && hikers.length > 0){
                         console.log("start calculation for " + hike.hikenamehebrew);
                         ridesmodules.hikeproperties(hike, hikers);
-                        console.log("hike.hitchers.length " + hike.hitchers.length);
+                        console.log("index hike.drivers.length " + hike.drivers.length);
+                        console.log("index hike.hitchers.length " + hike.hitchers.length);
                         ridesmodules.findhikerslocation(hikers)
                         .then(() => {
                             // public transport for hikers that don't need a ride
-                            ridesmodules.bustohike(false, hike, res);
+                            return ridesmodules.bustohike(false, hike, res);
                         })
                         .then(() => {
-                            ridesmodules.carstohike(hike, res);
+                            return ridesmodules.carstohike(hike, res);
                         })
                         .then(() => {
                             console.log("calculaterides getDistancesBetweenHikers");
@@ -2569,8 +2570,6 @@ app.patch("/api/calculaterides", function(req, res) {
                         // })
                         // .then(() => {
                             ridesmodules.fillavailableplaces(res, hike);
-                        })
-                        .then(() => {
                             Queuemodule.enqueue(() => {
                                 ridesmodules.updateavailableplaces(hike);
                                 logservices.logcalculationresult(hikers);
@@ -2578,13 +2577,9 @@ app.patch("/api/calculaterides", function(req, res) {
                                 // public transport for hikers that hadn't left with a ride
                                 ridesmodules.bustohike(true, hike, res);
                             });
-                        })
-                        .then(() => {
                             Queuemodule.enqueue(() => {
                                 dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
                             });
-                        })
-                        .then(() => {
                             Queuemodule.enqueue(() => {
                                 register.updateCarpool(res);
                             });
