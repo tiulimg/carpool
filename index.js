@@ -1,7 +1,6 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
-var Promise = require('promise');
 var moment = require("moment");
 var fs = require('fs');
 
@@ -12,6 +11,7 @@ var replies = require("./replies");
 var register = require("./register_to_hikes");
 var ridesmodules = require("./rides");
 var util = require("./util");
+var Queue = require("./promisequeue");
 var wanttomodify_obj = JSON.parse(fs.readFileSync('./wanttomodifytexts.json', 'utf8'));
 
 var ObjectID = mongodb.ObjectID;
@@ -2561,35 +2561,32 @@ app.patch("/api/calculaterides", function(req, res) {
                             hike.hikersdistances = util.getDistancesBetweenHikers(hikers);
                             //var areas = util.getHikerAreas(hikers);
 
-                            ridesmodules.makecalculation(hike);
+                        //     ridesmodules.makecalculation(hike);
+                        // })
+                        // .then(() => {
+                        //     ridesmodules.switchhitcherscannotreachdriver(res, hike);
+                        // })
+                        // .then(() => {
+                            ridesmodules.fillavailableplaces(res, hike);
                         })
                         .then(() => {
-                            ridesmodules.canhitchersreachdrivers(res, hike, "to")
-                            .then(hitchersreachdrivers => {
-                                hike.hitchersreachdriverstothehike = hitchersreachdrivers;
-                                return ridesmodules.canhitchersreachdrivers(res, hike, "from");
-                            })
-                            .then(hitchersreachdrivers => {
-                                hike.hitchersreachdriversfromthehike = hitchersreachdrivers;
-                            })
-                            .catch(rejection => {
-                                logservices.logRejection(rejection);
+                            Queue.enqueue(() => {
+                                ridesmodules.updateavailableplaces(hikers);
+                                logservices.logcalculationresult(hikers);
+
+                                // public transport for hikers that hadn't left with a ride
+                                ridesmodules.bustohike(true, hike, res);
                             });
                         })
                         .then(() => {
-                            ridesmodules.replacehitcherscannotreachdriver(res, hike);
-                            ridesmodules.updateavailableplaces(hikers);
-                            logservices.logcalculationresult(hikers);
+                            Queue.enqueue(() => {
+                                dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
+                            });
                         })
                         .then(() => {
-                            // public transport for hikers that hadn't left with a ride
-                            ridesmodules.bustohike(true, hike, res);
-                        })
-                        .then(() => {
-                            dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
-                        })
-                        .then(() => {
-                            register.updateCarpool(res);
+                            Queue.enqueue(() => {
+                                register.updateCarpool(res);
+                            });
                         })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
