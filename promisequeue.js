@@ -1,4 +1,4 @@
-export default class Queue {
+class Queue {
     static queue = [];
     static pendingPromise = false;
   

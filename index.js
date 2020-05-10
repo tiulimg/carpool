@@ -5,13 +5,13 @@ var moment = require("moment");
 var fs = require('fs');
 
 // Custom modules
-import Queue from "./promisequeue";
 var dbservices = require("./dbservices");
 var logservices = require("./logservices");
 var replies = require("./replies");
 var register = require("./register_to_hikes");
 var ridesmodules = require("./rides");
 var util = require("./util");
+var Queue = require("./promisequeue");
 var wanttomodify_obj = JSON.parse(fs.readFileSync('./wanttomodifytexts.json', 'utf8'));
 
 var ObjectID = mongodb.ObjectID;
