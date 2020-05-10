@@ -1279,7 +1279,7 @@ function fillavailableplaces(res, hike) {
                 " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
     
             if (hiker.seatsrequired > 0) {
-                Queuemodule.Queue.enqueue(() => {
+                Queuemodule.enqueue(() => {
                     calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to");
                     calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "from");
                 });

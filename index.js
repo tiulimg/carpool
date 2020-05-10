@@ -2570,7 +2570,7 @@ app.patch("/api/calculaterides", function(req, res) {
                             ridesmodules.fillavailableplaces(res, hike);
                         })
                         .then(() => {
-                            Queuemodule.Queue.enqueue(() => {
+                            Queuemodule.enqueue(() => {
                                 ridesmodules.updateavailableplaces(hikers);
                                 logservices.logcalculationresult(hikers);
 
@@ -2579,12 +2579,12 @@ app.patch("/api/calculaterides", function(req, res) {
                             });
                         })
                         .then(() => {
-                            Queuemodule.Queue.enqueue(() => {
+                            Queuemodule.enqueue(() => {
                                 dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
                             });
                         })
                         .then(() => {
-                            Queuemodule.Queue.enqueue(() => {
+                            Queuemodule.enqueue(() => {
                                 register.updateCarpool(res);
                             });
                         })

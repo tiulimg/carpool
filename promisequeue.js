@@ -1,3 +1,11 @@
+module.exports = {
+    enqueue: enqueue,
+};
+
+function enqueue(promise) {
+    Queue.enqueue(promise);
+}
+
 class Queue {
     static queue = [];
     static pendingPromise = false;
