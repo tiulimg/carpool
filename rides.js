@@ -537,8 +537,8 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                         middlelat: middlelat,
                         middlelon: middlelon,
                         mode: mode,
-                        arrival: arrival,
-                        depart: depart,
+                        arrival: arrivaltime,
+                        depart: departtime,
                     };
                     return resolve(route);
                 }
