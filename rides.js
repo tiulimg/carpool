@@ -5,7 +5,7 @@ var dbservices = require("./dbservices");
 var logservices = require("./logservices");
 var register = require("./register_to_hikes");
 var util = require("./util");
-var Queue = require("./promisequeue");
+var Queuemodule = require("./promisequeue");
 
 module.exports = {
     patchridedetails: patchridedetails,
@@ -1272,13 +1272,14 @@ function stopsinrectangle(driverlat, driverlon, hikelat, hikelon) {
 function fillavailableplaces(res, hike) {
     return new Promise((resolve, reject) => {
         for (let index = 0; index < hike.hitchers.length; index++) {
+            console.log("hiker " + JSON.stringify(hiker));
             const hiker = hike.hitchers[index];
             console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
                 " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
                 " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
     
             if (hiker.seatsrequired > 0) {
-                Queue.enqueue(() => {
+                Queuemodule.Queue.enqueue(() => {
                     calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to");
                     calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "from");
                 });

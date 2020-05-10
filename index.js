@@ -11,7 +11,7 @@ var replies = require("./replies");
 var register = require("./register_to_hikes");
 var ridesmodules = require("./rides");
 var util = require("./util");
-var Queue = require("./promisequeue");
+var Queuemodule = require("./promisequeue");
 var wanttomodify_obj = JSON.parse(fs.readFileSync('./wanttomodifytexts.json', 'utf8'));
 
 var ObjectID = mongodb.ObjectID;
@@ -2570,7 +2570,7 @@ app.patch("/api/calculaterides", function(req, res) {
                             ridesmodules.fillavailableplaces(res, hike);
                         })
                         .then(() => {
-                            Queue.enqueue(() => {
+                            Queuemodule.Queue.enqueue(() => {
                                 ridesmodules.updateavailableplaces(hikers);
                                 logservices.logcalculationresult(hikers);
 
@@ -2579,12 +2579,12 @@ app.patch("/api/calculaterides", function(req, res) {
                             });
                         })
                         .then(() => {
-                            Queue.enqueue(() => {
+                            Queuemodule.Queue.enqueue(() => {
                                 dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
                             });
                         })
                         .then(() => {
-                            Queue.enqueue(() => {
+                            Queuemodule.Queue.enqueue(() => {
                                 register.updateCarpool(res);
                             });
                         })
