@@ -639,7 +639,7 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
 
 function transporttohikebydirection(hiker, hike, direction, res, mode) {
     return new Promise((resolve, reject) => {
-        console.log("transporttohikebydirection hiker " + JSON.stringify(hiker));
+        console.log("transporttohikebydirection hiker " + hiker.name + " " + hiker.phone);
         console.log(mode + " " + direction + " the hike for hiker " + hiker.fullname);
         var arrival = hike.starttime;
         var depart = null;
