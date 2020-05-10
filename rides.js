@@ -506,7 +506,6 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             else
             {
                 var responsebodyjson = JSON.parse(response.body);
-                console.log("responsebodyjson " + JSON.stringify(responsebodyjson));
                 //console.log("calculatecarroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
                     return resolve("No route found");
