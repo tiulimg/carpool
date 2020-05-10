@@ -1,7 +1,7 @@
 var mongodb = require("mongodb");
 var Promise = require('promise');
 
-var util = require("./util");
+var tools = require("./tools");
 
 module.exports = {
     initialize: initialize,
@@ -201,7 +201,7 @@ function gethikes(res) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to get hikes.");
             } else {
-                docs = util.sort_hikes(docs, false);
+                docs = tools.sort_hikes(docs, false);
                 return resolve(docs);
             }
         });

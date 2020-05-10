@@ -1,7 +1,7 @@
 var dbservices = require("./dbservices");
 var logservices = require("./logservices");
 var replies = require("./replies");
-var util = require("./util");
+var tools = require("./tools");
 
 module.exports = {
     register_to_hikes: register_to_hikes,
@@ -191,8 +191,8 @@ function sendForm(formId, body, language, recast_reply, res, memory, edit)
 
 function setAvailableHikesReply(recast_conversation_reply, hikes, lang, title)
 {
-    hikes = util.remove_past_hikes(hikes, false);
-    hikes = util.sort_hikes(hikes, false);
+    hikes = tools.remove_past_hikes(hikes, false);
+    hikes = tools.sort_hikes(hikes, false);
 
     if (title == null) {
         title = replies.get_conversation_string("WHICH_HIKE_REGISTER", lang);
@@ -226,8 +226,8 @@ function setAvailableHikesReply(recast_conversation_reply, hikes, lang, title)
 
 function setAvailableHikesReplyBut(recast_conversation_reply, hikes, lang, selectedHikes)
 {
-    hikes = util.remove_past_hikes(hikes, false);
-    hikes = util.sort_hikes(hikes, false);
+    hikes = tools.remove_past_hikes(hikes, false);
+    hikes = tools.sort_hikes(hikes, false);
 
     var title = replies.get_conversation_string("SELECT_MORE_HIKES", lang);
     recast_conversation_reply = replies.push_quick_reply_to_recast(recast_conversation_reply, title);

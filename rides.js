@@ -4,7 +4,7 @@ var request = require('request');
 var dbservices = require("./dbservices");
 var logservices = require("./logservices");
 var register = require("./register_to_hikes");
-var util = require("./util");
+var tools = require("./tools");
 var Queuemodule = require("./promisequeue");
 
 module.exports = {
@@ -35,13 +35,13 @@ var stops = JSON.parse(fs.readFileSync('./stopsparser/meetingpoints.json', 'utf8
 function patchridedetails(req, res, replies)
 {
     var memory = req.body.conversation.memory;
-    if (util.checkpwd(res, memory.pwd)) {
-        var language = util.set_language(memory);
+    if (tools.checkpwd(res, memory.pwd)) {
+        var language = tools.set_language(memory);
         dbservices.gethikes()
         .then(docs => {
             var nowstring = docs[0].lastupdate;
             var phonenumber = req.params.phone;
-            phonenumber = util.normalize_phonenumber(phonenumber);
+            phonenumber = tools.normalize_phonenumber(phonenumber);
             var selectedhike = memory.selectedhike;
             var hiketodate = selectedhike.match(/\d{1,2}\.\d{1,2}\.\d{2}/g)[0];
             console.log("hiketodate " + hiketodate);
@@ -429,7 +429,7 @@ function findhikerslocation(hikers) {
             const hiker = hikers[hikerindex];
             if (!hiker.comesfromlocation) {
                 promises.push(
-                    util.wait(100*timer)
+                    tools.wait(100*timer)
                     .then(() => {
                         return translateaddresstolocation(hiker.comesfromdetailed);
                     })
@@ -446,7 +446,7 @@ function findhikerslocation(hikers) {
             }
             if (!hiker.returnstolocation) {
                 promises.push(
-                    util.wait(100*timer)
+                    tools.wait(100*timer)
                     .then(() => {
                         return translateaddresstolocation(hiker.returnstodetailed);
                     })
@@ -1122,7 +1122,7 @@ function hikeproperties(hike, hikers) {
         }
     }
     if (hike.startlatitude) {
-        var hikestartenddistance = util.distanceLatLons(
+        var hikestartenddistance = tools.distanceLatLons(
             hike.startlatitude, hike.startlongitude, hike.endlatitude, hike.endlongitude);
         hike.iscircular = hikestartenddistance < 500 ? true : false;
         hike.minimumcarstoleave = 0;
