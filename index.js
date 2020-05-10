@@ -2548,6 +2548,7 @@ app.patch("/api/calculaterides", function(req, res) {
                     if (hikers && hikers.length > 0){
                         console.log("start calculation for " + hike.hikenamehebrew);
                         ridesmodules.hikeproperties(hike, hikers);
+                        console.log("hike.hitchers.length " + hike.hitchers.length);
                         ridesmodules.findhikerslocation(hikers)
                         .then(() => {
                             // public transport for hikers that don't need a ride
@@ -2571,7 +2572,7 @@ app.patch("/api/calculaterides", function(req, res) {
                         })
                         .then(() => {
                             Queuemodule.enqueue(() => {
-                                ridesmodules.updateavailableplaces(hikers);
+                                ridesmodules.updateavailableplaces(hike);
                                 logservices.logcalculationresult(hikers);
 
                                 // public transport for hikers that hadn't left with a ride

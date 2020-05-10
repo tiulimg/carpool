@@ -1271,6 +1271,7 @@ function stopsinrectangle(driverlat, driverlon, hikelat, hikelon) {
 
 function fillavailableplaces(res, hike) {
     return new Promise((resolve, reject) => {
+        console.log("hike.hitchers.length " + hike.hitchers.length);
         for (let index = 0; index < hike.hitchers.length; index++) {
             console.log("hiker " + JSON.stringify(hiker));
             const hiker = hike.hitchers[index];
@@ -1285,6 +1286,7 @@ function fillavailableplaces(res, hike) {
                 });
             }
         }
+        return resolve();
     });
 }
 
