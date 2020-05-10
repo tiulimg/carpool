@@ -5,7 +5,7 @@ var dbservices = require("./dbservices");
 var logservices = require("./logservices");
 var register = require("./register_to_hikes");
 var util = require("./util");
-var Queue = require("./promisequeue");
+import Queue from "./promisequeue";
 
 module.exports = {
     patchridedetails: patchridedetails,
