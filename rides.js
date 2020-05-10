@@ -640,7 +640,6 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
 
 function transporttohikebydirection(hiker, hike, direction, res, mode) {
     return new Promise((resolve, reject) => {
-        console.log("transporttohikebydirection hiker " + util.inspect(hiker));
         console.log(mode + " " + direction + " the hike for hiker " + hiker.fullname);
         var arrival = hike.starttime;
         var depart = null;
@@ -672,7 +671,6 @@ function carstohike(hike, res) {
         var promises = [];
         for (let index = 0; index < hike.drivers.length; index++) {
             const hiker = hike.drivers[index];
-            console.log("carstohike hiker " + util.inspect(hiker));
 
             if (hike.startlatitude && hike.endlatitude) {
                 if (!hiker.routetothehike && hiker.comesfromlocation) {
@@ -1278,7 +1276,6 @@ function fillavailableplaces(res, hike) {
         console.log("fillavailableplaces hike.hitchers.length " + hike.hitchers.length);
         for (let index = 0; index < hike.hitchers.length; index++) {
             const hiker = hike.hitchers[index];
-            console.log("fillavailableplaces hiker " + util.inspect(hiker));
             console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
                 " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
                 " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
