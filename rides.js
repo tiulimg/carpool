@@ -669,10 +669,13 @@ function carstohike(hike, res) {
     return new Promise((resolve, reject) => {
         var promises = [];
         console.log("carstohike hike.drivers.length " + hike.drivers.length);
+        console.log("carstohike hike.startlatitude && hike.endlatitude " + hike.startlatitude + " " + hike.endlatitude);
 
         for (let index = 0; index < hike.drivers.length; index++) {
             const hiker = hike.drivers[index];
             if (hike.startlatitude && hike.endlatitude) {
+                console.log("carstohike hiker.routetothehike " + hiker.routetothehike);
+                console.log("carstohike hiker.routefromthehike " + hiker.routefromthehike);
                 if (!hiker.routetothehike) {
                     promises.push(
                         transporttohikebydirection(hiker, hike, "to", res, "car")
