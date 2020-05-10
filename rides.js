@@ -671,6 +671,8 @@ function carstohike(hike, res) {
         var promises = [];
         for (let index = 0; index < hike.drivers.length; index++) {
             const hiker = hike.drivers[index];
+            console.log("carstohike hiker " + hiker.name + " " + hiker.phone + " " + hiker.fullname);
+
             if (hike.startlatitude && hike.endlatitude) {
                 if (!hiker.routetothehike && hiker.comesfromlocation) {
                     promises.push(
