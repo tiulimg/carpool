@@ -464,7 +464,6 @@ function findhikerslocation(hikers) {
 
             timer++;
         }
-        promises = promises.map(promise => promise());
         Promise.all(promises).then(() => {
             return resolve(hikers);
         });
@@ -632,7 +631,6 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
                 }
             }
         }
-        promises = promises.map(promise => promise());
         Promise.all(promises).then(() => {
             return resolve();
         });
@@ -702,8 +700,6 @@ function carstohike(hike, res) {
                 }
             }
         }
-        
-        promises = promises.map(promise => promise());
         Promise.all(promises).then(() => {
             return resolve();
         });
@@ -860,8 +856,6 @@ function removestopshighdeviation(res, driver, stops, direction, hike, hitcher) 
                 })
             );
         }
-
-        promises = promises.map(promise => promise());
         Promise.all(promises).then(() => {
             return resolve(stopsfairdeviation);
         })
@@ -1194,7 +1188,6 @@ function switchhitcherscannotreachdriver(res, hike) {
                 })
             );
         }
-        promises = promises.map(promise => promise());
         Promise.all(promises).then(() => {
             return resolve();
         })
@@ -1229,7 +1222,6 @@ function switchhitcherscannotreachdriverbydirection(res, hitcher, direction, hik
                             );
                         }
                     }
-                    promises = promises.map(promise => promise());
                     Promise.all(switchpromises).then(() => {
                         if (!hadswitched) {
                             hitcher.couldnotfindaride = true;
