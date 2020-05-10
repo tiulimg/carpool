@@ -607,7 +607,7 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
             if (hike.startlatitude && hike.endlatitude &&
                 (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                  hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
-                if (!hiker.mydriverto && !hiker.routetothehike) {
+                if (!hiker.mydriverto && !hiker.routetothehike && hiker.comesfromlocation) {
                     promises.push(
                         transporttohikebydirection(hiker, hike, "to", res, "publicTransport")
                         .then(route => {
@@ -618,7 +618,7 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
                         })
                     );
                 }
-                if (!hiker.mydriverfrom && !hiker.routefromthehike) {
+                if (!hiker.mydriverfrom && !hiker.routefromthehike && hiker.returnstolocation) {
                     promises.push(
                         transporttohikebydirection(hiker, hike, "from", res, "publicTransport")
                         .then(route => {
@@ -639,7 +639,7 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
 
 function transporttohikebydirection(hiker, hike, direction, res, mode) {
     return new Promise((resolve, reject) => {
-        console.log("transporttohikebydirection hiker " + hiker.name + " " + hiker.phone);
+        console.log("transporttohikebydirection hiker " + hiker);
         console.log(mode + " " + direction + " the hike for hiker " + hiker.fullname);
         var arrival = hike.starttime;
         var depart = null;
@@ -671,7 +671,7 @@ function carstohike(hike, res) {
         var promises = [];
         for (let index = 0; index < hike.drivers.length; index++) {
             const hiker = hike.drivers[index];
-            console.log("carstohike hiker " + hiker.name + " " + hiker.phone + " " + hiker.fullname);
+            console.log("carstohike hiker " + hiker);
 
             if (hike.startlatitude && hike.endlatitude) {
                 if (!hiker.routetothehike && hiker.comesfromlocation) {
