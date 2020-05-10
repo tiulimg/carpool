@@ -1,5 +1,6 @@
 var Promise = require('promise');
 var request = require('request');
+var util = require('util');
 
 var dbservices = require("./dbservices");
 var logservices = require("./logservices");
