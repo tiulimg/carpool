@@ -49,7 +49,7 @@ class Queue {
           })
       } catch (err) {
         this.workingOnPromise = false;
-        logservices.logRejection(rejection);
+        logservices.logRejection(err);
         item.reject(err);
         this.dequeue();
       }
