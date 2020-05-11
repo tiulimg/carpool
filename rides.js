@@ -1302,7 +1302,6 @@ function fillavailableplaces(res, hike) {
 
 function calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, direction) {
     return new Promise((resolve, reject) => {
-        var distances = hike.hikersdistances;
         if (!hiker["route"+direction+"thehike"] && hike.startlatitude) {
             return nextdriverifcannotmeet(res, hiker, hike, direction, 0)
             .catch(rejection => {
@@ -1317,6 +1316,7 @@ function calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, directi
 
 function nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex) {
     return new Promise((resolve, reject) => {
+        var distances = hike.hikersdistances;
         if (neardriverindex >= distances[hiker.phone][direction+"thehike"].length) {
             return resolve();
         }
