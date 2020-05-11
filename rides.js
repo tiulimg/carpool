@@ -20,6 +20,7 @@ module.exports = {
     hikeproperties: hikeproperties,
     switchhitcherscannotreachdriver: switchhitcherscannotreachdriver,
     fillavailableplaces: fillavailableplaces,
+    setavailableplaces: setavailableplaces,
 };
 
 const HERE_APPID = process.env.HERE_APPID;
@@ -1322,6 +1323,14 @@ function calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, directi
             return resolve();
         }
     });
+}
+
+function setavailableplaces(hike) {
+    for (let index = 0; index < hike.drivers.length; index++) {
+        const driver = hike.drivers[index];
+        driver.availableplacestothehike = driver.availableplaces - driver.myhitchersto.length;
+        driver.availableplacesfromthehike = driver.availableplaces - driver.myhitchersfrom.length;
+    }
 }
 
 function nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex) {
