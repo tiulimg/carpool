@@ -2570,27 +2570,23 @@ app.patch("/api/calculaterides", function(req, res) {
                         // .then(() => {
                             return ridesmodules.fillavailableplaces(res, hike);
                         })
-                        // .then(() => {
-                        //     Queuemodule.enqueue(() => {
-                        //         ridesmodules.updateavailableplaces(hike);
-                        //         logservices.logcalculationresult(hikers);
+                        .then(timer => {
+                            timer++;
+                            tools.wait(timer * 1000)
+                            .then(() => {
+                                ridesmodules.updateavailableplaces(hike);
+                                logservices.logcalculationresult(hikers);
 
-                        //         // public transport for hikers that hadn't left with a ride
-                        //         ridesmodules.bustohike(true, hike, res)
-                        //         .catch(rejection => {
-                        //             logservices.logRejection(rejection);
-                        //         });
-                        //     });
-                        //     Queuemodule.enqueue(() => {
-                        //         dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
-                        //         .catch(rejection => {
-                        //             logservices.logRejection(rejection);
-                        //         });
-                        //     });
-                        //     Queuemodule.enqueue(() => {
-                        //         register.updateCarpool(res);
-                        //     });
-                        // })
+                                // public transport for hikers that hadn't left with a ride
+                                return ridesmodules.bustohike(true, hike, res)
+                            })
+                        })
+                        .then(() => {
+                            return dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
+                        })
+                        .then(() => {
+                            register.updateCarpool(res);
+                        })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
                         });

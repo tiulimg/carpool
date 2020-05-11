@@ -1281,33 +1281,30 @@ function stopsinrectangle(driverlat, driverlon, hikelat, hikelon) {
 
 function fillavailableplaces(res, hike) {
     return new Promise((resolve, reject) => {
+        var timer = 0;
         for (let index = 0; index < hike.hitchers.length; index++) {
             const hiker = hike.hitchers[index];
             console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
                 " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
                 " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
-    
             if (hiker.seatsrequired > 0) {
-                Queuemodule.enqueue(() => {
-                    return new Promise((resolve, reject) => {
-                        tools.wait(index * 100)
-                        .then(() => {
-                            return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to");
-                        })
-                        .then(() => {
-                            return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "from");
-                        })
-                        .then(() => {
-                            return resolve();
-                        })
-                        .catch(rejection => {
-                            logservices.logRejection(rejection);
-                        });
-                    });
+                timer++;
+                tools.wait(timer * 1000)
+                .then(() => {
+                    return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to");
+                })
+                .then(() => {
+                    return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "from");
+                })
+                .then(() => {
+                    return resolve();
+                })
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
                 });
             }
         }
-        return resolve();
+        return resolve(timer);
     });
 }
 
