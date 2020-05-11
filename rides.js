@@ -520,7 +520,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     for (let index = 0; index < leg.maneuver.length; index++) {
                         const step = leg.maneuver[index];
                         var instruction = step.instruction.replace(/<[^>]+>/g, '');
-                        //console.log("instruction " + instruction);
+                        console.log("instruction " + instruction);
                         maneuver.push({
                             position: step.position,
                             length: step.length,
@@ -618,12 +618,10 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
                 (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                  hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
                 if (!hiker.mydriverto && !hiker.routetothehike && hiker.comesfromlocation) {
-                    console.log("BBB");
                     promises.push(
                         transporttohikebydirection(hiker, hike, "to", res, "publicTransport")
                         .then(route => {
                             hiker.routetothehike = route;
-                            console.log("BBB1");
                         })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
@@ -631,12 +629,10 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
                     );
                 }
                 if (!hiker.mydriverfrom && !hiker.routefromthehike && hiker.returnstolocation) {
-                    console.log("BBB2");
                     promises.push(
                         transporttohikebydirection(hiker, hike, "from", res, "publicTransport")
                         .then(route => {
                             hiker.routefromthehike = route;
-                            console.log("BBB3");
                         })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
@@ -692,12 +688,10 @@ function carstohike(hike, res) {
 
             if (hike.startlatitude && hike.endlatitude) {
                 if (!hiker.routetothehike && hiker.comesfromlocation) {
-                    console.log("CCC");
                     promises.push(
                         transporttohikebydirection(hiker, hike, "to", res, "car")
                         .then(route => {
                             hiker.routetothehike = route;
-                            console.log("CCC1");
                         })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
@@ -705,12 +699,10 @@ function carstohike(hike, res) {
                     );
                 }
                 if (!hiker.routefromthehike && hiker.returnstolocation) {
-                    console.log("CCC2");
                     promises.push(
                         transporttohikebydirection(hiker, hike, "from", res, "car")
                         .then(route => {
                             hiker.routefromthehike = route;
-                            console.log("CCC3");
                         })
                         .catch(rejection => {
                             logservices.logRejection(rejection);

@@ -2575,7 +2575,6 @@ app.patch("/api/calculaterides", function(req, res) {
                             timer += 60;
                             return tools.wait(timer * 1000)
                             .then(() => {
-                                console.log("DDD");
                                 ridesmodules.updateavailableplaces(hike);
                                 logservices.logcalculationresult(hikers);
 
@@ -2584,7 +2583,6 @@ app.patch("/api/calculaterides", function(req, res) {
                             })
                         })
                         .then(() => {
-                            console.log("EEE");
                             return dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
                         })
                         .then(() => {
