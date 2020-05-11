@@ -1287,18 +1287,23 @@ function fillavailableplaces(res, hike) {
                 " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
     
             if (hiker.seatsrequired > 0) {
-                Queuemodule.enqueue(
-                    tools.wait(index * 100)
-                    .then(() => {
-                        return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to");
-                    })
-                    .then(() => {
-                        return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "from");
-                    })
-                    .catch(rejection => {
-                        logservices.logRejection(rejection);
-                    })
-                );
+                Queuemodule.enqueue(() => {
+                    return new Promise((resolve, reject) => {
+                        tools.wait(index * 100)
+                        .then(() => {
+                            return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to");
+                        })
+                        .then(() => {
+                            return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "from");
+                        })
+                        .then(() => {
+                            return resolve();
+                        })
+                        .catch(rejection => {
+                            logservices.logRejection(rejection);
+                        });
+                    });
+                });
             }
         }
         return resolve();
