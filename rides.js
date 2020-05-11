@@ -21,6 +21,7 @@ module.exports = {
     switchhitcherscannotreachdriver: switchhitcherscannotreachdriver,
     fillavailableplaces: fillavailableplaces,
     setavailableplaces: setavailableplaces,
+    setrequiredseats: setrequiredseats,
 };
 
 const HERE_APPID = process.env.HERE_APPID;
@@ -567,6 +568,9 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
         }
         var transportincache = transportcachearray[transportincachekey];
         if (transportincache) {
+            if (route.traveltime) {
+                console.log("route.traveltime " + route.traveltime);
+            }
             // console.log("found in cache:\n" + JSON.stringify(transportincache));
             return resolve(transportincache);
         }
@@ -574,6 +578,9 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
             dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon)
             .then(routefromdb => {
                 if (routefromdb) {
+                    if (route.traveltime) {
+                        console.log("route.traveltime " + route.traveltime);
+                    }
                     return resolve(routefromdb);
                 }
                 else {
@@ -1334,6 +1341,14 @@ function setavailableplaces(hike) {
         const driver = hike.drivers[index];
         driver.availableplacestothehike = driver.availableplaces - driver.myhitchersto.length;
         driver.availableplacesfromthehike = driver.availableplaces - driver.myhitchersfrom.length;
+    }
+}
+
+function setrequiredseats(hike) {
+    for (let index = 0; index < hike.hitchers.length; index++) {
+        const hitcher = hike.hitchers[index];
+        hitcher.seatsrequiredtothehike = hitcher.seatsrequired;
+        hitcher.seatsrequiredfromthehike = hitcher.seatsrequired;
     }
 }
 

@@ -2555,6 +2555,7 @@ app.patch("/api/calculaterides", function(req, res) {
                         })
                         .then(() => {
                             ridesmodules.setavailableplaces(hike);
+                            ridesmodules.setrequiredseats(hike);
                             return ridesmodules.carstohike(hike, res);
                         })
                         .then(() => {
