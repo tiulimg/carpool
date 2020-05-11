@@ -2567,16 +2567,24 @@ app.patch("/api/calculaterides", function(req, res) {
                         //     ridesmodules.switchhitcherscannotreachdriver(res, hike);
                         // })
                         // .then(() => {
-                            ridesmodules.fillavailableplaces(res, hike);
+                            return ridesmodules.fillavailableplaces(res, hike);
+                        })
+                        .then(() => {
                             Queuemodule.enqueue(() => {
                                 ridesmodules.updateavailableplaces(hike);
                                 logservices.logcalculationresult(hikers);
 
                                 // public transport for hikers that hadn't left with a ride
-                                ridesmodules.bustohike(true, hike, res);
+                                ridesmodules.bustohike(true, hike, res)
+                                .catch(rejection => {
+                                    logservices.logRejection(rejection);
+                                });
                             });
                             Queuemodule.enqueue(() => {
                                 dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
+                                .catch(rejection => {
+                                    logservices.logRejection(rejection);
+                                });
                             });
                             Queuemodule.enqueue(() => {
                                 register.updateCarpool(res);

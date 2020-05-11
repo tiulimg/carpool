@@ -484,16 +484,16 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
         if (middlelat && middlelon) {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+middlelat+"%2C"+middlelon+"&waypoint2="+endlat+"%2C"+endlon + 
                 "&mode=fastest%3B" + mode + "&combineChange=true&language=he" + arrivaldepartaddition;
-            console.log("calculatecarroute here start ("+startlat+","+startlon+") middle ("+middlelat+","+middlelon+
-                ") end ("+endlat+","+endlon+") arrival " + arrivaltime + " depart " + departtime + " mode " + mode);
+            // console.log("calculatecarroute here start ("+startlat+","+startlon+") middle ("+middlelat+","+middlelon+
+            //     ") end ("+endlat+","+endlon+") arrival " + arrivaltime + " depart " + departtime + " mode " + mode);
         }
         else {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
                 "&combineChange=true&language=he" + arrivaldepartaddition;
-            console.log("calculatecarroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
-                " depart " + departtime + " mode " + mode);
+            // console.log("calculatecarroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
+            //     " depart " + departtime + " mode " + mode);
         }
-        console.log("url " + url);
+//        console.log("url " + url);
         request({
             url: url,
             method: "GET",
@@ -580,6 +580,9 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
                     findroute(
                         startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon)
                     .then(route => {
+                        if (route.traveltime) {
+                            console.log("route.traveltime " + route.traveltime);
+                        }
                         transportcachearray[transportincachekey] = route;
                         dbservices.insertnewroute(res, route)
                         .catch(rejection => {
@@ -1272,7 +1275,6 @@ function stopsinrectangle(driverlat, driverlon, hikelat, hikelon) {
 
 function fillavailableplaces(res, hike) {
     return new Promise((resolve, reject) => {
-        console.log("fillavailableplaces hike.hitchers.length " + hike.hitchers.length);
         for (let index = 0; index < hike.hitchers.length; index++) {
             const hiker = hike.hitchers[index];
             console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
