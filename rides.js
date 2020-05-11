@@ -1304,33 +1304,58 @@ function calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, directi
     return new Promise((resolve, reject) => {
         var distances = hike.hikersdistances;
         if (!hiker["route"+direction+"thehike"] && hike.startlatitude) {
-            for (let neardriverindex = 0; neardriverindex < distances[hiker.phone][direction+"thehike"].length; 
-                    neardriverindex++) {
-                const neardriverdistance = distances[hiker.phone][direction+"thehike"][neardriverindex];
-                var neardriver = neardriverdistance.link;
-                console.log("calculaterides driver "+direction+" the hike: distance " + 
-                    neardriverdistance.distance + 
-                    " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
-                    neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
-                    " neardriver.availableplaces"+direction+"thehike " + neardriver["availableplaces"+direction+"thehike"] + 
-                    " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
-                    neardriver.returnstodetailed);
-                if (neardriver["availableplaces"+direction+"thehike"] >= hiker["seatsrequired"+direction+"thehike"]) {
-                    if (!hiker["mydriver"+direction]) {
-                        canhitcherreachdriver(res, hiker, neardriver, direction, hike)
-                        .then(canmeet => {
-                            if (canmeet) {
-                                addhitchertodriver(hiker, neardriver, direction);
-                            }
+            return nextdriverifcannotmeet(res, hiker, hike, direction, 0)
+            .catch(rejection => {
+                logservices.logRejection(rejection);
+            });
+        }
+        else {
+            return resolve();
+        }
+    });
+}
+
+function nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex) {
+    return new Promise((resolve, reject) => {
+        if (neardriverindex >= distances[hiker.phone][direction+"thehike"].length) {
+            return resolve();
+        }
+        else {
+            const neardriverdistance = distances[hiker.phone][direction+"thehike"][neardriverindex];
+            var neardriver = neardriverdistance.link;
+            console.log("calculaterides driver "+direction+" the hike: distance " + 
+                neardriverdistance.distance + 
+                " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
+                neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
+                " neardriver.availableplaces"+direction+"thehike " + neardriver["availableplaces"+direction+"thehike"] + 
+                " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
+                neardriver.returnstodetailed);
+            if (neardriver["availableplaces"+direction+"thehike"] >= hiker["seatsrequired"+direction+"thehike"]) {
+                if (!hiker["mydriver"+direction]) {
+                    canhitcherreachdriver(res, hiker, neardriver, direction, hike)
+                    .then(canmeet => {
+                        if (canmeet) {
+                            addhitchertodriver(hiker, neardriver, direction);
                             return resolve();
-                        })
-                        .catch(rejection => {
-                            logservices.logRejection(rejection);
-                            return reject();
-                        });
-                    }
-                    break;
+                        }
+                        else {
+                            return nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex+1)
+                            .catch(rejection => {
+                                logservices.logRejection(rejection);
+                            });
+                        }
+                    })
+                    .catch(rejection => {
+                        logservices.logRejection(rejection);
+                    });
                 }
+                return resolve();
+            }
+            else {
+                return nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex+1)
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                });
             }
         }
     });
