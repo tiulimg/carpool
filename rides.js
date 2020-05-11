@@ -1287,7 +1287,7 @@ function fillavailableplaces(res, hike) {
                 " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
     
             if (hiker.seatsrequired > 0) {
-                Queuemodule.enqueue(() => {
+                Queuemodule.enqueue(
                     tools.wait(index * 100)
                     .then(() => {
                         return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to");
@@ -1297,8 +1297,8 @@ function fillavailableplaces(res, hike) {
                     })
                     .catch(rejection => {
                         logservices.logRejection(rejection);
-                    });
-                });
+                    })
+                );
             }
         }
         return resolve();
