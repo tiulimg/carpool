@@ -611,10 +611,12 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
                 (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                  hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
                 if (!hiker.mydriverto && !hiker.routetothehike && hiker.comesfromlocation) {
+                    console.log("BBB");
                     promises.push(
                         transporttohikebydirection(hiker, hike, "to", res, "publicTransport")
                         .then(route => {
                             hiker.routetothehike = route;
+                            console.log("BBB1");
                         })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
@@ -622,10 +624,12 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
                     );
                 }
                 if (!hiker.mydriverfrom && !hiker.routefromthehike && hiker.returnstolocation) {
+                    console.log("BBB2");
                     promises.push(
                         transporttohikebydirection(hiker, hike, "from", res, "publicTransport")
                         .then(route => {
                             hiker.routefromthehike = route;
+                            console.log("BBB3");
                         })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
@@ -681,10 +685,12 @@ function carstohike(hike, res) {
 
             if (hike.startlatitude && hike.endlatitude) {
                 if (!hiker.routetothehike && hiker.comesfromlocation) {
+                    console.log("CCC");
                     promises.push(
                         transporttohikebydirection(hiker, hike, "to", res, "car")
                         .then(route => {
                             hiker.routetothehike = route;
+                            console.log("CCC1");
                         })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
@@ -692,10 +698,12 @@ function carstohike(hike, res) {
                     );
                 }
                 if (!hiker.routefromthehike && hiker.returnstolocation) {
+                    console.log("CCC2");
                     promises.push(
                         transporttohikebydirection(hiker, hike, "from", res, "car")
                         .then(route => {
                             hiker.routefromthehike = route;
+                            console.log("CCC3");
                         })
                         .catch(rejection => {
                             logservices.logRejection(rejection);
@@ -758,7 +766,6 @@ function calculateridesbydistanceanddirection(hiker, hike, direction) {
 
 function canswitchhitchers(res, firsthitcher, firstdriver, secondhitcher, seconddriver, direction, hike) {
     return new Promise((resolve, reject) => {
-        console.log("AAA1");
         canhitcherreachdriver(res, firsthitcher, seconddriver, direction, hike)
         .then(canfirsthitcherswitch => {
             if (canfirsthitcherswitch) {
@@ -1346,7 +1353,11 @@ function nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex) {
                 " neardriver.availableplaces"+direction+"thehike " + neardriver["availableplaces"+direction+"thehike"] + 
                 " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
                 neardriver.returnstodetailed);
+            console.log("places seats " + neardriver["availableplaces"+direction+"thehike"] + " " + 
+                hiker["seatsrequired"+direction+"thehike"]);
             if (neardriver["availableplaces"+direction+"thehike"] >= hiker["seatsrequired"+direction+"thehike"]) {
+                console.log("hiker[mydriver+direction] " + hiker["mydriver"+direction]); 
+
                 if (!hiker["mydriver"+direction]) {
                     console.log("AAA neardriverindex " + neardriverindex);
                     canhitcherreachdriver(res, hiker, neardriver, direction, hike)
