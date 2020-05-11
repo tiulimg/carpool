@@ -1283,8 +1283,13 @@ function fillavailableplaces(res, hike) {
     
             if (hiker.seatsrequired > 0) {
                 Queuemodule.enqueue(() => {
-                    calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to");
-                    calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "from");
+                    calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to")
+                    .then(() => {
+                        return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "from");
+                    })
+                    .catch(rejection => {
+                        logservices.logRejection(rejection);
+                    });
                 });
             }
         }
