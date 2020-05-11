@@ -1283,7 +1283,10 @@ function fillavailableplaces(res, hike) {
     
             if (hiker.seatsrequired > 0) {
                 Queuemodule.enqueue(() => {
-                    calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to")
+                    tools.wait(index * 100)
+                    .then(() => {
+                        return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to");
+                    })
                     .then(() => {
                         return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "from");
                     })
