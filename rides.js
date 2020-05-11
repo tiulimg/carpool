@@ -644,10 +644,14 @@ function transporttohikebydirection(hiker, hike, direction, res, mode) {
         console.log(mode + " " + direction + " the hike for hiker " + hiker.fullname);
         var arrival = hike.starttime;
         var depart = null;
-        var startlat = hiker.comesfromlocation.lat;
-        var startlon = hiker.comesfromlocation.lon;
+        var startlat;
+        var startlon;
         var endlat = hike.startlatitude;
         var endlon = hike.startlongitude;
+        if (direction == "to") {
+            startlat = hiker.comesfromlocation.lat;
+            startlon = hiker.comesfromlocation.lon;
+        }
         if (direction == "from") {
             startlat = hike.endlatitude;
             startlon = hike.startlongitude;
@@ -753,6 +757,7 @@ function calculateridesbydistanceanddirection(hiker, hike, direction) {
 
 function canswitchhitchers(res, firsthitcher, firstdriver, secondhitcher, seconddriver, direction, hike) {
     return new Promise((resolve, reject) => {
+        console.log("AAA1");
         canhitcherreachdriver(res, firsthitcher, seconddriver, direction, hike)
         .then(canfirsthitcherswitch => {
             if (canfirsthitcherswitch) {
@@ -1332,8 +1337,10 @@ function nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex) {
                 neardriver.returnstodetailed);
             if (neardriver["availableplaces"+direction+"thehike"] >= hiker["seatsrequired"+direction+"thehike"]) {
                 if (!hiker["mydriver"+direction]) {
+                    console.log("AAA neardriverindex " + neardriverindex);
                     canhitcherreachdriver(res, hiker, neardriver, direction, hike)
                     .then(canmeet => {
+                        console.log("AAA canmeet " + canmeet);
                         if (canmeet) {
                             addhitchertodriver(hiker, neardriver, direction);
                             return resolve();
@@ -1349,7 +1356,10 @@ function nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex) {
                         logservices.logRejection(rejection);
                     });
                 }
-                return resolve();
+                else {
+                    console.log("AAA hiker[mydriver"+direction+"]");
+                    return resolve();
+                }
             }
             else {
                 return nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex+1)
