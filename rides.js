@@ -573,7 +573,6 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
             dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon)
             .then(routefromdb => {
                 if (routefromdb) {
-                    hiker["route"+direction+"thehike"] = routefromdb;
                     return resolve(routefromdb);
                 }
                 else {
@@ -660,6 +659,7 @@ function transporttohikebydirection(hiker, hike, direction, res, mode) {
 
         findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null)
         .then(route => {
+            hiker["route"+direction+"thehike"] = routefromdb;
             return resolve(route);
         })
         .catch(rejection => {
