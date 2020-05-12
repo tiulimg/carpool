@@ -568,8 +568,8 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
         }
         var transportincache = transportcachearray[transportincachekey];
         if (transportincache) {
-            if (route.traveltime) {
-                console.log("route.traveltime " + route.traveltime);
+            if (transportincache.traveltime) {
+                console.log("route.traveltime " + transportincache.traveltime);
             }
             // console.log("found in cache:\n" + JSON.stringify(transportincache));
             return resolve(transportincache);
@@ -578,8 +578,8 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
             dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon)
             .then(routefromdb => {
                 if (routefromdb) {
-                    if (route.traveltime) {
-                        console.log("route.traveltime " + route.traveltime);
+                    if (routefromdb.traveltime) {
+                        console.log("route.traveltime " + routefromdb.traveltime);
                     }
                     return resolve(routefromdb);
                 }
