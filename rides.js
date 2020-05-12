@@ -1290,13 +1290,13 @@ function fillavailableplaces(res, hike) {
         var timer = 0;
         for (let index = 0; index < hike.hitchers.length; index++) {
             const hiker = hike.hitchers[index];
-            console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
-                " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
-                " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
             if (hiker.seatsrequired > 0) {
                 timer++;
                 tools.wait(timer * 1000)
                 .then(() => {
+                    console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
+                    " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
+                    " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);    
                     return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to");
                 })
                 .then(() => {
