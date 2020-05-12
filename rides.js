@@ -1294,6 +1294,7 @@ function fillavailableplaces(res, hike) {
                 timer++;
                 tools.wait(timer * 1000)
                 .then(() => {
+                    console.log("waited " + timer + " seconds");
                     console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
                     " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
                     " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);    

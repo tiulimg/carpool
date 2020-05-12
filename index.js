@@ -2575,6 +2575,7 @@ app.patch("/api/calculaterides", function(req, res) {
                             timer += 60;
                             return tools.wait(timer * 1000)
                             .then(() => {
+                                console.log("waited " + timer + " seconds (last)");
                                 ridesmodules.updateavailableplaces(hike);
                                 logservices.logcalculationresult(hikers);
 
