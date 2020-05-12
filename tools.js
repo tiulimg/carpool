@@ -6,6 +6,7 @@ module.exports = {
     checkpwd: checkpwd,
     checkspecialpwd: checkspecialpwd,
     wait: wait,
+    addsecondstodate: addsecondstodate,
     normalize_phonenumber: normalize_phonenumber,
     datestringtoobject: datestringtoobject,
     get_near_hikes: get_near_hikes, 
@@ -52,6 +53,12 @@ function checkspecialpwd(res, pwd, specialpwd) {
 function wait(ms)
 {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function addsecondstodate(datestring, seconds) {
+    var dt = new Date(datestring);
+    dt.setSeconds(dt.getSeconds() + seconds);
+    return dt.toISOString();
 }
 
 function normalize_phonenumber(phonenumber) {

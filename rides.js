@@ -520,7 +520,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     for (let index = 0; index < leg.maneuver.length; index++) {
                         const step = leg.maneuver[index];
                         var instruction = step.instruction.replace(/<[^>]+>/g, '');
-                        console.log("instruction " + instruction);
+                        //console.log("instruction " + instruction);
                         maneuver.push({
                             position: step.position,
                             length: step.length,
@@ -811,13 +811,13 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
         if (direction == "to") {
             hikerloc = hiker.comesfromlocation;
             driverloc = neardriver.comesfromlocation;
-            arrival = (new Date(hike.starttime) - neardriver.routetothehike.traveltime).toLocaleString();
+            arrival = tools.addsecondstodate(hike.starttime, - neardriver.routetothehike.traveltime);
             console.log("desired arrival to driver " + arrival);
         }
         else if (direction == "from") {
             hikerloc = hiker.returnstolocation;
             driverloc = neardriver.returnstolocation;
-            depart = (new Date(hike.endtime) + neardriver.routefromthehike.traveltime).toLocaleString();
+            depart = tools.addsecondstodate(hike.endtime, neardriver.routefromthehike.traveltime);
             console.log("desired depart from driver " + depart);
         }
         findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransport", arrival, depart)
@@ -926,12 +926,12 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                     arrival = null;
                     depart = null;
                     if (direction == "to") {
-                        depart = (new Date(hike.starttime) - routethroughstop.traveltime).toLocaleString();
+                        depart = tools.addsecondstodate(hike.starttime, - routethroughstop.traveltime);
                         endlat = stop.lat;
                         endlon = stop.lon;
                     }
                     else if (direction == "from") {
-                        arrival = (new Date(hike.endtime) + routethroughstop.traveltime).toLocaleString();
+                        arrival = tools.addsecondstodate(hike.endtime, routethroughstop.traveltime);
                         startlat = stop.lat;
                         startlon = stop.lon;
                     }
@@ -940,10 +940,10 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                         if (routetostop.traveltime) {
                             var travaltimefromstop = routethroughstop.traveltime - routetostop.traveltime;
                             if (direction == "to") {
-                                arrival = (new Date(depart) + routetostop.traveltime).toLocaleString();
+                                arrival = tools.addsecondstodate(depart, routetostop.traveltime);
                             }
                             else if (direction == "from") {
-                                depart = (new Date(arrival) - routetostop.traveltime).toLocaleString();
+                                depart = tools.addsecondstodate(arrival, - routetostop.traveltime);
                             }
                             wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, depart, travaltimefromstop)
                             .then(hitcherwouldcome => {
@@ -1367,10 +1367,9 @@ function nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex) {
                 console.log("hiker[mydriver+direction] " + hiker["mydriver"+direction]); 
 
                 if (!hiker["mydriver"+direction]) {
-                    console.log("AAA neardriverindex " + neardriverindex);
                     canhitcherreachdriver(res, hiker, neardriver, direction, hike)
                     .then(canmeet => {
-                        console.log("AAA canmeet " + canmeet);
+                        console.log("canmeet " + canmeet);
                         if (canmeet) {
                             addhitchertodriver(hiker, neardriver, direction);
                             return resolve();
@@ -1387,7 +1386,6 @@ function nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex) {
                     });
                 }
                 else {
-                    console.log("AAA hiker[mydriver"+direction+"]");
                     return resolve();
                 }
             }
