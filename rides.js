@@ -1302,7 +1302,7 @@ function stopsinrectangle(driverlat, driverlon, hikelat, hikelon) {
 
 function fillavailableplaces(res, hike) {
     return new Promise((resolve, reject) => {
-        return nexthikercalculateride(res, hike, "to", 0)
+        nexthikercalculateride(res, hike, "to", 0)
         .then(() => {
             console.log("fillavailableplaces fromthehike");
             return nexthikercalculateride(res, hike, "from", 0)
