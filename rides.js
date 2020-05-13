@@ -840,6 +840,8 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
 
         findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransport", arrival, depart, description)
         .then(routetodriver => {
+            console.log("routetodriver " + routetodriver.traveltime + " hike.maximumpublictransporttime " + 
+                hike.maximumpublictransporttime);
             if (routetodriver.traveltime && routetodriver.traveltime < hike.maximumpublictransporttime) {
                 return resolve(true);
             }
@@ -915,6 +917,8 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
         findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, description)
         .then(routetostop => {
             if (routetostop.traveltime) {
+                console.log("routetostop+travaltimefromstop " + (routetostop.traveltime+travaltimefromstop) + 
+                    " hike.maximumpublictransporttime " + hike.maximumpublictransporttime);
                 if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime) {
                     return resolve(true);
                 }
@@ -957,6 +961,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
         findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, stop.lat, stop.lon, description)
         .then(routethroughstop => {
             if (routethroughstop.traveltime) {
+                console.log("routethroughstop " + routethroughstop.traveltime);
                 var additionaltime = routethroughstop.traveltime - driver["route"+direction+"thehike"].traveltime;
                 if (additionaltime <= hike.maximumcardeviation) {
                     arrival = null;
@@ -979,6 +984,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                     findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, description)
                     .then(routetostop => {
                         if (routetostop.traveltime) {
+                            console.log("routetostop " + routetostop.traveltime);
                             var travaltimefromstop = routethroughstop.traveltime - routetostop.traveltime;
                             if (direction == "to") {
                                 arrival = tools.addsecondstodate(depart, routetostop.traveltime);
