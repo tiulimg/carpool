@@ -1338,26 +1338,36 @@ function nexthikercalculateride(res, hike, direction, hikerindex) {
         if (hikerindex < hike.hitchers.length) {
             var hiker = hike.hitchers[hikerindex];
             if (hiker.seatsrequired > 0) {
-                console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
+                console.log("nexthikercalculateride hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
                             " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
                             " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
                 nextdriverifcannotmeet(res, hikerindex, hike, direction, 0)
                 .then(() => {
+                    console.log("nexthikercalculateride finished nextdriverifcannotmeet next hiker");
                     return nexthikercalculateride(res, hike, direction, hikerindex+1);
+                })
+                .then(() => {
+                    console.log("nexthikercalculateride finished a run1");
+                    return resolve();
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
                 });
             }
             else {
+                console.log("nexthikercalculateride no seats required next hiker");
                 return nexthikercalculateride(res, hike, direction, hikerindex+1)
+                .then(() => {
+                    console.log("nexthikercalculateride finished a run2");
+                    return resolve();
+                })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
                 });
             }
         }
         else {
-            console.log("nexthikercalculateride resolve");
+            console.log("nexthikercalculateride resolve no more hitchers");
             return resolve();
         }
     });
@@ -1387,20 +1397,21 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
             console.log("nextdriverifcannotmeet drivers " + distances[hiker.phone][direction+"thehike"].length + 
                 " neardriverindex " + neardriverindex);
             if (neardriverindex >= distances[hiker.phone][direction+"thehike"].length) {
+                console.log("nextdriverifcannotmeet no more drivers");
                 return resolve();
             }
             else {
                 const neardriverdistance = distances[hiker.phone][direction+"thehike"][neardriverindex];
                 var neardriver = neardriverdistance.link;
-                console.log("calculaterides driver "+direction+" the hike: distance " + 
+                console.log("nexthikercalculateride driver "+direction+" the hike: distance " + 
                     neardriverdistance.distance + 
                     " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
                     neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
                     " neardriver.availableplaces"+direction+"thehike " + neardriver["availableplaces"+direction+"thehike"] + 
                     " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
                     neardriver.returnstodetailed);
-                console.log("places seats " + neardriver["availableplaces"+direction+"thehike"] + " " + 
-                    hiker["seatsrequired"+direction+"thehike"]);
+                // console.log("places seats " + neardriver["availableplaces"+direction+"thehike"] + " " + 
+                //     hiker["seatsrequired"+direction+"thehike"]);
                 if (neardriver["availableplaces"+direction+"thehike"] >= hiker["seatsrequired"+direction+"thehike"]) {
                     console.log("hiker[mydriver+direction] " + hiker["mydriver"+direction]); 
 
@@ -1414,6 +1425,10 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
                             }
                             else {
                                 return nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex+1)
+                                .then(() => {
+                                    console.log("nextdriverifcannotmeet cannot meet next driver");
+                                    return resolve();
+                                })
                                 .catch(rejection => {
                                     logservices.logRejection(rejection);
                                 });
@@ -1424,11 +1439,16 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
                         });
                     }
                     else {
+                        console.log("nextdriverifcannotmeet already have a driver");
                         return resolve();
                     }
                 }
                 else {
                     return nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex+1)
+                    .then(() => {
+                        console.log("nextdriverifcannotmeet no places next driver");
+                        return resolve();
+                    })
                     .catch(rejection => {
                         logservices.logRejection(rejection);
                     });
@@ -1436,6 +1456,7 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
             }
         }
         else {
+            console.log("nextdriverifcannotmeet don't need a ride");
             return resolve();
         }
     });
@@ -1461,7 +1482,7 @@ function nexthiketosetcarpool(res, nearhikes, hikeindex) {
                         return carstohike(hike, res);
                     })
                     .then(() => {
-                        console.log("calculaterides getDistancesBetweenHikers");
+                        console.log("nexthiketosetcarpool getDistancesBetweenHikers");
                         hike.hikersdistances = tools.getDistancesBetweenHikers(hikers);
                         return fillavailableplaces(res, hike);
                     })
