@@ -1426,28 +1426,28 @@ function nexthiketosetcarpool(res, nearhikes, hikeindex) {
             .then(hikers => {
                 if (hikers && hikers.length > 0){
                     console.log("start calculation for " + hike.hikenamehebrew);
-                    ridesmodules.hikeproperties(hike, hikers);
-                    ridesmodules.findhikerslocation(hikers)
+                    hikeproperties(hike, hikers);
+                    findhikerslocation(hikers)
                     .then(() => {
                         // public transport for hikers that don't need a ride
-                        return ridesmodules.bustohike(false, hike, res);
+                        return bustohike(false, hike, res);
                     })
                     .then(() => {
-                        ridesmodules.setavailableplaces(hike);
-                        ridesmodules.setrequiredseats(hike);
-                        return ridesmodules.carstohike(hike, res);
+                        setavailableplaces(hike);
+                        setrequiredseats(hike);
+                        return carstohike(hike, res);
                     })
                     .then(() => {
                         console.log("calculaterides getDistancesBetweenHikers");
                         hike.hikersdistances = tools.getDistancesBetweenHikers(hikers);
-                        return ridesmodules.fillavailableplaces(res, hike);
+                        return fillavailableplaces(res, hike);
                     })
                     .then(() => {
-                        ridesmodules.updateavailableplaces(hike);
+                        updateavailableplaces(hike);
                         logservices.logcalculationresult(hikers);
     
                         // public transport for hikers that hadn't left with a ride
-                        return ridesmodules.bustohike(true, hike, res);
+                        return bustohike(true, hike, res);
                     })
                     .then(() => {
                         return dbservices.replaceallhikersforhike(res, hike.hikedate, hikers);
