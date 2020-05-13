@@ -888,8 +888,12 @@ function removestopshighdeviation(res, driver, stops, direction, hike, hitcher) 
                 .catch(rejection => {
                     logservices.logRejection(rejection);
                 })
+                .finally(() => {
+                    console.log("removestopshighdeviation finally");
+                })
             );
         }
+        console.log("removestopshighdeviation waiting...");
         Promise.all(promises).then(() => {
             console.log("removestopshighdeviation stopsfairdeviation " + stopsfairdeviation.length);
             return resolve(stopsfairdeviation);
