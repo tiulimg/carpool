@@ -1297,8 +1297,8 @@ function stopsinrectangle(driverlat, driverlon, hikelat, hikelon) {
     var stopsinarea = [];
     for (let index = 0; index < stops.length; index++) {
         const stop = stops[index];
-        if ((driverlat < stop.lat < hikelat || driverlat > stop.lat > hikelat) &&
-            (driverlon < stop.lon < hikelon || driverlon > stop.lon > hikelon)) {
+        if (((driverlat < stop.lat && stop.lat < hikelat) || (driverlat > stop.lat && stop.lat > hikelat)) &&
+            ((driverlon < stop.lon && stop.lon < hikelon) || (driverlon > stop.lon && stop.lon > hikelon))) {
             stopsinarea.push(stop);
         }
     }
