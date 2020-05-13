@@ -880,10 +880,11 @@ function removestopshighdeviation(res, driver, stops, direction, hike, hitcher) 
             promises.push(
                 woulddriverstop(res, driver, stop, direction, hike, hitcher)
                 .then(wouldstop => {
-                    console.log("removestopshighdeviation wouldstop " + wouldstop);
+                    console.log("removestopshighdeviation wouldstop " + wouldstop + " " + direction + " stop " + stop.name);
                     if (wouldstop) {
                         stopsfairdeviation.push(stop);
                     }
+                    resolve();
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
@@ -893,7 +894,7 @@ function removestopshighdeviation(res, driver, stops, direction, hike, hitcher) 
                 })
             );
         }
-        console.log("removestopshighdeviation waiting...");
+        console.log("removestopshighdeviation waiting... promises " + promises + " " + promises.length);
         Promise.all(promises).then(() => {
             console.log("removestopshighdeviation stopsfairdeviation " + stopsfairdeviation.length);
             return resolve(stopsfairdeviation);
