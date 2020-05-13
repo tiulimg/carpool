@@ -1193,7 +1193,7 @@ function hikeproperties(hike, hikers) {
     if (hike.starttime) {
         var starttime = new Date(hike.starttime);
         var endtime = new Date(hike.endtime);
-        hike.duration = endtime - starttime;
+        hike.duration = (endtime - starttime) / 60000;
         hike.maximumpublictransporttime = hike.duration / 3;
     }
     hike.maximumcardeviation = 15;
