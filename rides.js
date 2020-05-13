@@ -494,7 +494,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
         else {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
                 "&combineChange=true&language=he" + arrivaldepartaddition;
-            console.log("calculatecarroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
+            console.log("findroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
                 " depart " + departtime + " mode " + mode + " description " + description);
         }
         console.log("url good " + url);
@@ -503,7 +503,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             method: "GET",
         }, function (error, response, body){
             if (error) {
-                var rejection = "calculatecarroute Promise reject: " + error;
+                var rejection = "findroute Promise reject: " + error;
                 console.log(rejection);
                 return reject(rejection);
             }
@@ -518,7 +518,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     logservices.logRejection(error);
                     return reject("error " + error);
                 }
-                //console.log("calculatecarroute here responsebodyjson " + JSON.stringify(responsebodyjson));
+                //console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
                     return resolve("No route found");
                 }
@@ -838,7 +838,8 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
             " comesfrom " + neardriver.comesfromdetailed + " returns to " + neardriver.returnstodetailed;
         console.log(description);
 
-        findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransport", arrival, depart, description)
+        findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransport", arrival, depart, 
+            null, null, description)
         .then(routetodriver => {
             console.log("routetodriver " + routetodriver.traveltime + " hike.maximumpublictransporttime " + 
                 hike.maximumpublictransporttime);
@@ -850,7 +851,8 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
                 removestopshighdeviation(res, neardriver, driverstops, direction, hike, hiker)
                 .then(driverandhitcherwouldstopat => {
     //                var driverandhitcherwouldstopat = util.getDistancesToStops(neardriver, driverstops, direction);
-                    console.log("stops " + driverstops.length);
+                    console.log("driverstops " + driverstops.length + " driverandhitcherwouldstopat " + 
+                        driverandhitcherwouldstopat.length);
                     if (driverandhitcherwouldstopat.length > 0) {
                         return resolve(true);
                     }
@@ -878,6 +880,7 @@ function removestopshighdeviation(res, driver, stops, direction, hike, hitcher) 
             promises.push(
                 woulddriverstop(res, driver, stop, direction, hike, hitcher)
                 .then(wouldstop => {
+                    console.log("removestopshighdeviation wouldstop " + wouldstop);
                     if (wouldstop) {
                         stopsfairdeviation.push(stop);
                     }
@@ -888,6 +891,7 @@ function removestopshighdeviation(res, driver, stops, direction, hike, hitcher) 
             );
         }
         Promise.all(promises).then(() => {
+            console.log("removestopshighdeviation stopsfairdeviation " + stopsfairdeviation.length);
             return resolve(stopsfairdeviation);
         })
     });
@@ -914,7 +918,7 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
             " come to stop " + stop.name + " in arrival " + arrival + " depart " + depart;
         console.log(description);
 
-        findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, description)
+        findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, null, null, description)
         .then(routetostop => {
             if (routetostop.traveltime) {
                 console.log("routetostop+travaltimefromstop " + (routetostop.traveltime+travaltimefromstop) + 
@@ -981,7 +985,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                         " in arrival " + arrival + " depart " + depart;
                     console.log(description);
         
-                    findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, description)
+                    findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, null, null, description)
                     .then(routetostop => {
                         if (routetostop.traveltime) {
                             console.log("routetostop " + routetostop.traveltime);
@@ -994,6 +998,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                             }
                             wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, depart, travaltimefromstop)
                             .then(hitcherwouldcome => {
+                                console.log("hitcherwouldcome " + hitcherwouldcome);
                                 return resolve(hitcherwouldcome);
                             })
                             .catch(rejection => {
@@ -1193,7 +1198,7 @@ function hikeproperties(hike, hikers) {
     if (hike.starttime) {
         var starttime = new Date(hike.starttime);
         var endtime = new Date(hike.endtime);
-        hike.duration = (endtime - starttime) / 60000;
+        hike.duration = (endtime - starttime) / 1000;
         hike.maximumpublictransporttime = hike.duration / 3;
     }
     hike.maximumcardeviation = 15;
