@@ -495,7 +495,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             // console.log("calculatecarroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
             //     " depart " + departtime + " mode " + mode);
         }
-        console.log("url " + url);
+//        console.log("url " + url);
         request({
             url: url,
             method: "GET",
@@ -507,8 +507,16 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             }
             else
             {
-                var responsebodyjson = JSON.parse(response.body);
-                console.log("calculatecarroute here responsebodyjson " + JSON.stringify(responsebodyjson));
+                var responsebodyjson;
+                try {
+                    responsebodyjson = JSON.parse(response.body);
+                } catch (error) {
+                    console.log("url " + url);
+                    console.log("body " + response.body);
+                    logservices.logRejection(error);
+                    return reject("error " + error);
+                }
+                //console.log("calculatecarroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
                     return resolve("No route found");
                 }
