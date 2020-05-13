@@ -2541,53 +2541,10 @@ app.patch("/api/calculaterides", function(req, res) {
         dbservices.gethikes(res)
         .then(hikes => {
             var nearhikes = tools.get_near_hikes(hikes);
-            for (let hikeindex = 0; hikeindex < nearhikes.length; hikeindex++) {
-                const hike = nearhikes[hikeindex];
-                dbservices.gethikersbyhikedate(res, hike.hikedate)
-                .then(hikers => {
-                    if (hikers && hikers.length > 0){
-                        console.log("start calculation for " + hike.hikenamehebrew);
-                        ridesmodules.hikeproperties(hike, hikers);
-                        ridesmodules.findhikerslocation(hikers)
-                        .then(() => {
-                            // public transport for hikers that don't need a ride
-                            return ridesmodules.bustohike(false, hike, res);
-                        })
-                        .then(() => {
-                            ridesmodules.setavailableplaces(hike);
-                            ridesmodules.setrequiredseats(hike);
-                            return ridesmodules.carstohike(hike, res);
-                        })
-                        .then(() => {
-                            console.log("calculaterides getDistancesBetweenHikers");
-                            hike.hikersdistances = tools.getDistancesBetweenHikers(hikers);
-                            //var areas = tools.getHikerAreas(hikers);
-
-                        //     ridesmodules.makecalculation(hike);
-                        // })
-                        // .then(() => {
-                        //     ridesmodules.switchhitcherscannotreachdriver(res, hike);
-                        // })
-                        // .then(() => {
-                            return ridesmodules.fillavailableplaces(res, hike);
-                        })
-                        .then(() => {
-                            ridesmodules.updateavailableplaces(hike);
-                            logservices.logcalculationresult(hikers);
-
-                            // public transport for hikers that hadn't left with a ride
-                            return ridesmodules.bustohike(true, hike, res)
-                        })
-                        .then(() => {
-                            return dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
-                        })
-                        .then(() => {
-                            register.updateCarpool(res);
-                        })
-                        .catch(rejection => {
-                            logservices.logRejection(rejection);
-                        });
-                    };
+            if (nearhikes.length > 0) {
+                ridesmodules.nexthiketosetcarpool(res, nearhikes, 0)
+                .then(() => {
+                    register.updateCarpool(res);
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
