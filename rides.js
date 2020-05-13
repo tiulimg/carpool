@@ -487,9 +487,9 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
         if (middlelat && middlelon) {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+middlelat+"%2C"+middlelon+"&waypoint2="+endlat+"%2C"+endlon + 
                 "&mode=fastest%3B" + mode + "&combineChange=true&language=he" + arrivaldepartaddition;
-            console.log("calculatecarroute here start ("+startlat+","+startlon+") middle ("+middlelat+","+middlelon+
-                ") end ("+endlat+","+endlon+") arrival " + arrivaltime + " depart " + departtime + " mode " + mode) + 
-                " description " + description;
+            console.log("findroute here start ("+startlat+","+startlon+") middle ("+middlelat+","+middlelon+
+                ") end ("+endlat+","+endlon+") arrival " + arrivaltime + " depart " + departtime + " mode " + mode + 
+                " description " + description);
         }
         else {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
@@ -834,7 +834,7 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
             console.log("desired depart from driver " + depart);
         }
         var description = "can " + hiker.fullname + " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed + 
-            direction + " the hike " + hike.hikenamehebrew + " meet " + neardriver.fullname + 
+            " " + direction + " the hike " + hike.hikenamehebrew + " meet " + neardriver.fullname + 
             " comesfrom " + neardriver.comesfromdetailed + " returns to " + neardriver.returnstodetailed;
         console.log(description);
 
@@ -908,7 +908,8 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
             endlon = hitcher.returnstolocation.lon;
         }
         var description = "can " + hiker.fullname + " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed + 
-            direction + " the hike " + hike.hikenamehebrew + " come to stop " + stop.name + " in arrival " + arrival + " depart " + depart;
+            " " + direction + " the hike " + hike.hikenamehebrew + " come to stop " + stop.name + 
+            " in arrival " + arrival + " depart " + depart;
         console.log(description);
 
         findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, description)
@@ -1297,7 +1298,12 @@ function fillavailableplaces(res, hike) {
     return new Promise((resolve, reject) => {
         return nexthikercalculateride(res, hike, "to", 0)
         .then(() => {
+            console.log("fillavailableplaces fromthehike");
             return nexthikercalculateride(res, hike, "from", 0)
+        })
+        .then(() => {
+            console.log("fillavailableplaces resolve");
+            return resolve();
         })
         .catch(rejection => {
             logservices.logRejection(rejection);
@@ -1307,6 +1313,7 @@ function fillavailableplaces(res, hike) {
 
 function nexthikercalculateride(res, hike, direction, hikerindex) {
     return new Promise((resolve, reject) => {
+        console.log("hike.hitchers.length " + hike.hitchers.length + " hikerindex " + hikerindex);
         if (hikerindex < hike.hitchers.length) {
             var hiker = hike.hitchers[hikerindex];
             if (hiker.seatsrequired > 0) {
@@ -1326,6 +1333,7 @@ function nexthikercalculateride(res, hike, direction, hikerindex) {
             }
         }
         else {
+            console.log("nexthikercalculateride resolve");
             return resolve();
         }
     });
