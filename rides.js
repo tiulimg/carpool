@@ -568,9 +568,9 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
         }
         var transportincache = transportcachearray[transportincachekey];
         if (transportincache) {
-            if (transportincache.traveltime) {
-                console.log("route.traveltime " + transportincache.traveltime);
-            }
+            // if (transportincache.traveltime) {
+            //     console.log("route.traveltime " + transportincache.traveltime);
+            // }
             // console.log("found in cache:\n" + JSON.stringify(transportincache));
             return resolve(transportincache);
         }
@@ -578,18 +578,18 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
             dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon)
             .then(routefromdb => {
                 if (routefromdb) {
-                    if (routefromdb.traveltime) {
-                        console.log("route.traveltime " + routefromdb.traveltime);
-                    }
+                    // if (routefromdb.traveltime) {
+                    //     console.log("route.traveltime " + routefromdb.traveltime);
+                    // }
                     return resolve(routefromdb);
                 }
                 else {
                     findroute(
                         startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon)
                     .then(route => {
-                        if (route.traveltime) {
-                            console.log("route.traveltime " + route.traveltime);
-                        }
+                        // if (route.traveltime) {
+                        //     console.log("route.traveltime " + route.traveltime);
+                        // }
                         transportcachearray[transportincachekey] = route;
                         dbservices.insertnewroute(res, route)
                         .catch(rejection => {
@@ -1287,41 +1287,35 @@ function stopsinrectangle(driverlat, driverlon, hikelat, hikelon) {
 
 function fillavailableplaces(res, hike) {
     return new Promise((resolve, reject) => {
-        var timer = 0;
-        for (let index = 0; index < hike.hitchers.length; index++) {
-            const hiker = hike.hitchers[index];
+        return nexthikercalculateride(res, hike, "to", 0)
+        .then(() => {
+            return nexthikercalculateride(res, hike, "from", 0)
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
+    });
+}
+
+function nexthikercalculateride(res, hike, direction, hikerindex) {
+    return new Promise((resolve, reject) => {
+        if (hikerindex < hike.hitchers.length) {
+            var hiker = hike.hitchers[hikerindex];
             if (hiker.seatsrequired > 0) {
-                timer++;
-                tools.wait(timer * 1000)
-                .then(() => {
-                    console.log("waited " + timer + " seconds");
-                    console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
-                    " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
-                    " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);    
-                    return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "to");
-                })
-                .then(() => {
-                    return calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, "from");
-                })
-                .then(() => {
-                    return resolve();
-                })
+                console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
+                            " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
+                            " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
+                return nextdriverifcannotmeet(res, hikerindex, hike, direction, 0)
                 .catch(rejection => {
                     logservices.logRejection(rejection);
                 });
             }
-        }
-        return resolve(timer);
-    });
-}
-
-function calculateridesbydistanceanddirectionifcanmeet(res, hiker, hike, direction) {
-    return new Promise((resolve, reject) => {
-        if (!hiker["route"+direction+"thehike"] && hike.startlatitude) {
-            return nextdriverifcannotmeet(res, hiker, hike, direction, 0)
-            .catch(rejection => {
-                logservices.logRejection(rejection);
-            });
+            else {
+                return nexthikercalculateride(res, hike, direction, hikerindex+1)
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                });
+            }
         }
         else {
             return resolve();
@@ -1345,56 +1339,73 @@ function setrequiredseats(hike) {
     }
 }
 
-function nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex) {
+function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex) {
     return new Promise((resolve, reject) => {
-        var distances = hike.hikersdistances;
-        if (neardriverindex >= distances[hiker.phone][direction+"thehike"].length) {
-            return resolve();
-        }
-        else {
-            const neardriverdistance = distances[hiker.phone][direction+"thehike"][neardriverindex];
-            var neardriver = neardriverdistance.link;
-            console.log("calculaterides driver "+direction+" the hike: distance " + 
-                neardriverdistance.distance + 
-                " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
-                neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
-                " neardriver.availableplaces"+direction+"thehike " + neardriver["availableplaces"+direction+"thehike"] + 
-                " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
-                neardriver.returnstodetailed);
-            console.log("places seats " + neardriver["availableplaces"+direction+"thehike"] + " " + 
-                hiker["seatsrequired"+direction+"thehike"]);
-            if (neardriver["availableplaces"+direction+"thehike"] >= hiker["seatsrequired"+direction+"thehike"]) {
-                console.log("hiker[mydriver+direction] " + hiker["mydriver"+direction]); 
+        var hiker = hike.hitchers[hikerindex];
+        if (!hiker["route"+direction+"thehike"] && hike.startlatitude) {
+            var distances = hike.hikersdistances;
+            if (neardriverindex >= distances[hiker.phone][direction+"thehike"].length) {
+                return resolve();
+            }
+            else {
+                const neardriverdistance = distances[hiker.phone][direction+"thehike"][neardriverindex];
+                var neardriver = neardriverdistance.link;
+                console.log("calculaterides driver "+direction+" the hike: distance " + 
+                    neardriverdistance.distance + 
+                    " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
+                    neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
+                    " neardriver.availableplaces"+direction+"thehike " + neardriver["availableplaces"+direction+"thehike"] + 
+                    " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
+                    neardriver.returnstodetailed);
+                console.log("places seats " + neardriver["availableplaces"+direction+"thehike"] + " " + 
+                    hiker["seatsrequired"+direction+"thehike"]);
+                if (neardriver["availableplaces"+direction+"thehike"] >= hiker["seatsrequired"+direction+"thehike"]) {
+                    console.log("hiker[mydriver+direction] " + hiker["mydriver"+direction]); 
 
-                if (!hiker["mydriver"+direction]) {
-                    canhitcherreachdriver(res, hiker, neardriver, direction, hike)
-                    .then(canmeet => {
-                        console.log("canmeet " + canmeet);
-                        if (canmeet) {
-                            addhitchertodriver(hiker, neardriver, direction);
-                            return resolve();
-                        }
-                        else {
-                            return nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex+1)
-                            .catch(rejection => {
-                                logservices.logRejection(rejection);
-                            });
-                        }
-                    })
+                    if (!hiker["mydriver"+direction]) {
+                        canhitcherreachdriver(res, hiker, neardriver, direction, hike)
+                        .then(canmeet => {
+                            console.log("canmeet " + canmeet);
+                            if (canmeet) {
+                                addhitchertodriver(hiker, neardriver, direction);
+                                if (hikerindex >= hike.hitchers.length) {
+                                    return resolve();
+                                }
+                                else {
+                                    return nexthikercalculateride(res, hike, direction, hikerindex+1)
+                                    .catch(rejection => {
+                                        logservices.logRejection(rejection);
+                                    });
+                                }
+                            }
+                            else {
+                                return nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex+1)
+                                .catch(rejection => {
+                                    logservices.logRejection(rejection);
+                                });
+                            }
+                        })
+                        .catch(rejection => {
+                            logservices.logRejection(rejection);
+                        });
+                    }
+                    else {
+                        return resolve();
+                    }
+                }
+                else {
+                    return nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex+1)
                     .catch(rejection => {
                         logservices.logRejection(rejection);
                     });
                 }
-                else {
-                    return resolve();
-                }
             }
-            else {
-                return nextdriverifcannotmeet(res, hiker, hike, direction, neardriverindex+1)
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
-            }
+        }
+        else {
+            return nexthikercalculateride(res, hike, direction, hikerindex+1)
+            .catch(rejection => {
+                logservices.logRejection(rejection);
+            });
         }
     });
 }

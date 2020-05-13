@@ -2571,17 +2571,12 @@ app.patch("/api/calculaterides", function(req, res) {
                         // .then(() => {
                             return ridesmodules.fillavailableplaces(res, hike);
                         })
-                        .then(timer => {
-                            timer += 60;
-                            return tools.wait(timer * 1000)
-                            .then(() => {
-                                console.log("waited " + timer + " seconds (last)");
-                                ridesmodules.updateavailableplaces(hike);
-                                logservices.logcalculationresult(hikers);
+                        .then(() => {
+                            ridesmodules.updateavailableplaces(hike);
+                            logservices.logcalculationresult(hikers);
 
-                                // public transport for hikers that hadn't left with a ride
-                                return ridesmodules.bustohike(true, hike, res)
-                            })
+                            // public transport for hikers that hadn't left with a ride
+                            return ridesmodules.bustohike(true, hike, res)
                         })
                         .then(() => {
                             return dbservices.replaceallhikersforhike(res, hike.hikedate, hikers)
