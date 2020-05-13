@@ -1413,7 +1413,7 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
                 // console.log("places seats " + neardriver["availableplaces"+direction+"thehike"] + " " + 
                 //     hiker["seatsrequired"+direction+"thehike"]);
                 if (neardriver["availableplaces"+direction+"thehike"] >= hiker["seatsrequired"+direction+"thehike"]) {
-                    console.log("hiker[mydriver+direction] " + hiker["mydriver"+direction]); 
+                    // console.log("hiker[mydriver+direction] " + hiker["mydriver"+direction]); 
 
                     if (!hiker["mydriver"+direction]) {
                         canhitcherreachdriver(res, hiker, neardriver, direction, hike)
@@ -1426,7 +1426,7 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
                             else {
                                 return nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex+1)
                                 .then(() => {
-                                    console.log("nextdriverifcannotmeet cannot meet next driver");
+                                    //console.log("nextdriverifcannotmeet cannot meet next driver");
                                     return resolve();
                                 })
                                 .catch(rejection => {
@@ -1439,14 +1439,14 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
                         });
                     }
                     else {
-                        console.log("nextdriverifcannotmeet already have a driver");
+                        //console.log("nextdriverifcannotmeet already have a driver");
                         return resolve();
                     }
                 }
                 else {
                     return nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex+1)
                     .then(() => {
-                        console.log("nextdriverifcannotmeet no places next driver");
+                        //console.log("nextdriverifcannotmeet no places next driver");
                         return resolve();
                     })
                     .catch(rejection => {
@@ -1456,7 +1456,7 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
             }
         }
         else {
-            console.log("nextdriverifcannotmeet don't need a ride");
+            //console.log("nextdriverifcannotmeet don't need a ride");
             return resolve();
         }
     });
@@ -1497,7 +1497,10 @@ function nexthiketosetcarpool(res, nearhikes, hikeindex) {
                         return dbservices.replaceallhikersforhike(res, hike.hikedate, hikers);
                     })
                     .then(() => {
-                        return nexthiketosetcarpool(res, nearhikes, hikeindex+1);
+                        return nexthiketosetcarpool(res, nearhikes, hikeindex+1)
+                    })
+                    .then(() => {
+                        return resolve();
                     })
                     .catch(rejection => {
                         logservices.logRejection(rejection);
