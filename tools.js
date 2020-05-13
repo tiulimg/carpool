@@ -379,7 +379,12 @@ function getDistancesBetweenHikers(hikers) {
                     aage = Math.abs(hikerage - aage);
                     bage = Math.abs(hikerage - bage);
                     result = aage>bage ? -1 : aage<bage ? 1 : 0;
-                }                    
+                }
+                if (result == 0) {
+                    aname = a.link.fullname;
+                    bname = b.link.fullname;
+                    result = aname > bname;
+                }
             }
             return result;
         });
@@ -395,7 +400,12 @@ function getDistancesBetweenHikers(hikers) {
                     aage = Math.abs(hikerage - aage);
                     bage = Math.abs(hikerage - bage);
                     result = aage>bage ? -1 : aage<bage ? 1 : 0;
-                }                    
+                }
+                if (result == 0) {
+                    aname = a.link.fullname;
+                    bname = b.link.fullname;
+                    result = aname > bname;
+                }
             }
             return result;
         });
