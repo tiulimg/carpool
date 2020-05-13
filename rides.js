@@ -920,7 +920,7 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
             endlat = hitcher.returnstolocation.lat;
             endlon = hitcher.returnstolocation.lon;
         }
-        var description = "can " + hitcher.fullname + " comesfrom " + hitcher.comesfromdetailed + 
+        var description = "wouldhitchercometostop can " + hitcher.fullname + " comesfrom " + hitcher.comesfromdetailed + 
             " returns to " + hitcher.returnstodetailed + " " + direction + " the hike " + hike.hikenamehebrew + 
             " come to stop " + stop.name + " in arrival " + arrival + " depart " + depart;
         console.log(description);
@@ -928,7 +928,7 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
         findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, null, null, description)
         .then(routetostop => {
             if (routetostop.traveltime) {
-                console.log("routetostop+travaltimefromstop " + (routetostop.traveltime+travaltimefromstop) + 
+                console.log("wouldhitchercometostop routetostop+travaltimefromstop " + (routetostop.traveltime+travaltimefromstop) + 
                     " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + " stop " + stop.name);
                 if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime) {
                     return resolve(true);
@@ -936,6 +936,10 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
                 else {
                     return resolve(false);
                 }
+            }
+            else {
+                console.log("wouldhitchercometostop no traveltime " + routetostop);
+                return resolve(false);
             }
         })
         .catch(rejection => {
