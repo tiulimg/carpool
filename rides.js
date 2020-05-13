@@ -909,9 +909,9 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
             endlat = hitcher.returnstolocation.lat;
             endlon = hitcher.returnstolocation.lon;
         }
-        var description = "can " + hiker.fullname + " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed + 
-            " " + direction + " the hike " + hike.hikenamehebrew + " come to stop " + stop.name + 
-            " in arrival " + arrival + " depart " + depart;
+        var description = "can " + hitcher.fullname + " comesfrom " + hitcher.comesfromdetailed + 
+            " returns to " + hitcher.returnstodetailed + " " + direction + " the hike " + hike.hikenamehebrew + 
+            " come to stop " + stop.name + " in arrival " + arrival + " depart " + depart;
         console.log(description);
 
         findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, description)
