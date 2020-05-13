@@ -582,7 +582,7 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
             // if (transportincache.traveltime) {
             //     console.log("route.traveltime " + transportincache.traveltime);
             // }
-            // console.log("found in cache:\n" + JSON.stringify(transportincache));
+            console.log("route found in cache");
             return resolve(transportincache);
         }
         else {
@@ -592,6 +592,7 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
                     // if (routefromdb.traveltime) {
                     //     console.log("route.traveltime " + routefromdb.traveltime);
                     // }
+                    console.log("route found in db");
                     return resolve(routefromdb);
                 }
                 else {
@@ -606,6 +607,7 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
                         .catch(rejection => {
                             logservices.logRejection(rejection);
                         });
+                        console.log("route found through query");
                         return resolve(route);
                     })
                     .catch(rejection => {
@@ -962,7 +964,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
             arrival = null;
             depart = hike.endtime;
         }
-        var description = "routethroughstop " + driver.fullname + " comesfrom " + driver.comesfromdetailed + " returns to " + 
+        var description = "routethroughstop details " + driver.fullname + " comesfrom " + driver.comesfromdetailed + " returns to " + 
             driver.returnstodetailed + " " + direction + " the hike " + hike.hikenamehebrew + " stop " + stop.name + 
             " in arrival " + arrival + " depart " + depart;
         console.log(description);
@@ -970,7 +972,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
         findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, stop.lat, stop.lon, description)
         .then(routethroughstop => {
             if (routethroughstop.traveltime) {
-                console.log("routethroughstop " + routethroughstop.traveltime);
+                console.log("routethroughstop traveltime " + routethroughstop.traveltime);
                 var additionaltime = routethroughstop.traveltime - driver["route"+direction+"thehike"].traveltime;
                 if (additionaltime <= hike.maximumcardeviation) {
                     arrival = null;
@@ -985,7 +987,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                         startlat = stop.lat;
                         startlon = stop.lon;
                     }
-                    description = "routetostop " + driver.fullname + " comesfrom " + driver.comesfromdetailed + " returns to " + 
+                    description = "routetostop details " + driver.fullname + " comesfrom " + driver.comesfromdetailed + " returns to " + 
                         driver.returnstodetailed + " " + direction + " the hike " + hike.hikenamehebrew + " stop " + stop.name + 
                         " in arrival " + arrival + " depart " + depart;
                     console.log(description);
@@ -993,7 +995,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                     findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, null, null, description)
                     .then(routetostop => {
                         if (routetostop.traveltime) {
-                            console.log("routetostop " + routetostop.traveltime);
+                            console.log("routetostop traveltime " + routetostop.traveltime);
                             var travaltimefromstop = routethroughstop.traveltime - routetostop.traveltime;
                             if (direction == "to") {
                                 arrival = tools.addsecondstodate(depart, routetostop.traveltime);
@@ -1011,6 +1013,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                             });
                         }
                         else {
+                            console.log("routetostop no traveltime " + routetostop);
                             return resolve(false);
                         }
                     })
@@ -1019,10 +1022,12 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                     });
                 }
                 else {
+                    console.log("routethroughstop additionaltime big");
                     return resolve(false);
                 }
             }
             else {
+                console.log("routethroughstop no traveltime " + routethroughstop)
                 return resolve(false);
             }
         })
