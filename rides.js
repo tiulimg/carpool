@@ -487,17 +487,17 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
         if (middlelat && middlelon) {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+middlelat+"%2C"+middlelon+"&waypoint2="+endlat+"%2C"+endlon + 
                 "&mode=fastest%3B" + mode + "&combineChange=true&language=he" + arrivaldepartaddition;
-            console.log("findroute here start ("+startlat+","+startlon+") middle ("+middlelat+","+middlelon+
-                ") end ("+endlat+","+endlon+") arrival " + arrivaltime + " depart " + departtime + " mode " + mode + 
-                " description " + description);
+            // console.log("findroute here start ("+startlat+","+startlon+") middle ("+middlelat+","+middlelon+
+            //     ") end ("+endlat+","+endlon+") arrival " + arrivaltime + " depart " + departtime + " mode " + mode + 
+            //     " description " + description);
         }
         else {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
                 "&combineChange=true&language=he" + arrivaldepartaddition;
-            console.log("findroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
-                " depart " + departtime + " mode " + mode + " description " + description);
+            // console.log("findroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
+            //     " depart " + departtime + " mode " + mode + " description " + description);
         }
-        console.log("url good " + url);
+//        console.log("url good " + url);
         request({
             url: url,
             method: "GET",
@@ -582,7 +582,7 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
             // if (transportincache.traveltime) {
             //     console.log("route.traveltime " + transportincache.traveltime);
             // }
-            console.log("route found in cache");
+            //console.log("route found in cache");
             return resolve(transportincache);
         }
         else {
@@ -592,7 +592,7 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
                     // if (routefromdb.traveltime) {
                     //     console.log("route.traveltime " + routefromdb.traveltime);
                     // }
-                    console.log("route found in db");
+                    //console.log("route found in db");
                     return resolve(routefromdb);
                 }
                 else {
@@ -607,7 +607,7 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
                         .catch(rejection => {
                             logservices.logRejection(rejection);
                         });
-                        console.log("route found through query");
+                        //console.log("route found through query");
                         return resolve(route);
                     })
                     .catch(rejection => {
@@ -662,7 +662,7 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
 
 function transporttohikebydirection(hiker, hike, direction, res, mode) {
     return new Promise((resolve, reject) => {
-        console.log(mode + " " + direction + " the hike for hiker " + hiker.fullname);
+        //console.log(mode + " " + direction + " the hike for hiker " + hiker.fullname);
         var arrival = hike.starttime;
         var depart = null;
         var startlat;
@@ -838,13 +838,13 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
         var description = "can " + hiker.fullname + " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed + 
             " " + direction + " the hike " + hike.hikenamehebrew + " meet " + neardriver.fullname + 
             " comesfrom " + neardriver.comesfromdetailed + " returns to " + neardriver.returnstodetailed;
-        console.log(description);
+        //console.log(description);
 
         findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransport", arrival, depart, 
             null, null, description)
         .then(routetodriver => {
-            console.log("routetodriver " + routetodriver.traveltime + " hike.maximumpublictransporttime " + 
-                hike.maximumpublictransporttime);
+            // console.log("routetodriver " + routetodriver.traveltime + " hike.maximumpublictransporttime " + 
+            //     hike.maximumpublictransporttime);
             if (routetodriver.traveltime && routetodriver.traveltime < hike.maximumpublictransporttime) {
                 return resolve(true);
             }
@@ -885,20 +885,16 @@ function removestopshighdeviation(res, driver, stops, direction, hike, hitcher) 
                     if (wouldstop) {
                         stopsfairdeviation.push(stop);
                     }
-                    console.log("removestopshighdeviation wouldstop " + wouldstop + " " + direction + " stop " + stop.name + 
-                        " stopsfairdeviation " + stopsfairdeviation.length);
+                    // console.log("removestopshighdeviation wouldstop " + wouldstop + " " + direction + " stop " + stop.name + 
+                    //     " stopsfairdeviation " + stopsfairdeviation.length);
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
                 })
-                .finally(() => {
-                    console.log("removestopshighdeviation finally");
-                })
             );
         }
-        console.log("removestopshighdeviation waiting... promises " + promises + " " + promises.length);
         Promise.all(promises).then(() => {
-            console.log("removestopshighdeviation stopsfairdeviation " + stopsfairdeviation.length);
+            // console.log("removestopshighdeviation stopsfairdeviation " + stopsfairdeviation.length);
             return resolve(stopsfairdeviation);
         })
     });
@@ -923,13 +919,13 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
         var description = "wouldhitchercometostop can " + hitcher.fullname + " comesfrom " + hitcher.comesfromdetailed + 
             " returns to " + hitcher.returnstodetailed + " " + direction + " the hike " + hike.hikenamehebrew + 
             " come to stop " + stop.name + " in arrival " + arrival + " depart " + depart;
-        console.log(description);
+        //console.log(description);
 
         findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, null, null, description)
         .then(routetostop => {
             if (routetostop.traveltime) {
-                console.log("wouldhitchercometostop routetostop+travaltimefromstop " + (routetostop.traveltime+travaltimefromstop) + 
-                    " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + " stop " + stop.name);
+                // console.log("wouldhitchercometostop routetostop+travaltimefromstop " + (routetostop.traveltime+travaltimefromstop) + 
+                //     " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + " stop " + stop.name);
                 if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime) {
                     return resolve(true);
                 }
@@ -938,7 +934,7 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
                 }
             }
             else {
-                console.log("wouldhitchercometostop no traveltime " + routetostop);
+                //console.log("wouldhitchercometostop no traveltime " + routetostop);
                 return resolve(false);
             }
         })
@@ -971,12 +967,12 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
         var description = "routethroughstop details " + driver.fullname + " comesfrom " + driver.comesfromdetailed + " returns to " + 
             driver.returnstodetailed + " " + direction + " the hike " + hike.hikenamehebrew + " stop " + stop.name + 
             " in arrival " + arrival + " depart " + depart;
-        console.log(description);
+        //console.log(description);
 
         findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, stop.lat, stop.lon, description)
         .then(routethroughstop => {
             if (routethroughstop.traveltime) {
-                console.log("routethroughstop traveltime " + routethroughstop.traveltime);
+                //console.log("routethroughstop traveltime " + routethroughstop.traveltime);
                 var additionaltime = routethroughstop.traveltime - driver["route"+direction+"thehike"].traveltime;
                 if (additionaltime <= hike.maximumcardeviation) {
                     arrival = null;
@@ -994,12 +990,12 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                     description = "routetostop details " + driver.fullname + " comesfrom " + driver.comesfromdetailed + " returns to " + 
                         driver.returnstodetailed + " " + direction + " the hike " + hike.hikenamehebrew + " stop " + stop.name + 
                         " in arrival " + arrival + " depart " + depart;
-                    console.log(description);
+                    //console.log(description);
         
                     findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, null, null, description)
                     .then(routetostop => {
                         if (routetostop.traveltime) {
-                            console.log("routetostop traveltime " + routetostop.traveltime);
+                            //console.log("routetostop traveltime " + routetostop.traveltime);
                             var travaltimefromstop = routethroughstop.traveltime - routetostop.traveltime;
                             if (direction == "to") {
                                 arrival = tools.addsecondstodate(depart, routetostop.traveltime);
@@ -1009,7 +1005,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                             }
                             wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, depart, travaltimefromstop)
                             .then(hitcherwouldcome => {
-                                console.log("hitcherwouldcome " + hitcherwouldcome);
+                                //console.log("hitcherwouldcome " + hitcherwouldcome);
                                 return resolve(hitcherwouldcome);
                             })
                             .catch(rejection => {
@@ -1017,7 +1013,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                             });
                         }
                         else {
-                            console.log("routetostop no traveltime " + routetostop);
+                            //console.log("routetostop no traveltime " + routetostop);
                             return resolve(false);
                         }
                     })
@@ -1026,12 +1022,12 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                     });
                 }
                 else {
-                    console.log("routethroughstop additionaltime big");
+                    //console.log("routethroughstop additionaltime big");
                     return resolve(false);
                 }
             }
             else {
-                console.log("routethroughstop no traveltime " + routethroughstop)
+                //console.log("routethroughstop no traveltime " + routethroughstop)
                 return resolve(false);
             }
         })
@@ -1345,7 +1341,10 @@ function nexthikercalculateride(res, hike, direction, hikerindex) {
                 console.log("calculaterides hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
                             " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
                             " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
-                return nextdriverifcannotmeet(res, hikerindex, hike, direction, 0)
+                nextdriverifcannotmeet(res, hikerindex, hike, direction, 0)
+                .then(() => {
+                    return nexthikercalculateride(res, hike, direction, hikerindex+1);
+                })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
                 });
@@ -1388,10 +1387,7 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
             console.log("nextdriverifcannotmeet drivers " + distances[hiker.phone][direction+"thehike"].length + 
                 " neardriverindex " + neardriverindex);
             if (neardriverindex >= distances[hiker.phone][direction+"thehike"].length) {
-                return nexthikercalculateride(res, hike, direction, hikerindex+1)
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
+                return resolve();
             }
             else {
                 const neardriverdistance = distances[hiker.phone][direction+"thehike"][neardriverindex];
@@ -1414,10 +1410,7 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
                             console.log("canmeet " + canmeet);
                             if (canmeet) {
                                 addhitchertodriver(hiker, neardriver, direction);
-                                return nexthikercalculateride(res, hike, direction, hikerindex+1)
-                                .catch(rejection => {
-                                    logservices.logRejection(rejection);
-                                }); 
+                                return resolve();
                             }
                             else {
                                 return nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex+1)
@@ -1431,10 +1424,7 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
                         });
                     }
                     else {
-                        return nexthikercalculateride(res, hike, direction, hikerindex+1)
-                        .catch(rejection => {
-                            logservices.logRejection(rejection);
-                        });
+                        return resolve();
                     }
                 }
                 else {
@@ -1446,10 +1436,7 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
             }
         }
         else {
-            return nexthikercalculateride(res, hike, direction, hikerindex+1)
-            .catch(rejection => {
-                logservices.logRejection(rejection);
-            });
+            return resolve();
         }
     });
 }
