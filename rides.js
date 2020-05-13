@@ -827,7 +827,7 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
             }
             else {
                 var driverstops = stopsinthewaytohike(neardriver, hike, direction);
-                removestopshighdeviation(res, neardriver, driverstops, direction, hike, hitcher)
+                removestopshighdeviation(res, neardriver, driverstops, direction, hike, hiker)
                 .then(driverandhitcherwouldstopat => {
     //                var driverandhitcherwouldstopat = util.getDistancesToStops(neardriver, driverstops, direction);
                     console.log("stops " + driverstops.length);
@@ -875,11 +875,15 @@ function removestopshighdeviation(res, driver, stops, direction, hike, hitcher) 
 
 function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, depart, travaltimefromstop) {
     return new Promise((resolve, reject) => {
-        var startlat = hitcher.comesfromlocation.lat;
-        var startlon = hitcher.comesfromlocation.lon;
+        var startlat;
+        var startlon;
         var endlat = stop.lat;
         var endlon = stop.lon;
-        if (direction == "from") {
+        if (direction == "to") {
+            startlat = hitcher.comesfromlocation.lat;
+            startlon = hitcher.comesfromlocation.lon;
+        }
+        else if (direction == "from") {
             startlat = stop.lat;
             startlon = stop.lon;
             endlat = hitcher.returnstolocation.lat;
@@ -906,11 +910,15 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
     return new Promise((resolve, reject) => {
         var arrival = hike.starttime;
         var depart = null;
-        var startlat = driver.comesfromlocation.lat;
-        var startlon = driver.comesfromlocation.lon;
+        var startlat;
+        var startlon;
         var endlat = hike.startlatitude;
         var endlon = hike.startlongitude;
-        if (direction == "from") {
+        if (direction == "to") {
+            startlat = driver.comesfromlocation.lat;
+            startlon = driver.comesfromlocation.lon;
+        }
+        else if (direction == "from") {
             startlat = hike.endlatitude;
             startlon = hike.startlongitude;
             endlat = driver.returnstolocation.lat;
