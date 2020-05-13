@@ -880,11 +880,11 @@ function removestopshighdeviation(res, driver, stops, direction, hike, hitcher) 
             promises.push(
                 woulddriverstop(res, driver, stop, direction, hike, hitcher)
                 .then(wouldstop => {
-                    console.log("removestopshighdeviation wouldstop " + wouldstop + " " + direction + " stop " + stop.name);
                     if (wouldstop) {
                         stopsfairdeviation.push(stop);
                     }
-                    resolve();
+                    console.log("removestopshighdeviation wouldstop " + wouldstop + " " + direction + " stop " + stop.name + 
+                        " stopsfairdeviation " + stopsfairdeviation.length);
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
@@ -927,7 +927,7 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
         .then(routetostop => {
             if (routetostop.traveltime) {
                 console.log("routetostop+travaltimefromstop " + (routetostop.traveltime+travaltimefromstop) + 
-                    " hike.maximumpublictransporttime " + hike.maximumpublictransporttime);
+                    " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + " stop " + stop.name);
                 if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime) {
                     return resolve(true);
                 }
