@@ -481,6 +481,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             arrivaldepartaddition = "&depart="+departtime;
         }
         var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID;
+        console.log("findroute middlelat " + middlelat + " middlelon " + middlelon);
         if (middlelat && middlelon) {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+middlelat+"%2C"+middlelon+"&waypoint2="+endlat+"%2C"+endlon + 
                 "&mode=fastest%3B" + mode + "&combineChange=true&language=he" + arrivaldepartaddition;
@@ -562,6 +563,11 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
 
 function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depart, middlelat, middlelon, description) { 
     return new Promise((resolve, reject) => {
+        if (startlat == endlat && startlon == endlon) {
+            return resolve({
+                traveltime: 0
+            });
+        }
         arrivaldepart = arrival;
         if (depart) {
             arrivaldepart = depart;
@@ -571,6 +577,7 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
             transportcachearray = carroutecache;
         }
         var transportincachekey = mode+":"+startlat+","+startlon+":"+endlat+","+endlon+":"+arrivaldepart;
+        console.log("findroutecachedb middlelat " + middlelat + " middlelon " + middlelon);
         if (middlelat) {
             transportincachekey = mode+":"+startlat+","+startlon+":"+middlelat+","+middlelon+":"+endlat+","+endlon+":"+arrivaldepart;
         }
@@ -804,7 +811,8 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
         .then(routetodriver => {
             console.log("routetodriver " + routetodriver.traveltime + " hike.maximumpublictransporttime " + 
                 hike.maximumpublictransporttime);
-            if (routetodriver.traveltime && routetodriver.traveltime < hike.maximumpublictransporttime) {
+            if (routetodriver.traveltime == 0 || 
+                (routetodriver.traveltime && routetodriver.traveltime < hike.maximumpublictransporttime)) {
                 return resolve(true);
             }
             else {
@@ -883,10 +891,11 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
 
         findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, null, null, description)
         .then(routetostop => {
-            if (routetostop.traveltime) {
+            if (routetostop.traveltime || routetostop.traveltime == 0) {
                 console.log("wouldhitchercometostop routetostop " + routetostop.traveltime + " travaltimefromstop " + travaltimefromstop + 
                     " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + " stop " + stop.name);
-                if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime) {
+                if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime ||
+                    routetostop.traveltime * 4 < travaltimefromstop) {
                     stop.busroutetostoptime = routetostop.traveltime;
                     return resolve(true);
                 }
@@ -930,6 +939,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
             " in arrival " + arrival + " depart " + depart;
         //console.log(description);
 
+        console.log("woulddriverstop stop.lat " + stop.lat + " stop.lon " + stop.lon);
         findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, stop.lat, stop.lon, description)
         .then(routethroughstop => {
             if (routethroughstop.traveltime) {
@@ -958,7 +968,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
         
                     findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, null, null, description)
                     .then(routetostop => {
-                        if (routetostop.traveltime) {
+                        if (routetostop.traveltime || routetostop.traveltime == 0) {
                             stop.carroutetostoptime = routetostop.traveltime;
                             //console.log("routetostop traveltime " + routetostop.traveltime);
                             var travaltimefromstop = routethroughstop.traveltime - routetostop.traveltime;
