@@ -1283,22 +1283,7 @@ function stopsinrectangle(driverlat, driverlon, hikelat, hikelon) {
     return stopsinarea;
 }
 
-function fillavailableplaces(res, hike) {
-    return new Promise((resolve, reject) => {
-        nexthikercalculateride(res, hike, "to", 0)
-        .then(() => {
-            return nexthikercalculateride(res, hike, "from", 0)
-        })
-        .then(() => {
-            return resolve();
-        })
-        .catch(rejection => {
-            logservices.logRejection(rejection);
-        });
-    });
-}
-
-function nexthikercalculateride(res, hike, direction, hikerindex) {
+function nexthikercalculateride(res, hike, hikerindex) {
     return new Promise((resolve, reject) => {
         console.log("hike.hitchers.length " + hike.hitchers.length + " hikerindex " + hikerindex);
         if (hikerindex < hike.hitchers.length) {
@@ -1307,10 +1292,19 @@ function nexthikercalculateride(res, hike, direction, hikerindex) {
                 console.log("nexthikercalculateride hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
                             " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
                             " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
-                nextdriverifcannotmeet(res, hikerindex, hike, direction, 0)
+                nextdriverifcannotmeet(res, hikerindex, hike, "to", 0)
+                .then(() => {
+                    return nextdriverifcannotmeet(res, hikerindex, hike, "from", 0);
+                })
                 .then(() => {
                     // console.log("nexthikercalculateride finished nextdriverifcannotmeet next hiker");
-                    return nexthikercalculateride(res, hike, direction, hikerindex+1);
+                    if (hiker.mydriverto && hiker.mydriverto.link && !hiker.mydriverfrom && !hiker.routefromthehike) {
+                        removehitcherfromdriver(hiker, hiker.mydriverto.link, "to");
+                    }
+                    else if (!hiker.mydriverto && hiker.mydriverfrom && hiker.mydriverfrom.link && !hiker.routetothehike) {
+                        removehitcherfromdriver(hiker, hiker.mydriverfrom.link, "from");
+                    }
+                    return nexthikercalculateride(res, hike, hikerindex+1);
                 })
                 .then(() => {
                     // console.log("nexthikercalculateride finished a run1");
@@ -1322,7 +1316,7 @@ function nexthikercalculateride(res, hike, direction, hikerindex) {
             }
             else {
                 // console.log("nexthikercalculateride no seats required next hiker");
-                return nexthikercalculateride(res, hike, direction, hikerindex+1)
+                return nexthikercalculateride(res, hike, hikerindex+1)
                 .then(() => {
                     // console.log("nexthikercalculateride finished a run2");
                     return resolve();
@@ -1450,7 +1444,7 @@ function nexthiketosetcarpool(res, nearhikes, hikeindex) {
                     .then(() => {
                         console.log("nexthiketosetcarpool getDistancesBetweenHikers");
                         hike.hikersdistances = tools.getDistancesBetweenHikers(hikers);
-                        return fillavailableplaces(res, hike);
+                        return nexthikercalculateride(res, hike, 0);
                     })
                     .then(() => {
                         updateavailableplaces(hike);
