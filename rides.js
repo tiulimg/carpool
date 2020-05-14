@@ -581,12 +581,14 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
         if (middlelat) {
             transportincachekey = mode+":"+startlat+","+startlon+":"+middlelat+","+middlelon+":"+endlat+","+endlon+":"+arrivaldepart;
         }
+        console.log("transportincachekey " + transportincachekey + " middlelat " + middlelat + " middlelon " + middlelon + 
+            " description " + description);
         var transportincache = transportcachearray[transportincachekey];
         if (transportincache) {
             // if (transportincache.traveltime) {
             //     console.log("route.traveltime " + transportincache.traveltime);
             // }
-            //console.log("route found in cache");
+            console.log("route found in cache middlelat " + middlelat + " middlelon " + middlelon + " description " + description);
             return resolve(transportincache);
         }
         else {
@@ -596,7 +598,7 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
                     // if (routefromdb.traveltime) {
                     //     console.log("route.traveltime " + routefromdb.traveltime);
                     // }
-                    //console.log("route found in db");
+                    console.log("route found in db middlelat " + middlelat + " middlelon " + middlelon + " description " + description);
                     return resolve(routefromdb);
                 }
                 else {

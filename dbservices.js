@@ -363,6 +363,7 @@ function getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arr
             filter.middlelat = middlelat;
             filter.middlelon = middlelon;
         }
+        console.log("getroutebylatlontime middlelat " + middlelat + " middlelon " + middlelon + " filter " + JSON.stringify(filter));
         db.collection(ROUTES_COLLECTION).findOne(
             { $and: filter }, function(err, doc) {
             if (err) {
