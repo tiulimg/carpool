@@ -360,8 +360,8 @@ function getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arr
             filter.depart = depart;
         }
         if (middlelat && middlelon) {
-            filter.middlelat = middlelat;
-            filter.middlelon = middlelon;
+            filter.push({middlelat: middlelat});
+            filter.push({middlelon: middlelon});
         }
         console.log("getroutebylatlontime middlelat " + middlelat + " middlelon " + middlelon + " filter " + JSON.stringify(filter));
         db.collection(ROUTES_COLLECTION).findOne(
