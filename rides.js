@@ -17,7 +17,6 @@ module.exports = {
     carstohike: carstohike,
     updateavailableplaces: updateavailableplaces,
     hikeproperties: hikeproperties,
-    fillavailableplaces: fillavailableplaces,
     setavailableplaces: setavailableplaces,
     setrequiredseats: setrequiredseats,
     nexthiketosetcarpool: nexthiketosetcarpool,
