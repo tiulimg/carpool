@@ -481,7 +481,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             arrivaldepartaddition = "&depart="+departtime;
         }
         var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID;
-        console.log("findroute middlelat " + middlelat + " middlelon " + middlelon);
+        console.log("findroute middlelat " + middlelat + " middlelon " + middlelon + " description " + description);
         if (middlelat && middlelon) {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+middlelat+"%2C"+middlelon+"&waypoint2="+endlat+"%2C"+endlon + 
                 "&mode=fastest%3B" + mode + "&combineChange=true&language=he" + arrivaldepartaddition;
@@ -577,7 +577,7 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
             transportcachearray = carroutecache;
         }
         var transportincachekey = mode+":"+startlat+","+startlon+":"+endlat+","+endlon+":"+arrivaldepart;
-        console.log("findroutecachedb middlelat " + middlelat + " middlelon " + middlelon);
+        console.log("findroutecachedb middlelat " + middlelat + " middlelon " + middlelon + " description " + description);
         if (middlelat) {
             transportincachekey = mode+":"+startlat+","+startlon+":"+middlelat+","+middlelon+":"+endlat+","+endlon+":"+arrivaldepart;
         }
@@ -600,6 +600,8 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
                     return resolve(routefromdb);
                 }
                 else {
+                    console.log("findroutecachedb b4 findroute middlelat " + middlelat + " middlelon " + middlelon + 
+                        " description " + description);
                     findroute(
                         startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon, description)
                     .then(route => {
@@ -939,7 +941,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
             " in arrival " + arrival + " depart " + depart;
         //console.log(description);
 
-        console.log("woulddriverstop stop.lat " + stop.lat + " stop.lon " + stop.lon);
+        console.log("woulddriverstop stop.lat " + stop.lat + " stop.lon " + stop.lon + " description " + description);
         findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, stop.lat, stop.lon, description)
         .then(routethroughstop => {
             if (routethroughstop.traveltime) {
