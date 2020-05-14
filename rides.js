@@ -494,7 +494,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             // console.log("findroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
             //     " depart " + departtime + " mode " + mode + " description " + description);
         }
-//        console.log("url good " + url);
+        console.log("url good " + url);
         request({
             url: url,
             method: "GET",
@@ -884,7 +884,7 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
         findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, null, null, description)
         .then(routetostop => {
             if (routetostop.traveltime) {
-                console.log("wouldhitchercometostop routetostop+travaltimefromstop " + (routetostop.traveltime+travaltimefromstop) + 
+                console.log("wouldhitchercometostop routetostop " + routetostop.traveltime + " travaltimefromstop " + travaltimefromstop + 
                     " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + " stop " + stop.name);
                 if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime) {
                     stop.busroutetostoptime = routetostop.traveltime;
@@ -935,7 +935,8 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
             if (routethroughstop.traveltime) {
                 var additionaltime = routethroughstop.traveltime - driver["route"+direction+"thehike"].traveltime;
                 console.log("woulddriverstop routethroughstop traveltime " + routethroughstop.traveltime + 
-                    " additionaltime " + additionaltime);
+                    " - route"+direction+"thehike " + driver["route"+direction+"thehike"].traveltime + 
+                    " = additionaltime " + additionaltime + " stop " + stop.name);
                 if (additionaltime <= hike.maximumcardeviation) {
                     stop.caradditionaltime = additionaltime;
                     arrival = null;
