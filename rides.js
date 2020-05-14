@@ -513,7 +513,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     console.log("url bad " + url);
                     console.log("body " + response.body);
                     logservices.logRejection(error);
-                    return reject("error " + error);
+                    return resolve("No route found");
                 }
                 //console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
@@ -802,8 +802,8 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
         findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransport", arrival, depart, 
             null, null, description)
         .then(routetodriver => {
-            // console.log("routetodriver " + routetodriver.traveltime + " hike.maximumpublictransporttime " + 
-            //     hike.maximumpublictransporttime);
+            console.log("routetodriver " + routetodriver.traveltime + " hike.maximumpublictransporttime " + 
+                hike.maximumpublictransporttime);
             if (routetodriver.traveltime && routetodriver.traveltime < hike.maximumpublictransporttime) {
                 return resolve(true);
             }
@@ -884,8 +884,8 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
         findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, null, null, description)
         .then(routetostop => {
             if (routetostop.traveltime) {
-                // console.log("wouldhitchercometostop routetostop+travaltimefromstop " + (routetostop.traveltime+travaltimefromstop) + 
-                //     " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + " stop " + stop.name);
+                console.log("wouldhitchercometostop routetostop+travaltimefromstop " + (routetostop.traveltime+travaltimefromstop) + 
+                    " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + " stop " + stop.name);
                 if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime) {
                     stop.busroutetostoptime = routetostop.traveltime;
                     return resolve(true);
@@ -933,8 +933,9 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
         findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, stop.lat, stop.lon, description)
         .then(routethroughstop => {
             if (routethroughstop.traveltime) {
-                //console.log("routethroughstop traveltime " + routethroughstop.traveltime);
                 var additionaltime = routethroughstop.traveltime - driver["route"+direction+"thehike"].traveltime;
+                console.log("woulddriverstop routethroughstop traveltime " + routethroughstop.traveltime + 
+                    " additionaltime " + additionaltime);
                 if (additionaltime <= hike.maximumcardeviation) {
                     stop.caradditionaltime = additionaltime;
                     arrival = null;
@@ -1441,7 +1442,6 @@ function nexthiketosetcarpool(res, nearhikes, hikeindex) {
                         return carstohike(hike, res);
                     })
                     .then(() => {
-                        console.log("nexthiketosetcarpool getDistancesBetweenHikers");
                         hike.hikersdistances = tools.getDistancesBetweenHikers(hikers);
                         return nexthikercalculateride(res, hike, 0);
                     })
