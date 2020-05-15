@@ -1179,7 +1179,7 @@ function hikeproperties(hike, hikers) {
         hike.duration = (endtime - starttime) / 1000;
         hike.maximumpublictransporttime = hike.duration / 3;
     }
-    hike.maximumcardeviation = 15;
+    hike.maximumcardeviation = 15 * 60;
 }
 
 function switchhitcherscannotreachdriver(res, hike) {
