@@ -939,9 +939,8 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
         .then(routethroughstop => {
             if (routethroughstop.traveltime) {
                 var additionaltime = routethroughstop.traveltime - driver["route"+direction+"thehike"].traveltime;
-                console.log("woulddriverstop routethroughstop traveltime " + routethroughstop.traveltime + 
-                    " - route"+direction+"thehike " + driver["route"+direction+"thehike"].traveltime + 
-                    " = additionaltime " + additionaltime + " stop " + stop.name);
+                console.log("woulddriverstop additionaltime " + additionaltime + " maximumcardeviation " + hike.maximumcardeviation + 
+                    " stop " + stop.name);
                 if (additionaltime <= hike.maximumcardeviation) {
                     stop.caradditionaltime = additionaltime;
                     arrival = null;
@@ -1177,7 +1176,7 @@ function hikeproperties(hike, hikers) {
         var starttime = new Date(hike.starttime);
         var endtime = new Date(hike.endtime);
         hike.duration = (endtime - starttime) / 1000;
-        hike.maximumpublictransporttime = hike.duration / 3;
+        hike.maximumpublictransporttime = hike.duration / 2.5;
     }
     hike.maximumcardeviation = 15 * 60;
 }
