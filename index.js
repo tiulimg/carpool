@@ -2559,8 +2559,21 @@ app.patch("/api/calculaterides", function(req, res) {
 });
 
 /*  "/api/routes"
+*    GET: prints all routes
 *    DELETE: deletes all routes
 */
+
+app.get("/api/routes", function(req, res) {
+    if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
+        dbservices.getroutes(res)
+        .then(routes => {
+            res.status(200).json(routes);
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
+    }
+});
 
 app.delete("/api/routes", function(req, res) {
     if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {

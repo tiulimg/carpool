@@ -354,16 +354,15 @@ function getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arr
         var filter = [ { startlat: startlat }, { startlon: startlon }, { endlat: endlat }, { endlon: endlon },
             { mode: mode } ];
         if (arrival) {
-            filter.arrival = arrival;
+            filter.push({arrival: arrival});
         }
         else if (depart) {
-            filter.depart = depart;
+            filter.push({depart: depart});
         }
         if (middlelat && middlelon) {
             filter.push({middlelat: middlelat});
             filter.push({middlelon: middlelon});
         }
-        console.log("getroutebylatlontime middlelat " + middlelat + " middlelon " + middlelon + " filter " + JSON.stringify(filter));
         db.collection(ROUTES_COLLECTION).findOne(
             { $and: filter }, function(err, doc) {
             if (err) {

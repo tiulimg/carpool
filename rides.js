@@ -481,7 +481,6 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             arrivaldepartaddition = "&depart="+departtime;
         }
         var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID;
-        console.log("findroute middlelat " + middlelat + " middlelon " + middlelon + " description " + description);
         if (middlelat && middlelon) {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+middlelat+"%2C"+middlelon+"&waypoint2="+endlat+"%2C"+endlon + 
                 "&mode=fastest%3B" + mode + "&combineChange=true&language=he" + arrivaldepartaddition;
@@ -495,7 +494,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             // console.log("findroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
             //     " depart " + departtime + " mode " + mode + " description " + description);
         }
-        console.log("url good " + url);
+        //console.log("url good " + url);
         request({
             url: url,
             method: "GET",
@@ -591,8 +590,6 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
                     return resolve(routefromdb);
                 }
                 else {
-                    console.log("findroutecachedb b4 findroute middlelat " + middlelat + " middlelon " + middlelon + 
-                        " description " + description);
                     findroute(
                         startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon, description)
                     .then(route => {
@@ -796,10 +793,13 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
         findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransport", arrival, depart, 
             null, null, description)
         .then(routetodriver => {
-            console.log("routetodriver " + routetodriver.traveltime + " hike.maximumpublictransporttime " + 
+            console.log("routetodriver " + routetodriver.traveltime + " drivertohike " + 
+                neardriver["route"+direction+"thehike"].traveltime + " hike.maximumpublictransporttime " + 
                 hike.maximumpublictransporttime);
             if (routetodriver.traveltime == 0 || 
-                (routetodriver.traveltime && routetodriver.traveltime < hike.maximumpublictransporttime)) {
+                (routetodriver.traveltime && 
+                 (routetodriver.traveltime + neardriver["route"+direction+"thehike"].traveltime < hike.maximumpublictransporttime) ||
+                  routetodriver.traveltime * 4 < neardriver["route"+direction+"thehike"].traveltime)) {
                 return resolve(true);
             }
             else {
