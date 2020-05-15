@@ -20,7 +20,7 @@ module.exports = {
     toRadians: toRadians,
     distanceLatLons: distanceLatLons,
     getDistancesBetweenHikers: getDistancesBetweenHikers,
-    getDistancesToStops: getDistancesToStops,
+    sortbyDistancesToStops: sortbyDistancesToStops,
     getHikerAreas: getHikerAreas,
 };
 
@@ -417,12 +417,15 @@ function getDistancesBetweenHikers(hikers) {
     return distances;
 }
 
-function getDistancesToStops(hiker, stops, direction) {
+function sortbyDistancesToStops(hiker, stops, direction) {
     var distances = {};
-    distances[direction+"stop"] = [];
-    var hikerlat = hiker.comesfromlocation.lat;
-    var hikerlon = hiker.comesfromlocation.lon;
-    if (direction == "from") {
+    var hikerlat;
+    var hikerlon;
+    if (direction == "to") {
+        hikerlat = hiker.comesfromlocation.lat;
+        hikerlon = hiker.comesfromlocation.lon;
+    }
+    else if (direction == "from") {
         hikerlat = hiker.returnstolocation.lat;
         hikerlon = hiker.returnstolocation.lon;
     }
@@ -430,25 +433,26 @@ function getDistancesToStops(hiker, stops, direction) {
     for (let indexstop = 0; indexstop < stops.length; indexstop++) {
         const stop = stops[indexstop];
         var stopdistance = distanceLatLons(hikerlat, hikerlon, stop.lat, stop.lon);
-        distances[direction+"stop"].push(
-            {
-                distance: stopdistance,
-                link: stop,
-            }
-        );
+        var stopkey = stop.lat + "," + stop.lon;
+        distances[stopkey] = {
+            distance: stopdistance,
+            link: stop,
+        };
     }
 
     // Sort distances for each hiker
-    distances[direction+"stop"].sort(function(b,a){
-        adistance = a.distance;
-        bdistance = b.distance;
+    stops.sort(function(b,a){
+        var stopakey = a.lat + "," + a.lon;
+        var stopbkey = b.lat + "," + b.lon;
+        adistance = distances[stopakey].distance;
+        bdistance = distances[stopbkey].distance;
         result = adistance>bdistance ? -1 : adistance<bdistance ? 1 : 0;
         return result;
     });
 
-    logservices.logstopsdistances(distances, direction);
+    //logservices.logstopsdistances(distances, direction);
 
-    return distances;
+    return stops;
 }
 
 function getHikerAreas(hikers) {

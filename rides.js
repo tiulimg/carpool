@@ -819,10 +819,10 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
             else {
                 var driverstops = stopsinthewaytohike(neardriver, hike, direction);
                 console.log("stopsinthewaytohike " + driverstops.length);
-                removestopshighdeviation(res, neardriver, driverstops, direction, hike, hiker)
+                var stopsnearhitcher = util.sortbyDistancesToStops(hiker, driverstops, direction);
+                removestopshighdeviation(res, neardriver, stopsnearhitcher, direction, hike, hiker)
                 .then(driverandhitcherwouldstopat => {
-    //                var driverandhitcherwouldstopat = util.getDistancesToStops(neardriver, driverstops, direction);
-                    console.log("driverstops " + driverstops.length + " driverandhitcherwouldstopat " + 
+                    console.log("stopsnearhitcher " + stopsnearhitcher.length + " driverandhitcherwouldstopat " + 
                         driverandhitcherwouldstopat.length + " " + JSON.stringify(driverandhitcherwouldstopat));
                     if (driverandhitcherwouldstopat.length > 0) {
                         hiker["stops"+direction+"thehike"] = driverandhitcherwouldstopat;
