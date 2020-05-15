@@ -36,11 +36,13 @@ function loghikersdistances(distances) {
     }
 }
 
-function logstopsdistances(distances, direction) {
+function logstopsdistances(distances, stops, direction) {
     console.log("distances:");
-    for (let index = 0; index < distances.length; index++) {
-        const dest = distances[index];
-        console.log(direction + "thehike: distance " + dest.distance + " meters dest " + dest.link.name);
+    for (let index = 0; index < stops.length; index++) {
+        var stop = stops[index];
+        var stopkey = stop.lat + "," + stop.lon;
+        const dest = distances[stopkey];
+        console.log(direction + "thehike: distance " + dest + " meters dest " + stop.name);
     }
 }
 

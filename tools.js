@@ -434,23 +434,20 @@ function sortbyDistancesToStops(hiker, stops, direction) {
         const stop = stops[indexstop];
         var stopdistance = distanceLatLons(hikerlat, hikerlon, stop.lat, stop.lon);
         var stopkey = stop.lat + "," + stop.lon;
-        distances[stopkey] = {
-            distance: stopdistance,
-            link: stop,
-        };
+        distances[stopkey] = stopdistance;
     }
 
     // Sort distances for each hiker
     stops.sort(function(b,a){
         var stopakey = a.lat + "," + a.lon;
         var stopbkey = b.lat + "," + b.lon;
-        adistance = distances[stopakey].distance;
-        bdistance = distances[stopbkey].distance;
+        adistance = distances[stopakey];
+        bdistance = distances[stopbkey];
         result = adistance>bdistance ? -1 : adistance<bdistance ? 1 : 0;
         return result;
     });
 
-    logservices.logstopsdistances(distances, direction);
+    logservices.logstopsdistances(stops, distances, direction);
 
     return stops;
 }
