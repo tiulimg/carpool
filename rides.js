@@ -846,7 +846,6 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
 
 function nextstopfairdeviation(res, driver, stops, stopsfairdeviation, direction, hike, hitcher, stopindex) {
     return new Promise((resolve, reject) => {
-        console.log("nextstopfairdeviation stopindex " + stopindex + " stopsfairdeviation " + stopsfairdeviation.length);
         if (stopindex < stops.length && stopsfairdeviation.length < 6) {
             var stop = stops[stopindex];
             woulddriverstop(res, driver, stop, direction, hike, hitcher)
@@ -854,11 +853,9 @@ function nextstopfairdeviation(res, driver, stops, stopsfairdeviation, direction
                 if (wouldstop) {
                     stopsfairdeviation.push(stop);
                 }
-                console.log("nextstopfairdeviation AAA");
                 return nextstopfairdeviation(res, driver, stops, stopsfairdeviation, direction, hike, hitcher, stopindex+1);
             })
             .then(stopsfairdeviation => {
-                console.log("nextstopfairdeviation BBB");
                 return resolve(stopsfairdeviation);
             })
             .catch(rejection => {
@@ -866,7 +863,6 @@ function nextstopfairdeviation(res, driver, stops, stopsfairdeviation, direction
             })
         }
         else {
-            console.log("nextstopfairdeviation CCC");
             return resolve(stopsfairdeviation);
         }
     });
