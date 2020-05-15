@@ -537,8 +537,10 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                             });
                         }
                     }
-                    var traveltime = 0;
-                    if (responsebodyjson.response.route[0].summary) {
+                    var traveltime;
+                    var distance;
+                    if (responsebodyjson.response.route[0].summary && responsebodyjson.response.route[0].summary.distance) {
+                        distance = responsebodyjson.response.route[0].summary.distance;
                         if (responsebodyjson.response.route[0].summary.trafficTime) {
                             traveltime = responsebodyjson.response.route[0].summary.trafficTime;
                         }
@@ -548,8 +550,8 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     }
 
                     var route = {
-                        length: leg.length,
-                        traveltime: leg.travelTime,
+                        length: distance,
+                        traveltime: traveltime,
                         maneuver: maneuver,
                         startlat: startlat,
                         startlon: startlon,
