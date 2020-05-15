@@ -520,21 +520,33 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     return resolve("No route found");
                 }
                 else if (responsebodyjson.response && responsebodyjson.response.route && responsebodyjson.response.route[0] &&
-                    responsebodyjson.response.route[0].leg && responsebodyjson.response.route[0].leg[0])
+                    responsebodyjson.response.route[0].leg)
                 {
-                    var leg = responsebodyjson.response.route[0].leg[0];
-                    var maneuver = [];
-                    for (let index = 0; index < leg.maneuver.length; index++) {
-                        const step = leg.maneuver[index];
-                        var instruction = step.instruction.replace(/<[^>]+>/g, '');
-                        //console.log("instruction " + instruction);
-                        maneuver.push({
-                            position: step.position,
-                            length: step.length,
-                            traveltime: step.travelTime,
-                            instruction: instruction,
-                        });
+                    for (let indexleg = 0; indexleg < responsebodyjson.response.route[0].leg.length; indexleg++) {
+                        const leg = responsebodyjson.response.route[0].leg[indexleg];
+                        var maneuver = [];
+                        for (let index = 0; index < leg.maneuver.length; index++) {
+                            const step = leg.maneuver[index];
+                            var instruction = step.instruction.replace(/<[^>]+>/g, '');
+                            //console.log("instruction " + instruction);
+                            maneuver.push({
+                                position: step.position,
+                                length: step.length,
+                                traveltime: step.travelTime,
+                                instruction: instruction,
+                            });
+                        }
                     }
+                    var traveltime = 0;
+                    if (responsebodyjson.response.route[0].summary) {
+                        if (responsebodyjson.response.route[0].summary.trafficTime) {
+                            traveltime = responsebodyjson.response.route[0].summary.trafficTime;
+                        }
+                        else if (responsebodyjson.response.route[0].summary.travelTime) {
+                            traveltime = responsebodyjson.response.route[0].summary.travelTime;
+                        }
+                    }
+
                     var route = {
                         length: leg.length,
                         traveltime: leg.travelTime,
@@ -949,8 +961,12 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                     findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, null, null, description)
                     .then(routetostop => {
                         if (routetostop.traveltime || routetostop.traveltime == 0) {
-                            stop.carroutetostoptime = routetostop.traveltime;
+                            stop.carroutetostoptime = routetostop.traveltime;        
                             var travaltimefromstop = routethroughstop.traveltime - routetostop.traveltime;
+                            console.log("woulddriverstop routethroughstop " + routethroughstop.traveltime + 
+                                " - routetostop " + routetostop.traveltime + 
+                                " = travaltimefromstop " + travaltimefromstop + " stop " + stop.name);
+
                             if (direction == "to") {
                                 arrival = tools.addsecondstodate(depart, routetostop.traveltime);
                             }
