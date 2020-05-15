@@ -971,6 +971,8 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                                 " - routetostop " + routetostop.traveltime + 
                                 " = travaltimefromstop " + travaltimefromstop + " stop " + stop.name);
 
+                            arrival = null;
+                            depart = null;
                             if (direction == "to") {
                                 arrival = tools.addsecondstodate(depart, routetostop.traveltime);
                             }
@@ -1303,7 +1305,12 @@ function nexthikercalculateride(res, hike, hikerindex) {
                             " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
                 nextdriverifcannotmeet(res, hikerindex, hike, "to", 0)
                 .then(() => {
-                    return nextdriverifcannotmeet(res, hikerindex, hike, "from", 0);
+                    if (hiker.mydriverto) {
+                        return nextdriverifcannotmeet(res, hikerindex, hike, "from", 0);
+                    }
+                    else {
+                        return resolve();
+                    }
                 })
                 .then(() => {
                     if (hiker.mydriverto && hiker.mydriverto.link && !hiker.mydriverfrom && !hiker.routefromthehike) {

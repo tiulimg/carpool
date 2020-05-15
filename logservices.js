@@ -37,7 +37,7 @@ function loghikersdistances(distances) {
 }
 
 function logstopsdistances(distances, stops, direction) {
-    console.log("distances:");
+    console.log("stop distances: " + stops.length);
     for (let index = 0; index < stops.length; index++) {
         var stop = stops[index];
         var stopkey = stop.lat + "," + stop.lon;
