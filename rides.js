@@ -818,6 +818,7 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
             }
             else {
                 var driverstops = stopsinthewaytohike(neardriver, hike, direction);
+                console.log("stopsinthewaytohike " + driverstops.length);
                 removestopshighdeviation(res, neardriver, driverstops, direction, hike, hiker)
                 .then(driverandhitcherwouldstopat => {
     //                var driverandhitcherwouldstopat = util.getDistancesToStops(neardriver, driverstops, direction);
@@ -885,12 +886,13 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
         var description = "wouldhitchercometostop can " + hitcher.fullname + " comesfrom " + hitcher.comesfromdetailed + 
             " returns to " + hitcher.returnstodetailed + " " + direction + " the hike " + hike.hikenamehebrew + 
             " come to stop " + stop.name + " in arrival " + arrival + " depart " + depart;
+        console.log(description);
 
         findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, null, null, description)
         .then(routetostop => {
+            console.log("wouldhitchercometostop routetostop " + routetostop.traveltime + " travaltimefromstop " + travaltimefromstop + 
+                " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + " stop " + stop.name);
             if (routetostop.traveltime || routetostop.traveltime == 0) {
-                console.log("wouldhitchercometostop routetostop " + routetostop.traveltime + " travaltimefromstop " + travaltimefromstop + 
-                    " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + " stop " + stop.name);
                 if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime ||
                     routetostop.traveltime * 4 < travaltimefromstop) {
                     stop.busroutetostoptime = routetostop.traveltime;
@@ -1176,7 +1178,7 @@ function hikeproperties(hike, hikers) {
         var starttime = new Date(hike.starttime);
         var endtime = new Date(hike.endtime);
         hike.duration = (endtime - starttime) / 1000;
-        hike.maximumpublictransporttime = hike.duration / 2.5;
+        hike.maximumpublictransporttime = hike.duration / 2;
     }
     hike.maximumcardeviation = 15 * 60;
 }

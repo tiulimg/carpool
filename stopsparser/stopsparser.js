@@ -44,7 +44,7 @@ csv()
 
   var resultstops = [];
   var currareastop;
-  var valid_descriptions = ["צומת", "רכבת", "קניון", "מרכזית", "מסוף", "מחלף"];
+  var valid_descriptions = ["צומת", "רכבת", "קניון", "מרכזית", "מסוף", "מחלף", "מסעף"];
   var min_distance = 1000;
   
   for (let index = 0; index < jsonStops.length; index++) {
