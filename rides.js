@@ -807,7 +807,7 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
         findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransport", arrival, depart, 
             null, null, description)
         .then(routetodriver => {
-            console.log("routetodriver " + routetodriver.traveltime + " drivertohike " + 
+            console.log("routetodriver " + routetodriver + " " + routetodriver.traveltime + " drivertohike " + 
                 neardriver["route"+direction+"thehike"].traveltime + " hike.maximumpublictransporttime " + 
                 hike.maximumpublictransporttime);
             if (routetodriver.traveltime == 0 || 
@@ -887,12 +887,13 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
         var description = "wouldhitchercometostop can " + hitcher.fullname + " comesfrom " + hitcher.comesfromdetailed + 
             " returns to " + hitcher.returnstodetailed + " " + direction + " the hike " + hike.hikenamehebrew + 
             " come to stop " + stop.name + " in arrival " + arrival + " depart " + depart;
-        console.log(description);
+        //console.log(description);
 
         findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, null, null, description)
         .then(routetostop => {
-            console.log("wouldhitchercometostop routetostop " + routetostop.traveltime + " travaltimefromstop " + travaltimefromstop + 
-                " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + " stop " + stop.name);
+            console.log("wouldhitchercometostop routetostop " + routetostop + " " + routetostop.traveltime + " travaltimefromstop " + 
+                travaltimefromstop + " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + 
+                " description " + description);
             if (routetostop.traveltime || routetostop.traveltime == 0) {
                 if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime ||
                     routetostop.traveltime * 4 < travaltimefromstop) {
@@ -937,13 +938,13 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
             driver.returnstodetailed + " " + direction + " the hike " + hike.hikenamehebrew + " stop " + stop.name + 
             " in arrival " + arrival + " depart " + depart;
 
-        console.log("woulddriverstop stop.lat " + stop.lat + " stop.lon " + stop.lon + " description " + description);
+        //console.log("woulddriverstop stop.lat " + stop.lat + " stop.lon " + stop.lon + " description " + description);
         findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, stop.lat, stop.lon, description)
         .then(routethroughstop => {
             if (routethroughstop.traveltime) {
                 var additionaltime = routethroughstop.traveltime - driver["route"+direction+"thehike"].traveltime;
                 console.log("woulddriverstop additionaltime " + additionaltime + " maximumcardeviation " + hike.maximumcardeviation + 
-                    " stop " + stop.name);
+                    " stop " + stop.name + " description " + description);
                 if (additionaltime <= hike.maximumcardeviation) {
                     stop.caradditionaltime = additionaltime;
                     arrival = null;
@@ -967,9 +968,6 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                         if (routetostop.traveltime || routetostop.traveltime == 0) {
                             stop.carroutetostoptime = routetostop.traveltime;        
                             var travaltimefromstop = routethroughstop.traveltime - routetostop.traveltime;
-                            console.log("woulddriverstop routethroughstop " + routethroughstop.traveltime + 
-                                " - routetostop " + routetostop.traveltime + 
-                                " = travaltimefromstop " + travaltimefromstop + " stop " + stop.name);
 
                             arrival = null;
                             depart = null;
