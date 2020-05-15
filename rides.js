@@ -819,7 +819,7 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
             else {
                 var driverstops = stopsinthewaytohike(neardriver, hike, direction);
                 console.log("stopsinthewaytohike " + driverstops.length);
-                var stopsnearhitcher = util.sortbyDistancesToStops(hiker, driverstops, direction);
+                var stopsnearhitcher = tools.sortbyDistancesToStops(hiker, driverstops, direction);
                 var stopsfairdeviation = [];
                 nextstopfairdeviation(res, neardriver, stopsnearhitcher, stopsfairdeviation, direction, hike, hiker, 0)
                 .then(driverandhitcherwouldstopat => {
@@ -1171,6 +1171,9 @@ function hikeproperties(hike, hikers) {
         if (!hike.iscircular) {
             hike.minimumcarstoleave = hike.drivers.length / 3;
         }
+    }
+    else {
+        console.log("hike " + hike.hikenamehebrew + " no lat lon!");
     }
     if (hike.starttime) {
         var starttime = new Date(hike.starttime);
