@@ -820,7 +820,8 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
                 var driverstops = stopsinthewaytohike(neardriver, hike, direction);
                 console.log("stopsinthewaytohike " + driverstops.length);
                 var stopsnearhitcher = util.sortbyDistancesToStops(hiker, driverstops, direction);
-                removestopshighdeviation(res, neardriver, stopsnearhitcher, direction, hike, hiker)
+                var stopsfairdeviation = [];
+                nextstopfairdeviation(res, neardriver, stopsnearhitcher, stopsfairdeviation, direction, hike, hiker, 0)
                 .then(driverandhitcherwouldstopat => {
                     console.log("stopsnearhitcher " + stopsnearhitcher.length + " driverandhitcherwouldstopat " + 
                         driverandhitcherwouldstopat.length + " " + JSON.stringify(driverandhitcherwouldstopat));
@@ -843,27 +844,24 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
     });
 }
 
-function removestopshighdeviation(res, driver, stops, direction, hike, hitcher) {
+function nextstopfairdeviation(res, driver, stops, stopsfairdeviation, direction, hike, hitcher, stopindex) {
     return new Promise((resolve, reject) => {
-        var stopsfairdeviation = [];
-        var promises = [];
-        for (let index = 0; index < stops.length; index++) {
-            const stop = stops[index];
-            promises.push(
-                woulddriverstop(res, driver, stop, direction, hike, hitcher)
-                .then(wouldstop => {
-                    if (wouldstop) {
-                        stopsfairdeviation.push(stop);
-                    }
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                })
-            );
+        if (stopindex < stops.length && stopsfairdeviation.length < 6) {
+            var stop = stops[stopindex];
+            woulddriverstop(res, driver, stop, direction, hike, hitcher)
+            .then(wouldstop => {
+                if (wouldstop) {
+                    stopsfairdeviation.push(stop);
+                }
+                return nextstopfairdeviation(res, driver, stops, stopsfairdeviation, direction, hike, hitcher, stopindex+1);
+            })
+            .catch(rejection => {
+                logservices.logRejection(rejection);
+            })
         }
-        Promise.all(promises).then(() => {
+        else {
             return resolve(stopsfairdeviation);
-        })
+        }
     });
 }
 
