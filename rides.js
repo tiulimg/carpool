@@ -480,17 +480,21 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
         else if (departtime) {
             arrivaldepartaddition = "&depart="+departtime;
         }
+        var walkRadius = "";
+        if (mode == "publicTransportTimeTable") {
+            walkRadius = "&walkRadius=1500";
+        }
         var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID;
         if (middlelat && middlelon) {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+middlelat+"%2C"+middlelon+"&waypoint2="+endlat+"%2C"+endlon + 
-                "&mode=fastest%3B" + mode + "&combineChange=true&language=he" + arrivaldepartaddition;
+                "&mode=fastest%3B" + mode + "&combineChange=true&language=he" + arrivaldepartaddition + walkRadius;
             // console.log("findroute here start ("+startlat+","+startlon+") middle ("+middlelat+","+middlelon+
             //     ") end ("+endlat+","+endlon+") arrival " + arrivaltime + " depart " + departtime + " mode " + mode + 
             //     " description " + description);
         }
         else {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
-                "&combineChange=true&language=he" + arrivaldepartaddition;
+                "&combineChange=true&language=he" + arrivaldepartaddition + walkRadius;
             // console.log("findroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
             //     " depart " + departtime + " mode " + mode + " description " + description);
         }
@@ -638,7 +642,7 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
                  hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
                 if (!hiker.mydriverto && !hiker.routetothehike && hiker.comesfromlocation) {
                     promises.push(
-                        transporttohikebydirection(hiker, hike, "to", res, "publicTransport")
+                        transporttohikebydirection(hiker, hike, "to", res, "publicTransportTimeTable")
                         .then(route => {
                             hiker.routetothehike = route;
                         })
@@ -649,7 +653,7 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
                 }
                 if (!hiker.mydriverfrom && !hiker.routefromthehike && hiker.returnstolocation) {
                     promises.push(
-                        transporttohikebydirection(hiker, hike, "from", res, "publicTransport")
+                        transporttohikebydirection(hiker, hike, "from", res, "publicTransportTimeTable")
                         .then(route => {
                             hiker.routefromthehike = route;
                         })
@@ -807,7 +811,7 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
             " comesfrom " + neardriver.comesfromdetailed + " returns to " + neardriver.returnstodetailed + 
             " in arrival " + arrival + " depart " + depart;
 
-        findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransport", arrival, depart, 
+        findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransportTimeTable", arrival, depart, 
             null, null, description)
         .then(routetodriver => {
             console.log("routetodriver " + routetodriver + " " + routetodriver.traveltime + " drivertohike " + 
@@ -892,7 +896,7 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
             " come to stop " + stop.name + " in arrival " + arrival + " depart " + depart;
         //console.log(description);
 
-        findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransport", arrival, depart, null, null, description)
+        findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransportTimeTable", arrival, depart, null, null, description)
         .then(routetostop => {
             console.log("wouldhitchercometostop routetostop " + routetostop + " " + routetostop.traveltime + " travaltimefromstop " + 
                 travaltimefromstop + " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + 
