@@ -595,12 +595,14 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
         }
         var transportincache = transportcachearray[transportincachekey];
         if (transportincache) {
+            console.log("found route in cache");
             return resolve(transportincache);
         }
         else {
             dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon)
             .then(routefromdb => {
                 if (routefromdb) {
+                    console.log("found route in db");
                     return resolve(routefromdb);
                 }
                 else {
