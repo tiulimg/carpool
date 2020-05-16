@@ -802,7 +802,8 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
         }
         var description = "can " + hiker.fullname + " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed + 
             " " + direction + " the hike " + hike.hikenamehebrew + " meet " + neardriver.fullname + 
-            " comesfrom " + neardriver.comesfromdetailed + " returns to " + neardriver.returnstodetailed;
+            " comesfrom " + neardriver.comesfromdetailed + " returns to " + neardriver.returnstodetailed + 
+            " in arrival " + arrival + " depart " + depart;
 
         findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransport", arrival, depart, 
             null, null, description)
@@ -969,13 +970,13 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                             stop.carroutetostoptime = routetostop.traveltime;        
                             var travaltimefromstop = routethroughstop.traveltime - routetostop.traveltime;
 
-                            arrival = null;
-                            depart = null;
                             if (direction == "to") {
                                 arrival = tools.addsecondstodate(depart, routetostop.traveltime);
+                                depart = null;
                             }
                             else if (direction == "from") {
                                 depart = tools.addsecondstodate(arrival, - routetostop.traveltime);
+                                arrival = null;
                             }
                             wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, depart, travaltimefromstop)
                             .then(hitcherwouldcome => {
@@ -1433,12 +1434,13 @@ function nexthiketosetcarpool(res, nearhikes, hikeindex) {
                     hikeproperties(hike, hikers);
                     findhikerslocation(hikers)
                     .then(() => {
+                        setavailableplaces(hike);
+                        setrequiredseats(hike);
+
                         // public transport for hikers that don't need a ride
                         return bustohike(false, hike, res);
                     })
                     .then(() => {
-                        setavailableplaces(hike);
-                        setrequiredseats(hike);
                         return carstohike(hike, res);
                     })
                     .then(() => {
