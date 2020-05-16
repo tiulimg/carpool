@@ -849,7 +849,7 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
 
 function nextstopfairdeviation(res, driver, stops, stopsfairdeviation, direction, hike, hitcher, stopindex) {
     return new Promise((resolve, reject) => {
-        if (stopindex < stops.length && stopsfairdeviation.length < 6) {
+        if (stopindex < stops.length && stopsfairdeviation.length < 3) {
             var stop = stops[stopindex];
             woulddriverstop(res, driver, stop, direction, hike, hitcher)
             .then(wouldstop => {
