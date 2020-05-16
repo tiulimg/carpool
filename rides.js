@@ -487,14 +487,14 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
         var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID;
         if (middlelat && middlelon) {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+middlelat+"%2C"+middlelon+"&waypoint2="+endlat+"%2C"+endlon + 
-                "&mode=fastest%3B" + mode + "&combineChange=true&language=he" + arrivaldepartaddition + walkRadius;
+                "&mode=fastest%3B" + mode + "&combineChange=true&language=he&instructionformat=text" + arrivaldepartaddition + walkRadius;
             // console.log("findroute here start ("+startlat+","+startlon+") middle ("+middlelat+","+middlelon+
             //     ") end ("+endlat+","+endlon+") arrival " + arrivaltime + " depart " + departtime + " mode " + mode + 
             //     " description " + description);
         }
         else {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
-                "&combineChange=true&language=he" + arrivaldepartaddition + walkRadius;
+                "&combineChange=true&language=he&instructionformat=text" + arrivaldepartaddition + walkRadius;
             // console.log("findroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
             //     " depart " + departtime + " mode " + mode + " description " + description);
         }
@@ -1313,9 +1313,6 @@ function nexthikercalculateride(res, hike, hikerindex) {
                     if (hiker.mydriverto) {
                         return nextdriverifcannotmeet(res, hikerindex, hike, "from", 0);
                     }
-                    else {
-                        return resolve();
-                    }
                 })
                 .then(() => {
                     if (hiker.mydriverto && hiker.mydriverto.link && !hiker.mydriverfrom && !hiker.routefromthehike) {
@@ -1326,18 +1323,12 @@ function nexthikercalculateride(res, hike, hikerindex) {
                     }
                     return nexthikercalculateride(res, hike, hikerindex+1);
                 })
-                .then(() => {
-                    return resolve();
-                })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
                 });
             }
             else {
                 return nexthikercalculateride(res, hike, hikerindex+1)
-                .then(() => {
-                    return resolve();
-                })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
                 });
@@ -1378,7 +1369,7 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
             else {
                 const neardriverdistance = distances[hiker.phone][direction+"thehike"][neardriverindex];
                 var neardriver = neardriverdistance.link;
-                console.log("nexthikercalculateride driver "+direction+" the hike: distance " + 
+                console.log("nextdriverifcannotmeet driver "+direction+" the hike: distance " + 
                     neardriverdistance.distance + 
                     " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
                     neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
@@ -1396,9 +1387,6 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
                             }
                             else {
                                 return nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex+1)
-                                .then(() => {
-                                    return resolve();
-                                })
                                 .catch(rejection => {
                                     logservices.logRejection(rejection);
                                 });
@@ -1414,9 +1402,6 @@ function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverinde
                 }
                 else {
                     return nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex+1)
-                    .then(() => {
-                        return resolve();
-                    })
                     .catch(rejection => {
                         logservices.logRejection(rejection);
                     });
@@ -1466,9 +1451,6 @@ function nexthiketosetcarpool(res, nearhikes, hikeindex) {
                     })
                     .then(() => {
                         return nexthiketosetcarpool(res, nearhikes, hikeindex+1)
-                    })
-                    .then(() => {
-                        return resolve();
                     })
                     .catch(rejection => {
                         logservices.logRejection(rejection);
