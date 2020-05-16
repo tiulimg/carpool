@@ -1299,45 +1299,25 @@ function stopsinrectangle(driverlat, driverlon, hikelat, hikelon) {
     return stopsinarea;
 }
 
-function nexthikercalculateride(res, hike, hikerindex) {
-    return new Promise((resolve, reject) => {
-        console.log("hike.hitchers.length " + hike.hitchers.length + " hikerindex " + hikerindex);
-        if (hikerindex < hike.hitchers.length) {
-            var hiker = hike.hitchers[hikerindex];
-            if (hiker.seatsrequired > 0) {
-                console.log("nexthikercalculateride hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
-                            " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
-                            " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
-                nextdriverifcannotmeet(res, hikerindex, hike, "to", 0)
-                .then(() => {
-                    if (hiker.mydriverto) {
-                        return nextdriverifcannotmeet(res, hikerindex, hike, "from", 0);
-                    }
-                })
-                .then(() => {
-                    if (hiker.mydriverto && hiker.mydriverto.link && !hiker.mydriverfrom && !hiker.routefromthehike) {
-                        removehitcherfromdriver(hiker, hiker.mydriverto.link, "to");
-                    }
-                    else if (!hiker.mydriverto && hiker.mydriverfrom && hiker.mydriverfrom.link && !hiker.routetothehike) {
-                        removehitcherfromdriver(hiker, hiker.mydriverfrom.link, "from");
-                    }
-                    return nexthikercalculateride(res, hike, hikerindex+1);
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
+async function hikercalculate(res, hike) {
+    for (let index = 0; index < hike.hitchers.length; index++) {
+        const hiker = hike.hitchers[index];
+        if (hiker.seatsrequired > 0) {
+            console.log("hikercalculate hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
+                        " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
+                        " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
+            await driverifcanmeet(res, hiker, hike, "to");
+            if (hiker.mydriverto) {
+                await driverifcanmeet(res, hiker, hike, "from");
             }
-            else {
-                return nexthikercalculateride(res, hike, hikerindex+1)
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
+            if (hiker.mydriverto && hiker.mydriverto.link && !hiker.mydriverfrom && !hiker.routefromthehike) {
+                removehitcherfromdriver(hiker, hiker.mydriverto.link, "to");
+            }
+            else if (!hiker.mydriverto && hiker.mydriverfrom && hiker.mydriverfrom.link && !hiker.routetothehike) {
+                removehitcherfromdriver(hiker, hiker.mydriverfrom.link, "from");
             }
         }
-        else {
-            return resolve();
-        }
-    });
+    }
 }
 
 function setavailableplaces(hike) {
@@ -1356,62 +1336,29 @@ function setrequiredseats(hike) {
     }
 }
 
-function nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex) {
-    return new Promise((resolve, reject) => {
-        var hiker = hike.hitchers[hikerindex];
-        if (!hiker["route"+direction+"thehike"] && hike.startlatitude) {
-            var distances = hike.hikersdistances;
-            console.log("nextdriverifcannotmeet drivers " + distances[hiker.phone][direction+"thehike"].length + 
-                " neardriverindex " + neardriverindex);
-            if (neardriverindex >= distances[hiker.phone][direction+"thehike"].length) {
-                return resolve();
-            }
-            else {
-                const neardriverdistance = distances[hiker.phone][direction+"thehike"][neardriverindex];
-                var neardriver = neardriverdistance.link;
-                console.log("nextdriverifcannotmeet driver "+direction+" the hike: distance " + 
-                    neardriverdistance.distance + 
-                    " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
-                    neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
-                    " neardriver.availableplaces"+direction+"thehike " + neardriver["availableplaces"+direction+"thehike"] + 
-                    " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
-                    neardriver.returnstodetailed);
+async function driverifcanmeet(res, hiker, hike, direction) {
+    if (!hiker["mydriver"+direction] && !hiker["route"+direction+"thehike"] && hike.startlatitude) {
+        var distances = hike.hikersdistances;
+        for (let index = 0; index < distances[hiker.phone][direction+"thehike"].length; index++) {
+            const neardriverdistance = distances[hiker.phone][direction+"thehike"][index];
+            var neardriver = neardriverdistance.link;
+            console.log("driverifcanmeet driver "+direction+" the hike: distance " + 
+                neardriverdistance.distance + 
+                " name " + neardriver.fullname + " isdriver " + neardriver.amidriver + " seats " + 
+                neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
+                " neardriver.availableplaces"+direction+"thehike " + neardriver["availableplaces"+direction+"thehike"] + 
+                " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
+                neardriver.returnstodetailed);
                 if (neardriver["availableplaces"+direction+"thehike"] >= hiker["seatsrequired"+direction+"thehike"]) {
-                    if (!hiker["mydriver"+direction]) {
-                        canhitcherreachdriver(res, hiker, neardriver, direction, hike)
-                        .then(canmeet => {
-                            console.log("canmeet " + canmeet);
-                            if (canmeet) {
-                                addhitchertodriver(hiker, neardriver, direction);
-                                return resolve();
-                            }
-                            else {
-                                return nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex+1)
-                                .catch(rejection => {
-                                    logservices.logRejection(rejection);
-                                });
-                            }
-                        })
-                        .catch(rejection => {
-                            logservices.logRejection(rejection);
-                        });
-                    }
-                    else {
-                        return resolve();
+                    var canmeet = await canhitcherreachdriver(res, hiker, neardriver, direction, hike);
+                    console.log("canmeet " + canmeet);
+                    if (canmeet) {
+                        addhitchertodriver(hiker, neardriver, direction);
+                        break;
                     }
                 }
-                else {
-                    return nextdriverifcannotmeet(res, hikerindex, hike, direction, neardriverindex+1)
-                    .catch(rejection => {
-                        logservices.logRejection(rejection);
-                    });
-                }
-            }
         }
-        else {
-            return resolve();
-        }
-    });
+    }
 }
 
 function nexthiketosetcarpool(res, nearhikes, hikeindex) {
@@ -1436,7 +1383,7 @@ function nexthiketosetcarpool(res, nearhikes, hikeindex) {
                     })
                     .then(() => {
                         hike.hikersdistances = tools.getDistancesBetweenHikers(hikers);
-                        return nexthikercalculateride(res, hike, 0);
+                        return hikercalculate(res, hike);
                     })
                     .then(() => {
                         updateavailableplaces(hike);
