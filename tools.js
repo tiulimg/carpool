@@ -58,7 +58,7 @@ function wait(ms)
 function addsecondstodate(datestring, seconds) {
     var dt = new Date(datestring);
     dt.setSeconds(dt.getSeconds() + seconds);
-    //console.log("addsecondstodate source " + datestring + " seconds " + seconds + " result " + dt.toISOString());
+    console.log("addsecondstodate source " + datestring + " seconds " + seconds + " result " + dt);
     return dt.toISOString();
 }
 
