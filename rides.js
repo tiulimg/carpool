@@ -482,7 +482,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
         }
         var walkRadius = "";
         if (mode == "publicTransportTimeTable") {
-            walkRadius = "&walkRadius=2000";
+            walkRadius = "&walkRadius=6000";
         }
         var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID;
         if (middlelat && middlelon) {
