@@ -498,7 +498,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             // console.log("findroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
             //     " depart " + departtime + " mode " + mode + " description " + description);
         }
-        //console.log("url good " + url);
+        console.log("url good " + url);
         request({
             url: url,
             method: "GET",
@@ -519,7 +519,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     logservices.logRejection(error);
                     return resolve("No route found");
                 }
-                //console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
+                console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
                     return resolve("No route found");
                 }
@@ -690,6 +690,7 @@ function transporttohikebydirection(hiker, hike, direction, res, mode) {
         }
         var description = mode + " " + direction + " the hike " + hike.hikenamehebrew + " for hiker " + hiker.fullname + 
             " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed;
+        console.log("transporttohikebydirection " + description);
 
         findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null, description)
         .then(route => {
@@ -708,8 +709,11 @@ function carstohike(hike, res) {
         for (let index = 0; index < hike.drivers.length; index++) {
             const hiker = hike.drivers[index];
 
+            console.log("AAA");
             if (hike.startlatitude && hike.endlatitude) {
+                console.log("BBB");
                 if (!hiker.routetothehike && hiker.comesfromlocation) {
+                    console.log("CCC");
                     promises.push(
                         transporttohikebydirection(hiker, hike, "to", res, "car")
                         .then(route => {
@@ -850,9 +854,6 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
             });
         }
         else {
-            console.log("canhitcherreachdriver no route found " + neardriver.fullname + 
-                " comesfrom " + neardriver.comesfromdetailed + " returns to " + neardriver.returnstodetailed + 
-                " in arrival " + arrival + " depart " + depart);
             return resolve(false);
         }
     });
