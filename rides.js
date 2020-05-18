@@ -1404,7 +1404,9 @@ async function setcarpool(res, nearhikes) {
 function removerouteinstructions(hikers) {
     for (let index = 0; hikers < hikers.length; index++) {
         const hiker = hikers[index];
+        console.log("removerouteinstructions b4 " + hiker.routetothehike + " " + hiker.routefromthehike);
         delete hiker.routetothehike;
         delete hiker.routefromthehike;
+        console.log("removerouteinstructions after " + hiker.routetothehike + " " + hiker.routefromthehike);
     }
 }
