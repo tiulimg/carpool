@@ -2542,7 +2542,7 @@ app.patch("/api/calculaterides", function(req, res) {
         .then(hikes => {
             var nearhikes = tools.get_near_hikes(hikes);
             if (nearhikes.length > 0) {
-                ridesmodules.nexthiketosetcarpool(res, nearhikes, 0)
+                ridesmodules.setcarpool(res, nearhikes)
                 .then(() => {
                     register.updateCarpool(res);
                 })

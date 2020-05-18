@@ -19,7 +19,7 @@ module.exports = {
     hikeproperties: hikeproperties,
     setavailableplaces: setavailableplaces,
     setrequiredseats: setrequiredseats,
-    nexthiketosetcarpool: nexthiketosetcarpool,
+    setcarpool: setcarpool,
 };
 
 const HERE_APPID = process.env.HERE_APPID;
@@ -599,14 +599,12 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
         }
         var transportincache = transportcachearray[transportincachekey];
         if (transportincache) {
-            console.log("found route in cache");
             return resolve(transportincache);
         }
         else {
             dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon)
             .then(routefromdb => {
                 if (routefromdb) {
-                    console.log("found route in db");
                     return resolve(routefromdb);
                 }
                 else {
@@ -827,13 +825,14 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
                 var driverstops = stopsinthewaytohike(neardriver, hike, direction);
                 console.log("stopsinthewaytohike " + driverstops.length);
                 var stopsnearhitcher = tools.sortbyDistancesToStops(hiker, driverstops, direction);
-                var stopsfairdeviation = [];
-                nextstopfairdeviation(res, neardriver, stopsnearhitcher, stopsfairdeviation, direction, hike, hiker, 0)
+                neareststopfairdeviation(res, neardriver, stopsnearhitcher, direction, hike, hiker)
                 .then(driverandhitcherwouldstopat => {
-                    console.log("stopsnearhitcher " + stopsnearhitcher.length + " driverandhitcherwouldstopat " + 
-                        driverandhitcherwouldstopat.length + " " + JSON.stringify(driverandhitcherwouldstopat));
+                    if (driverandhitcherwouldstopat) {
+                        console.log("stopsnearhitcher " + stopsnearhitcher.length + " driverandhitcherwouldstopat " + 
+                            JSON.stringify(driverandhitcherwouldstopat));
+                    }
                     if (driverandhitcherwouldstopat.length > 0) {
-                        hiker["stops"+direction+"thehike"] = driverandhitcherwouldstopat;
+                        hiker["stop"+direction+"thehike"] = driverandhitcherwouldstopat;
                         return resolve(true);
                     }
                     else {
@@ -851,28 +850,15 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
     });
 }
 
-function nextstopfairdeviation(res, driver, stops, stopsfairdeviation, direction, hike, hitcher, stopindex) {
-    return new Promise((resolve, reject) => {
-        if (stopindex < stops.length && stopsfairdeviation.length < 3) {
-            var stop = stops[stopindex];
-            woulddriverstop(res, driver, stop, direction, hike, hitcher)
-            .then(wouldstop => {
-                if (wouldstop) {
-                    stopsfairdeviation.push(stop);
-                }
-                return nextstopfairdeviation(res, driver, stops, stopsfairdeviation, direction, hike, hitcher, stopindex+1);
-            })
-            .then(stopsfairdeviation => {
-                return resolve(stopsfairdeviation);
-            })
-            .catch(rejection => {
-                logservices.logRejection(rejection);
-            })
+async function neareststopfairdeviation(res, driver, stops, direction, hike, hitcher) {
+    for (let index = 0; index < stops.length; index++) {
+        const stop = stops[index];
+        var wouldstop = await woulddriverstop(res, driver, stop, direction, hike, hitcher);
+        if (wouldstop) {
+            return stop;
         }
-        else {
-            return resolve(stopsfairdeviation);
-        }
-    });
+    }
+    return null;
 }
 
 function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, depart, travaltimefromstop) {
@@ -1361,57 +1347,49 @@ async function driverifcanmeet(res, hiker, hike, direction) {
     }
 }
 
-function nexthiketosetcarpool(res, nearhikes, hikeindex) {
-    return new Promise((resolve, reject) => {
-        if (hikeindex < nearhikes.length) {
-            const hike = nearhikes[hikeindex];
-            dbservices.gethikersbyhikedate(res, hike.hikedate)
-            .then(hikers => {
-                if (hikers && hikers.length > 0){
-                    console.log("start calculation for " + hike.hikenamehebrew);
-                    hikeproperties(hike, hikers);
-                    findhikerslocation(hikers)
-                    .then(() => {
-                        setavailableplaces(hike);
-                        setrequiredseats(hike);
+async function setcarpool(res, nearhikes) {
+    for (let index = 0; index < nearhikes.length; index++) {
+        const hike = nearhikes[index];
+        await dbservices.gethikersbyhikedate(res, hike.hikedate)
+        .then(hikers => {
+            if (hikers && hikers.length > 0){
+                console.log("start calculation for " + hike.hikenamehebrew);
+                hikeproperties(hike, hikers);
+                findhikerslocation(hikers)
+                .then(() => {
+                    setavailableplaces(hike);
+                    setrequiredseats(hike);
 
-                        // public transport for hikers that don't need a ride
-                        return bustohike(false, hike, res);
-                    })
-                    .then(() => {
-                        return carstohike(hike, res);
-                    })
-                    .then(() => {
-                        hike.hikersdistances = tools.getDistancesBetweenHikers(hikers);
-                        return hikercalculate(res, hike);
-                    })
-                    .then(() => {
-                        updateavailableplaces(hike);
-                        logservices.logcalculationresult(hikers);
-    
-                        // public transport for hikers that hadn't left with a ride
-                        return bustohike(true, hike, res);
-                    })
-                    .then(() => {
-                        removerouteinstructions(hikers);
-                        return dbservices.replaceallhikersforhike(res, hike.hikedate, hikers);
-                    })
-                    .then(() => {
-                        return nexthiketosetcarpool(res, nearhikes, hikeindex+1)
-                    })
-                    .catch(rejection => {
-                        logservices.logRejection(rejection);
-                    });
-                };
-            })
-            .catch(rejection => {
-                logservices.logRejection(rejection);
-            });
-        }
-        else {
-            return resolve();
-        }
-   });
+                    // public transport for hikers that don't need a ride
+                    return bustohike(false, hike, res);
+                })
+                .then(() => {
+                    return carstohike(hike, res);
+                })
+                .then(() => {
+                    hike.hikersdistances = tools.getDistancesBetweenHikers(hikers);
+                    return hikercalculate(res, hike);
+                })
+                .then(() => {
+                    updateavailableplaces(hike);
+                    logservices.logcalculationresult(hikers);
+
+                    // public transport for hikers that hadn't left with a ride
+                    return bustohike(true, hike, res);
+                })
+                .then(() => {
+                    removerouteinstructions(hikers);
+                    return dbservices.replaceallhikersforhike(res, hike.hikedate, hikers);
+                })
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                });
+            };
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
+    }
 }
 
 function removerouteinstructions(hikers) {

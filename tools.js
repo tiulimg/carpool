@@ -447,7 +447,7 @@ function sortbyDistancesToStops(hiker, stops, direction) {
         return result;
     });
 
-    logservices.logstopsdistances(stops, distances, direction);
+    //logservices.logstopsdistances(stops, distances, direction);
 
     return stops;
 }
