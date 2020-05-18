@@ -792,12 +792,10 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
         var driverloc;
         var arrival = null;
         var depart = null;
-        if (neardriver["route"+direction+"thehike"]) {
+        if (neardriver["route"+direction+"thehike"] && neardriver["route"+direction+"thehike"].traveltime) {
             if (direction == "to") {
                 hikerloc = hiker.comesfromlocation;
                 driverloc = neardriver.comesfromlocation;
-                console.log("minus seconds " + neardriver.routetothehike + " " + JSON.stringify(neardriver.routetothehike) + " " +
-                    neardriver.routetothehike.traveltime + " " + (- neardriver.routetothehike.traveltime));
                 arrival = tools.addsecondstodate(hike.starttime, - neardriver.routetothehike.traveltime);
                 console.log("desired arrival to driver " + arrival);
             }
@@ -852,6 +850,9 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
             });
         }
         else {
+            console.log("canhitcherreachdriver no route found " + neardriver.fullname + 
+                " comesfrom " + neardriver.comesfromdetailed + " returns to " + neardriver.returnstodetailed + 
+                " in arrival " + arrival + " depart " + depart);
             return resolve(false);
         }
     });
