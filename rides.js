@@ -482,7 +482,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
         }
         var walkRadius = "";
         if (mode == "publicTransportTimeTable") {
-            walkRadius = "&walkRadius=1500";
+            walkRadius = "&walkRadius=2000";
         }
         var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID;
         if (middlelat && middlelon) {
@@ -1359,45 +1359,31 @@ async function driverifcanmeet(res, hiker, hike, direction) {
 async function setcarpool(res, nearhikes) {
     for (let index = 0; index < nearhikes.length; index++) {
         const hike = nearhikes[index];
-        await dbservices.gethikersbyhikedate(res, hike.hikedate)
-        .then(hikers => {
-            if (hikers && hikers.length > 0){
-                console.log("start calculation for " + hike.hikenamehebrew);
-                hikeproperties(hike, hikers);
-                findhikerslocation(hikers)
-                .then(() => {
-                    setavailableplaces(hike);
-                    setrequiredseats(hike);
+        var hikers = await dbservices.gethikersbyhikedate(res, hike.hikedate);
+        if (hikers && hikers.length > 0){
+            console.log("start calculation for " + hike.hikenamehebrew);
+            hikeproperties(hike, hikers);
 
-                    // public transport for hikers that don't need a ride
-                    return bustohike(false, hike, res);
-                })
-                .then(() => {
-                    return carstohike(hike, res);
-                })
-                .then(() => {
-                    hike.hikersdistances = tools.getDistancesBetweenHikers(hikers);
-                    return hikercalculate(res, hike);
-                })
-                .then(() => {
-                    updateavailableplaces(hike);
-                    logservices.logcalculationresult(hikers);
+            await findhikerslocation(hikers);
+            setavailableplaces(hike);
+            setrequiredseats(hike);
 
-                    // public transport for hikers that hadn't left with a ride
-                    return bustohike(true, hike, res);
-                })
-                .then(() => {
-                    removerouteinstructions(hikers);
-                    return dbservices.replaceallhikersforhike(res, hike.hikedate, hikers);
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
-            };
-        })
-        .catch(rejection => {
-            logservices.logRejection(rejection);
-        });
+            // public transport for hikers that don't need a ride
+            await bustohike(false, hike, res);
+            await carstohike(hike, res);
+
+            hike.hikersdistances = tools.getDistancesBetweenHikers(hikers);
+            await hikercalculate(res, hike);
+                
+            updateavailableplaces(hike);
+            logservices.logcalculationresult(hikers);
+
+            // public transport for hikers that hadn't left with a ride
+            await bustohike(true, hike, res);
+                
+            removerouteinstructions(hikers);
+            await dbservices.replaceallhikersforhike(res, hike.hikedate, hikers);
+        };
     }
 }
 
