@@ -498,7 +498,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             // console.log("findroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
             //     " depart " + departtime + " mode " + mode + " description " + description);
         }
-        console.log("url good " + url);
+        //console.log("url good " + url);
         request({
             url: url,
             method: "GET",
@@ -519,7 +519,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     logservices.logRejection(error);
                     return resolve("No route found");
                 }
-                console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
+                // console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
                     return resolve("No route found");
                 }
@@ -836,7 +836,7 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
                             console.log("stopsnearhitcher " + stopsnearhitcher.length + " driverandhitcherwouldstopat " + 
                                 JSON.stringify(driverandhitcherwouldstopat));
                         }
-                        if (driverandhitcherwouldstopat.length > 0) {
+                        if (driverandhitcherwouldstopat && driverandhitcherwouldstopat.length > 0) {
                             hiker["stop"+direction+"thehike"] = driverandhitcherwouldstopat;
                             return resolve(true);
                         }
