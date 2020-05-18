@@ -1380,10 +1380,13 @@ async function setcarpool(res, nearhikes) {
             updateavailableplaces(hike);
             logservices.logcalculationresult(hikers);
 
+            console.log("setcarpool AAA");
             // public transport for hikers that hadn't left with a ride
             await bustohike(true, hike, res);
+            console.log("setcarpool BBB");
                 
             removerouteinstructions(hikers);
+            console.log("setcarpool CCC hikers " + hikers.length);
             await dbservices.replaceallhikersforhike(res, hike.hikedate, hikers);
         };
     }
