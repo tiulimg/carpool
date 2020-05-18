@@ -478,7 +478,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             arrivaldepartaddition = "&arrival="+arrivaltime;
         }
         else if (departtime) {
-            arrivaldepartaddition = "&depart="+departtime;
+            arrivaldepartaddition = "&departure="+departtime;
         }
         var walkRadius = "";
         if (mode == "publicTransportTimeTable") {
