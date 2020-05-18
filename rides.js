@@ -498,7 +498,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             // console.log("findroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
             //     " depart " + departtime + " mode " + mode + " description " + description);
         }
-        //console.log("url good " + url);
+        console.log("url good " + url);
         request({
             url: url,
             method: "GET",
@@ -890,8 +890,8 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
 
         findroutecachedb(res, startlat, startlon, endlat, endlon, "publicTransportTimeTable", arrival, depart, null, null, description)
         .then(routetostop => {
-            console.log("wouldhitchercometostop routetostop " + routetostop + " " + routetostop.traveltime + " travaltimefromstop " + 
-                travaltimefromstop + " hike.maximumpublictransporttime " + hike.maximumpublictransporttime + 
+            console.log("wouldhitchercometostop routetostop " + routetostop + " " + routetostop.traveltime + " + travaltimefromstop " + 
+                travaltimefromstop + " <? hike.maximumpublictransporttime " + hike.maximumpublictransporttime + 
                 " description " + description);
             if (routetostop.traveltime || routetostop.traveltime == 0) {
                 if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime ||
