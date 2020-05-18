@@ -1380,24 +1380,25 @@ async function setcarpool(res, nearhikes) {
             updateavailableplaces(hike);
             logservices.logcalculationresult(hikers);
 
-            console.log("setcarpool AAA");
             // public transport for hikers that hadn't left with a ride
             await bustohike(true, hike, res);
-            console.log("setcarpool BBB");
                 
-            removerouteinstructions(hikers);
             console.log("setcarpool CCC hikers " + hikers.length);
+            removerouteinstructions(hikers);
             await dbservices.replaceallhikersforhike(res, hike.hikedate, hikers);
         };
     }
 }
 
 function removerouteinstructions(hikers) {
+    console.log("removerouteinstructions begin hikers.length " + hikers.length);
     for (let index = 0; hikers < hikers.length; index++) {
+        console.log("removerouteinstructions hiker " + index);
         const hiker = hikers[index];
         console.log("removerouteinstructions b4 " + hiker.routetothehike + " " + hiker.routefromthehike);
         delete hiker.routetothehike;
         delete hiker.routefromthehike;
         console.log("removerouteinstructions after " + hiker.routetothehike + " " + hiker.routefromthehike);
     }
+    console.log("removerouteinstructions end ");
 }
