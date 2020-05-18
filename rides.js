@@ -942,8 +942,10 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
         .then(routethroughstop => {
             if (routethroughstop.traveltime) {
                 var additionaltime = routethroughstop.traveltime - driver["route"+direction+"thehike"].traveltime;
-                console.log("woulddriverstop additionaltime " + additionaltime + " maximumcardeviation " + hike.maximumcardeviation + 
-                    " stop " + stop.name + " description " + description);
+                console.log("woulddriverstop routethroughstop.traveltime " + routethroughstop.traveltime + 
+                    " - driver[route"+direction+"thehike].traveltime " + driver["route"+direction+"thehike"].traveltime + 
+                    " = additionaltime " + additionaltime + " <? maximumcardeviation " + hike.maximumcardeviation + " description " +  
+                    description + " stop " + stop.name);
                 if (additionaltime <= hike.maximumcardeviation) {
                     stop.caradditionaltime = additionaltime;
                     arrival = null;
@@ -967,6 +969,9 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                         if (routetostop.traveltime || routetostop.traveltime == 0) {
                             stop.carroutetostoptime = routetostop.traveltime;        
                             var travaltimefromstop = routethroughstop.traveltime - routetostop.traveltime;
+                            console.log("woulddriverstop routethroughstop.traveltime " + routethroughstop.traveltime + 
+                                " - routetostop.traveltime " + routetostop.traveltime + " = travaltimefromstop " + 
+                                travaltimefromstop + " description " + description);
 
                             if (direction == "to") {
                                 arrival = tools.addsecondstodate(depart, routetostop.traveltime);
