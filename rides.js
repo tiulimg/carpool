@@ -792,61 +792,66 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
         var driverloc;
         var arrival = null;
         var depart = null;
-        if (direction == "to") {
-            hikerloc = hiker.comesfromlocation;
-            driverloc = neardriver.comesfromlocation;
-            arrival = tools.addsecondstodate(hike.starttime, - neardriver.routetothehike.traveltime);
-            console.log("desired arrival to driver " + arrival);
-        }
-        else if (direction == "from") {
-            hikerloc = hiker.returnstolocation;
-            driverloc = neardriver.returnstolocation;
-            depart = tools.addsecondstodate(hike.endtime, neardriver.routefromthehike.traveltime);
-            console.log("desired depart from driver " + depart);
-        }
-        var description = "can " + hiker.fullname + " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed + 
-            " " + direction + " the hike " + hike.hikenamehebrew + " meet " + neardriver.fullname + 
-            " comesfrom " + neardriver.comesfromdetailed + " returns to " + neardriver.returnstodetailed + 
-            " in arrival " + arrival + " depart " + depart;
-
-        findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransportTimeTable", arrival, depart, 
-            null, null, description)
-        .then(routetodriver => {
-            console.log("routetodriver " + routetodriver + " " + routetodriver.traveltime + " drivertohike " + 
-                neardriver["route"+direction+"thehike"].traveltime + " hike.maximumpublictransporttime " + 
-                hike.maximumpublictransporttime);
-            if (routetodriver.traveltime == 0 || 
-                (routetodriver.traveltime && 
-                 (routetodriver.traveltime + neardriver["route"+direction+"thehike"].traveltime < hike.maximumpublictransporttime) ||
-                  routetodriver.traveltime * 4 < neardriver["route"+direction+"thehike"].traveltime)) {
-                return resolve(true);
+        if (neardriver["route"+direction+"thehike"]) {
+            if (direction == "to") {
+                hikerloc = hiker.comesfromlocation;
+                driverloc = neardriver.comesfromlocation;
+                arrival = tools.addsecondstodate(hike.starttime, - neardriver.routetothehike.traveltime);
+                console.log("desired arrival to driver " + arrival);
             }
-            else {
-                var driverstops = stopsinthewaytohike(neardriver, hike, direction);
-                console.log("stopsinthewaytohike " + driverstops.length);
-                var stopsnearhitcher = tools.sortbyDistancesToStops(hiker, driverstops, direction);
-                neareststopfairdeviation(res, neardriver, stopsnearhitcher, direction, hike, hiker)
-                .then(driverandhitcherwouldstopat => {
-                    if (driverandhitcherwouldstopat) {
-                        console.log("stopsnearhitcher " + stopsnearhitcher.length + " driverandhitcherwouldstopat " + 
-                            JSON.stringify(driverandhitcherwouldstopat));
-                    }
-                    if (driverandhitcherwouldstopat.length > 0) {
-                        hiker["stop"+direction+"thehike"] = driverandhitcherwouldstopat;
-                        return resolve(true);
-                    }
-                    else {
-                        return resolve(false);
-                    }
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
+            else if (direction == "from") {
+                hikerloc = hiker.returnstolocation;
+                driverloc = neardriver.returnstolocation;
+                depart = tools.addsecondstodate(hike.endtime, neardriver.routefromthehike.traveltime);
+                console.log("desired depart from driver " + depart);
             }
-        })
-        .catch(rejection => {
-            logservices.logRejection(rejection);
-        });
+            var description = "can " + hiker.fullname + " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed + 
+                " " + direction + " the hike " + hike.hikenamehebrew + " meet " + neardriver.fullname + 
+                " comesfrom " + neardriver.comesfromdetailed + " returns to " + neardriver.returnstodetailed + 
+                " in arrival " + arrival + " depart " + depart;
+    
+            findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransportTimeTable", arrival, depart, 
+                null, null, description)
+            .then(routetodriver => {
+                console.log("routetodriver " + routetodriver + " " + routetodriver.traveltime + " drivertohike " + 
+                    neardriver["route"+direction+"thehike"].traveltime + " hike.maximumpublictransporttime " + 
+                    hike.maximumpublictransporttime);
+                if (routetodriver.traveltime == 0 || 
+                    (routetodriver.traveltime && 
+                     (routetodriver.traveltime + neardriver["route"+direction+"thehike"].traveltime < hike.maximumpublictransporttime) ||
+                      routetodriver.traveltime * 4 < neardriver["route"+direction+"thehike"].traveltime)) {
+                    return resolve(true);
+                }
+                else {
+                    var driverstops = stopsinthewaytohike(neardriver, hike, direction);
+                    console.log("stopsinthewaytohike " + driverstops.length);
+                    var stopsnearhitcher = tools.sortbyDistancesToStops(hiker, driverstops, direction);
+                    neareststopfairdeviation(res, neardriver, stopsnearhitcher, direction, hike, hiker)
+                    .then(driverandhitcherwouldstopat => {
+                        if (driverandhitcherwouldstopat) {
+                            console.log("stopsnearhitcher " + stopsnearhitcher.length + " driverandhitcherwouldstopat " + 
+                                JSON.stringify(driverandhitcherwouldstopat));
+                        }
+                        if (driverandhitcherwouldstopat.length > 0) {
+                            hiker["stop"+direction+"thehike"] = driverandhitcherwouldstopat;
+                            return resolve(true);
+                        }
+                        else {
+                            return resolve(false);
+                        }
+                    })
+                    .catch(rejection => {
+                        logservices.logRejection(rejection);
+                    });
+                }
+            })
+            .catch(rejection => {
+                logservices.logRejection(rejection);
+            });
+        }
+        else {
+            return resolve(false);
+        }
     });
 }
 
