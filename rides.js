@@ -796,6 +796,8 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
             if (direction == "to") {
                 hikerloc = hiker.comesfromlocation;
                 driverloc = neardriver.comesfromlocation;
+                console.log("minus seconds " + neardriver.routetothehike + " " + JSON.stringify(neardriver.routetothehike) + " " +
+                    neardriver.routetothehike.traveltime + " " + (- neardriver.routetothehike.traveltime));
                 arrival = tools.addsecondstodate(hike.starttime, - neardriver.routetothehike.traveltime);
                 console.log("desired arrival to driver " + arrival);
             }
