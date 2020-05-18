@@ -690,7 +690,7 @@ function transporttohikebydirection(hiker, hike, direction, res, mode) {
         }
         var description = mode + " " + direction + " the hike " + hike.hikenamehebrew + " for hiker " + hiker.fullname + 
             " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed;
-        console.log("transporttohikebydirection " + description);
+        // console.log("transporttohikebydirection " + description);
 
         findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null, description)
         .then(route => {
@@ -709,11 +709,8 @@ function carstohike(hike, res) {
         for (let index = 0; index < hike.drivers.length; index++) {
             const hiker = hike.drivers[index];
 
-            console.log("AAA");
             if (hike.startlatitude && hike.endlatitude) {
-                console.log("BBB");
                 if (!hiker.routetothehike && hiker.comesfromlocation) {
-                    console.log("CCC");
                     promises.push(
                         transporttohikebydirection(hiker, hike, "to", res, "car")
                         .then(route => {
@@ -836,7 +833,7 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
                             console.log("stopsnearhitcher " + stopsnearhitcher.length + " driverandhitcherwouldstopat " + 
                                 JSON.stringify(driverandhitcherwouldstopat));
                         }
-                        if (driverandhitcherwouldstopat && driverandhitcherwouldstopat.length > 0) {
+                        if (driverandhitcherwouldstopat) {
                             hiker["stop"+direction+"thehike"] = driverandhitcherwouldstopat;
                             return resolve(true);
                         }

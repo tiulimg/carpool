@@ -289,6 +289,20 @@ function toRadians(degrees) {
     return degrees * Math.PI / 180;
 }
 
+function addmeterstolatlon(lat,lon,meters) {
+    var earth = 6378.137,  //radius of the earth in kilometer
+    pi = Math.PI,
+    cos = Math.cos,
+    m = (1 / ((2 * pi / 360) * earth)) / 1000;  //1 meter in degree
+
+    var new_latitude = latitude + (meters * m);
+    var new_longitude = longitude + (meters * m) / cos(latitude * (pi / 180));
+    return {
+        lat: new_latitude,
+        lon: new_longitude,
+    };
+}
+
 function distanceLatLons(lat1,lon1,lat2,lon2) {
     var d = 0;
 
@@ -412,7 +426,7 @@ function getDistancesBetweenHikers(hikers) {
 
     }
 
-    //logservices.loghikersdistances(distances);
+    logservices.loghikersdistances(distances);
 
     return distances;
 }
@@ -447,7 +461,7 @@ function sortbyDistancesToStops(hiker, stops, direction) {
         return result;
     });
 
-    //logservices.logstopsdistances(stops, distances, direction);
+    logservices.logstopsdistances(stops, distances, direction);
 
     return stops;
 }
