@@ -856,10 +856,10 @@ function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
                 console.log("routetodriver " + routetodriver + " " + routetodriver.traveltime + " drivertohike " + 
                     neardriver["route"+direction+"thehike"].traveltime + " hike.maximumpublictransporttime " + 
                     hike.maximumpublictransporttime);
-                if (routetodriver.traveltime == 0 || 
-                    (routetodriver.traveltime && 
-                     (routetodriver.traveltime + neardriver["route"+direction+"thehike"].traveltime < hike.maximumpublictransporttime) ||
-                      routetodriver.traveltime * 4 < neardriver["route"+direction+"thehike"].traveltime)) {
+                if (routetodriver.traveltime == 0 || routetodriver.traveltime) {
+                    // (routetodriver.traveltime && 
+                    //  (routetodriver.traveltime + neardriver["route"+direction+"thehike"].traveltime < hike.maximumpublictransporttime) ||
+                    //   routetodriver.traveltime * 4 < neardriver["route"+direction+"thehike"].traveltime)) {
                     return resolve(true);
                 }
                 else {
@@ -933,14 +933,14 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
                 travaltimefromstop + " <? hike.maximumpublictransporttime " + hike.maximumpublictransporttime + 
                 " description " + description);
             if (routetostop.traveltime || routetostop.traveltime == 0) {
-                if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime ||
-                    routetostop.traveltime * 4 < travaltimefromstop) {
+                // if (routetostop.traveltime + travaltimefromstop <= hike.maximumpublictransporttime ||
+                //     routetostop.traveltime * 4 < travaltimefromstop) {
                     stop.busroutetostoptime = routetostop.traveltime;
                     return resolve(true);
-                }
-                else {
-                    return resolve(false);
-                }
+                // }
+                // else {
+                //     return resolve(false);
+                // }
             }
             else {
                 return resolve(false);
