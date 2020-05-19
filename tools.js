@@ -407,11 +407,11 @@ function sorthikerdistances(b, a, hiker) {
         aage = a.link.age;
         bage = b.link.age;
         hikerage = hiker.age;
-    }
-    if (aage && bage && hikerage) {
-        aage = Math.abs(hikerage - aage);
-        bage = Math.abs(hikerage - bage);
-        result = aage>bage ? -1 : aage<bage ? 1 : 0;
+        if (aage && bage && hikerage) {
+            aage = Math.abs(hikerage - aage);
+            bage = Math.abs(hikerage - bage);
+            result = aage>bage ? -1 : aage<bage ? 1 : 0;
+        }
     }
     if (result == 0) {
         aname = a.link.fullname;
