@@ -1376,7 +1376,7 @@ function setrequiredseats(hike) {
 
 async function driverifcanmeet(res, hiker, hike, direction) {
     if (!hiker["mydriver"+direction] && !hiker["route"+direction+"thehike"] && hike.startlatitude) {
-        var distances = tools.getDistancesBetweenHikers(hiker, hike.drivers);
+        var distances = tools.getDistancesBetweenHikers(hiker, hike.drivers, direction);
         for (let index = 0; index < distances[direction+"thehike"].length; index++) {
             const neardriverdistance = distances[direction+"thehike"][index];
             var neardriver = neardriverdistance.link;
