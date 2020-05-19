@@ -478,7 +478,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             arrivaldepartaddition = "&arrival="+arrivaltime;
         }
         else if (departtime) {
-            arrivaldepartaddition = "&departure="+departtime;
+            arrivaldepartaddition = "&alternatives=9&departure="+departtime;
         }
         var walkRadius = "";
         if (mode == "publicTransportTimeTable") {
@@ -487,7 +487,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
         var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID;
         if (middlelat && middlelon) {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+middlelat+"%2C"+middlelon+"&waypoint2="+endlat+"%2C"+endlon + 
-                "&mode=fastest%3B" + mode + "&combineChange=true&language=he&instructionformat=text&alternatives=9" + 
+                "&mode=fastest%3B" + mode + "&combineChange=true&language=he&instructionformat=text" + 
                 arrivaldepartaddition + walkRadius;
             // console.log("findroute here start ("+startlat+","+startlon+") middle ("+middlelat+","+middlelon+
             //     ") end ("+endlat+","+endlon+") arrival " + arrivaltime + " depart " + departtime + " mode " + mode + 
@@ -495,7 +495,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
         }
         else {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
-                "&combineChange=true&language=he&instructionformat=text&alternatives=9" + arrivaldepartaddition + walkRadius;
+                "&combineChange=true&language=he&instructionformat=text" + arrivaldepartaddition + walkRadius;
             // console.log("findroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
             //     " depart " + departtime + " mode " + mode + " description " + description);
         }
@@ -520,16 +520,13 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     logservices.logRejection(error);
                     return resolve("No route found");
                 }
-                console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
+                //console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
-                    console.log("findroute NoRouteFound");
                     return resolve("No route found");
                 }
                 else if (responsebodyjson.response && responsebodyjson.response.route && responsebodyjson.response.route[0] &&
                     responsebodyjson.response.route[0].leg)
                 {
-                    console.log("findroute routefound");
-
                     var fasetsttime = 100000000000000000;
                     var bestroute;
                     var distance;
@@ -579,12 +576,11 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                         depart: departtime,
                         description: description,
                     };
-                    console.log("findroute route " + JSON.stringify(route));
 
                     return resolve(route);
                 }
                 else {
-                    console.log("findroute else");
+                    console.log("body " + response.body);
                     return resolve("No route found");
                 }
             }
