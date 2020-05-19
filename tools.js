@@ -7,6 +7,8 @@ module.exports = {
     checkspecialpwd: checkspecialpwd,
     wait: wait,
     addsecondstodate: addsecondstodate,
+    secondsbetweendates: secondsbetweendates,
+    getday: getday,
     normalize_phonenumber: normalize_phonenumber,
     datestringtoobject: datestringtoobject,
     get_near_hikes: get_near_hikes, 
@@ -60,6 +62,21 @@ function addsecondstodate(datestring, seconds) {
     dt.setSeconds(dt.getSeconds() + seconds);
     //console.log("addsecondstodate source " + datestring + " seconds " + seconds + " result " + dt);
     return dt.toISOString();
+}
+
+function secondsbetweendates(date1, date2) {
+    var t1 = new Date(date1);
+    var t2 = new Date(date2);
+    var dif = t1.getTime() - t2.getTime();
+
+    var Seconds_from_T1_to_T2 = dif / 1000;
+    var Seconds_Between_Dates = Math.abs(Seconds_from_T1_to_T2);
+    return Seconds_Between_Dates;
+}
+
+function getday(date) {
+    var d = new Date(date);
+    return d.getDate();
 }
 
 function normalize_phonenumber(phonenumber) {

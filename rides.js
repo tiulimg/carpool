@@ -527,24 +527,43 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                 else if (responsebodyjson.response && responsebodyjson.response.route && responsebodyjson.response.route[0] &&
                     responsebodyjson.response.route[0].leg)
                 {
-                    var fasetsttime = 100000000000000000;
+                    var fastesttime = 1000000000000000;
+                    var fastesttimeincludingwaiting = 1000000000000000;
                     var bestroute;
                     var distance;
+                    var routedeparture;
                     for (let index = 0; index < responsebodyjson.response.route.length; index++) {
                         const route = responsebodyjson.response.route[index];
                         if (route.summary && route.summary.distance) {
-                            if (route.summary.trafficTime && route.summary.trafficTime < fasetsttime) {
-                                fasetsttime = route.summary.trafficTime;
+                            if (route.summary.trafficTime && route.summary.trafficTime < fastesttime) {
+                                fastesttime = route.summary.trafficTime;
                                 distance = route.summary.distance;
+                                routedeparture = route.summary.departure;
                                 bestroute = route;
                             }
-                            else if (route.summary.travelTime && route.summary.travelTime < fasetsttime) {
-                                fasetsttime = route.summary.travelTime;
+                            else if (route.summary.travelTime && route.summary.travelTime < fastesttime) {
+                                fastesttime = route.summary.travelTime;
                                 distance = route.summary.distance;
+                                routedeparture = route.summary.departure;
                                 bestroute = route;
                             }
                         }
                     }
+                    if (routedeparture) {
+                        var arrivalafterroutedeparture = new Date(tools.addsecondstodate(routedeparture, fastesttime));
+                        var planneddeparture = departtime;
+                        if (arrivaltime) {
+                            planneddeparture = new Date(tools.addsecondstodate(arrivaltime, - fastesttime));
+                        }
+                        fastesttimeincludingwaiting = tools.secondsbetweendates(planneddeparture, arrivalafterroutedeparture);
+                        console.log("findroute routedeparture " + routedeparture + " + fastesttime " + fastesttime + 
+                            " arrivalafterroutedeparture " + arrivalafterroutedeparture + " planneddeparture " + planneddeparture +
+                            " fastesttimeincludingwaiting " + fastesttimeincludingwaiting);
+                        if (fastesttime < fastesttimeincludingwaiting) {
+                            fastesttime = fastesttimeincludingwaiting;
+                        }
+                    }
+
                     for (let indexleg = 0; indexleg < bestroute.leg.length; indexleg++) {
                         const leg = bestroute.leg[indexleg];
                         var maneuver = [];
@@ -563,7 +582,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
 
                     var route = {
                         length: distance,
-                        traveltime: fasetsttime,
+                        traveltime: fastesttime,
                         maneuver: maneuver,
                         startlat: startlat,
                         startlon: startlon,
