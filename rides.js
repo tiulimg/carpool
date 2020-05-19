@@ -487,14 +487,15 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
         var url = "https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey="+HERE_APPID;
         if (middlelat && middlelon) {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+middlelat+"%2C"+middlelon+"&waypoint2="+endlat+"%2C"+endlon + 
-                "&mode=fastest%3B" + mode + "&combineChange=true&language=he&instructionformat=text" + arrivaldepartaddition + walkRadius;
+                "&mode=fastest%3B" + mode + "&combineChange=true&language=he&instructionformat=text&alternatives=9" + 
+                arrivaldepartaddition + walkRadius;
             // console.log("findroute here start ("+startlat+","+startlon+") middle ("+middlelat+","+middlelon+
             //     ") end ("+endlat+","+endlon+") arrival " + arrivaltime + " depart " + departtime + " mode " + mode + 
             //     " description " + description);
         }
         else {
             url += "&waypoint0="+startlat+"%2C"+startlon+"&waypoint1="+endlat+"%2C"+endlon + "&mode=fastest%3B" + mode +
-                "&combineChange=true&language=he&instructionformat=text" + arrivaldepartaddition + walkRadius;
+                "&combineChange=true&language=he&instructionformat=text&alternatives=9" + arrivaldepartaddition + walkRadius;
             // console.log("findroute here start ("+startlat+","+startlon+") end ("+endlat+","+endlon+") arrival " + arrivaltime + 
             //     " depart " + departtime + " mode " + mode + " description " + description);
         }
@@ -526,8 +527,26 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                 else if (responsebodyjson.response && responsebodyjson.response.route && responsebodyjson.response.route[0] &&
                     responsebodyjson.response.route[0].leg)
                 {
-                    for (let indexleg = 0; indexleg < responsebodyjson.response.route[0].leg.length; indexleg++) {
-                        const leg = responsebodyjson.response.route[0].leg[indexleg];
+                    var fasetsttime = 100000000000000000;
+                    var bestroute;
+                    var distance;
+                    for (let index = 0; index < responsebodyjson.response.route.length; index++) {
+                        const route = responsebodyjson.response.route[index];
+                        if (route.summary && route.summary.distance) {
+                            if (route.summary.trafficTime && route.summary.trafficTime < fasetsttime) {
+                                fasetsttime = route.summary.trafficTime;
+                                distance = route.summary.distance;
+                                bestroute = route;
+                            }
+                            else if (route.summary.travelTime && route.summary.travelTime < fasetsttime) {
+                                fasetsttime = route.summary.travelTime;
+                                distance = route.summary.distance;
+                                bestroute = route;
+                            }
+                        }
+                    }
+                    for (let indexleg = 0; indexleg < bestroute.leg.length; indexleg++) {
+                        const leg = bestroute.leg[indexleg];
                         var maneuver = [];
                         for (let index = 0; index < leg.maneuver.length; index++) {
                             const step = leg.maneuver[index];
@@ -541,21 +560,10 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                             });
                         }
                     }
-                    var traveltime;
-                    var distance;
-                    if (responsebodyjson.response.route[0].summary && responsebodyjson.response.route[0].summary.distance) {
-                        distance = responsebodyjson.response.route[0].summary.distance;
-                        if (responsebodyjson.response.route[0].summary.trafficTime) {
-                            traveltime = responsebodyjson.response.route[0].summary.trafficTime;
-                        }
-                        else if (responsebodyjson.response.route[0].summary.travelTime) {
-                            traveltime = responsebodyjson.response.route[0].summary.travelTime;
-                        }
-                    }
 
                     var route = {
                         length: distance,
-                        traveltime: traveltime,
+                        traveltime: fasetsttime,
                         maneuver: maneuver,
                         startlat: startlat,
                         startlon: startlon,
@@ -946,6 +954,10 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                     " - driver[route"+direction+"thehike].traveltime " + driver["route"+direction+"thehike"].traveltime + 
                     " = additionaltime " + additionaltime + " <? maximumcardeviation " + hike.maximumcardeviation + " description " +  
                     description + " stop " + stop.name);
+                if (additionaltime < 0) {
+                    additionaltime = 0;
+                    driver["route"+direction+"thehike"] = routethroughstop;
+                }
                 if (additionaltime <= hike.maximumcardeviation) {
                     stop.caradditionaltime = additionaltime;
                     arrival = null;
@@ -972,6 +984,9 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                             console.log("woulddriverstop routethroughstop.traveltime " + routethroughstop.traveltime + 
                                 " - routetostop.traveltime " + routetostop.traveltime + " = travaltimefromstop " + 
                                 travaltimefromstop + " description " + description);
+                            if (travaltimefromstop < 0) {
+                                travaltimefromstop = 0;
+                            }
 
                             if (direction == "to") {
                                 arrival = tools.addsecondstodate(depart, routetostop.traveltime);
