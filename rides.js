@@ -1301,8 +1301,11 @@ function stopsinrectangle(driverlat, driverlon, hikelat, hikelon) {
     var stopsinarea = [];
     for (let index = 0; index < stops.length; index++) {
         const stop = stops[index];
-        if (((driverlat < stop.lat && stop.lat < hikelat) || (driverlat > stop.lat && stop.lat > hikelat)) &&
-            ((driverlon < stop.lon && stop.lon < hikelon) || (driverlon > stop.lon && stop.lon > hikelon))) {
+        var distance = tools.distanceLatLons(driverlat, driverlon, stop.lat, stop.lon);
+
+        if ((((driverlat < stop.lat && stop.lat < hikelat) || (driverlat > stop.lat && stop.lat > hikelat)) &&
+            ((driverlon < stop.lon && stop.lon < hikelon) || (driverlon > stop.lon && stop.lon > hikelon))) ||
+            distance <= 5000) {
             stopsinarea.push({
                 name: stop.name,
                 lat: stop.lat,
