@@ -550,15 +550,25 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                         }
                     }
                     if (routedeparture) {
+                        var hikeday;
+                        routedeparture = new Date(routedeparture).toISOString();
                         var arrivalafterroutedeparture = new Date(tools.addsecondstodate(routedeparture, fastesttime));
-                        var planneddeparture = departtime;
                         if (arrivaltime) {
-                            planneddeparture = new Date(tools.addsecondstodate(arrivaltime, - fastesttime));
+                            fastesttimeincludingwaiting = tools.secondsbetweendates(arrivaltime, routedeparture);
+                            hikeday = tools.getday(arrivaltime);
                         }
-                        fastesttimeincludingwaiting = tools.secondsbetweendates(planneddeparture, arrivalafterroutedeparture);
+                        else {
+                            fastesttimeincludingwaiting = tools.secondsbetweendates(departtime, arrivalafterroutedeparture);
+                            hikeday = tools.getday(departtime);
+                        }
+                        var departday = tools.getday(routedeparture);
                         console.log("findroute routedeparture " + routedeparture + " + fastesttime " + fastesttime + 
-                            " arrivalafterroutedeparture " + arrivalafterroutedeparture + " planneddeparture " + planneddeparture +
-                            " fastesttimeincludingwaiting " + fastesttimeincludingwaiting);
+                            " arrivalafterroutedeparture " + arrivalafterroutedeparture + " fastesttimeincludingwaiting " + 
+                            fastesttimeincludingwaiting + " hikeday " + hikeday + " departday " + departday);
+                        if (hikeday != departday) {
+                            return resolve("No route found - only on " + departday + " to month");
+                        }
+
                         if (fastesttime < fastesttimeincludingwaiting) {
                             fastesttime = fastesttimeincludingwaiting;
                         }
