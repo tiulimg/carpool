@@ -343,6 +343,9 @@ function getDistancesBetweenHikers(hikers) {
             else if (!partner.amidriver) {
                 continue;
             }
+            else if (partner.availableplaces == 0 || hiker.availableplaces == 0) {
+                continue;
+            }
 
             if (partner.comesfromlocation && hiker.comesfromlocation) {
                 var distancetothehike = distanceLatLons(
