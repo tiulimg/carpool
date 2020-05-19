@@ -364,51 +364,44 @@ function getDistancesBetweenHikers(hiker, drivers) {
 
     // Sort distances
     distances.tothehike.sort(function(b,a){
-        adistance = a.distance;
-        bdistance = b.distance;
-        result = adistance>bdistance ? -1 : adistance<bdistance ? 1 : 0;
-        if (result == 0) {
-            aage = a.link.age;
-            bage = b.link.age;
-            hikerage = hiker.age;
-            if (aage && bage && hikerage) {
-                aage = Math.abs(hikerage - aage);
-                bage = Math.abs(hikerage - bage);
-                result = aage>bage ? -1 : aage<bage ? 1 : 0;
-            }
-            if (result == 0) {
-                aname = a.link.fullname;
-                bname = b.link.fullname;
-                result = aname > bname;
-            }
-        }
+        var result = sorthikerdistances(b,a,hiker);
         return result;
     });
     distances.fromthehike.sort(function(b,a){
-        adistance = a.distance;
-        bdistance = b.distance;
-        result = adistance>bdistance ? -1 : adistance<bdistance ? 1 : 0;
-        if (result == 0) {
-            aage = a.link.age;
-            bage = b.link.age;
-            hikerage = hiker.age;
-            if (aage && bage && hikerage) {
-                aage = Math.abs(hikerage - aage);
-                bage = Math.abs(hikerage - bage);
-                result = aage>bage ? -1 : aage<bage ? 1 : 0;
-            }
-            if (result == 0) {
-                aname = a.link.fullname;
-                bname = b.link.fullname;
-                result = aname > bname;
-            }
-        }
+        var result = sorthikerdistances(b,a,hiker);
         return result;
     });
 
     logservices.loghikersdistances(distances);
 
     return distances;
+}
+
+function sorthikerdistances(b, a, hiker) {
+    adistance = a.distance;
+    bdistance = b.distance;
+    var result = adistance>bdistance ? -1 : adistance<bdistance ? 1 : 0;
+    if (result == 0) {
+        aplacesbothdirections = a.link.availableplacestothehike && a.link.availableplacesfromthehike;
+        bplacesbothdirections = b.link.availableplacestothehike && b.link.availableplacesfromthehike;
+        result = aplacesbothdirections>bplacesbothdirections ? -1 : bplacesbothdirections>aplacesbothdirections ? 1 : 0;
+    }
+    if (result == 0) {
+        aage = a.link.age;
+        bage = b.link.age;
+        hikerage = hiker.age;
+    }
+    if (aage && bage && hikerage) {
+        aage = Math.abs(hikerage - aage);
+        bage = Math.abs(hikerage - bage);
+        result = aage>bage ? -1 : aage<bage ? 1 : 0;
+    }
+    if (result == 0) {
+        aname = a.link.fullname;
+        bname = b.link.fullname;
+        result = aname > bname;
+    }
+    return result;
 }
 
 function sortbyDistancesToStops(hiker, stops, direction) {
