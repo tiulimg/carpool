@@ -1355,9 +1355,9 @@ function setrequiredseats(hike) {
 
 async function driverifcanmeet(res, hiker, hike, direction) {
     if (!hiker["mydriver"+direction] && !hiker["route"+direction+"thehike"] && hike.startlatitude) {
-        var distances = hike.hikersdistances;
-        for (let index = 0; index < distances[hiker.phone][direction+"thehike"].length; index++) {
-            const neardriverdistance = distances[hiker.phone][direction+"thehike"][index];
+        var distances = tools.getDistancesBetweenHikers(hiker, hike.drivers);
+        for (let index = 0; index < distances[direction+"thehike"].length; index++) {
+            const neardriverdistance = distances[direction+"thehike"][index];
             var neardriver = neardriverdistance.link;
             console.log("driverifcanmeet driver "+direction+" the hike: distance " + 
                 neardriverdistance.distance + 
@@ -1392,9 +1392,8 @@ async function setcarpool(res, nearhikes) {
 
             // public transport for hikers that don't need a ride
             await bustohike(false, hike, res);
+            
             await carstohike(hike, res);
-
-            hike.hikersdistances = tools.getDistancesBetweenHikers(hikers);
             await hikercalculate(res, hike);
                 
             updateavailableplaces(hike);

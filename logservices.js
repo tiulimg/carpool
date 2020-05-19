@@ -22,17 +22,14 @@ function logRejection(rejection) {
 
 function loghikersdistances(distances) {
     console.log("distances:");
-    for (var source in distances) {
-        source = distances[source];
-        for (let index = 0; index < source.tothehike.length; index++) {
-            const dest = source.tothehike[index];
-            console.log("tothehike: source " + source.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.fullname);
-        }
+    for (let index = 0; index < distances.tothehike.length; index++) {
+        const dest = distances.tothehike[index];
+        console.log("tothehike: source " + distances.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.fullname);
+    }
 
-        for (let index = 0; index < source.fromthehike.length; index++) {
-            const dest = source.fromthehike[index];
-            console.log("fromthehike: source " + source.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.fullname);
-        }
+    for (let index = 0; index < distances.fromthehike.length; index++) {
+        const dest = distances.fromthehike[index];
+        console.log("fromthehike: source " + distances.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.fullname);
     }
 }
 
@@ -42,7 +39,7 @@ function logstopsdistances(stops, distances, direction) {
         var stop = stops[index];
         var stopkey = stop.lat + "," + stop.lon;
         const dest = distances[stopkey];
-        console.log(direction + "thehike: distance " + dest + " meters dest " + stop.name);
+        console.log("stop " + direction + "thehike: distance " + dest + " meters dest " + stop.name);
     }
 }
 
