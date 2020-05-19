@@ -981,43 +981,36 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                 }
                 if (additionaltime <= hike.maximumcardeviation) {
                     stop.caradditionaltime = additionaltime;
-                    arrival = null;
-                    depart = null;
                     if (direction == "to") {
-                        depart = tools.addsecondstodate(hike.starttime, - routethroughstop.traveltime);
-                        endlat = stop.lat;
-                        endlon = stop.lon;
-                    }
-                    else if (direction == "from") {
-                        arrival = tools.addsecondstodate(hike.endtime, routethroughstop.traveltime);
                         startlat = stop.lat;
                         startlon = stop.lon;
                     }
-                    description = "routetostop details " + driver.fullname + " comesfrom " + driver.comesfromdetailed + " returns to " + 
-                        driver.returnstodetailed + " " + direction + " the hike " + hike.hikenamehebrew + " stop " + stop.name + 
-                        " in arrival " + arrival + " depart " + depart;
+                    else if (direction == "from") {
+                        endlat = stop.lat;
+                        endlon = stop.lon;
+                    }
+                    description = "routefromstop details " + driver.fullname + " comesfrom " + driver.comesfromdetailed + 
+                        " returns to " + driver.returnstodetailed + " " + direction + " the hike " + hike.hikenamehebrew + 
+                        " stop " + stop.name + " in arrival " + arrival + " depart " + depart;
         
                     findroutecachedb(res, startlat, startlon, endlat, endlon, "car", arrival, depart, null, null, description)
-                    .then(routetostop => {
-                        if (routetostop.traveltime || routetostop.traveltime == 0) {
-                            stop.carroutetostoptime = routetostop.traveltime;        
-                            var travaltimefromstop = routethroughstop.traveltime - routetostop.traveltime;
+                    .then(routefromstop => {
+                        if (routefromstop.traveltime || routefromstop.traveltime == 0) {
+                            var travaltimetostop = routethroughstop.traveltime - routefromstop.traveltime;
                             console.log("woulddriverstop routethroughstop.traveltime " + routethroughstop.traveltime + 
-                                " - routetostop.traveltime " + routetostop.traveltime + " = travaltimefromstop " + 
-                                travaltimefromstop + " description " + description);
-                            if (travaltimefromstop < 0) {
-                                travaltimefromstop = 0;
+                                " - routefromstop.traveltime " + routefromstop.traveltime + " = travaltimetostop " + 
+                                travaltimetostop + " description " + description);
+                            if (travaltimetostop < 0) {
+                                travaltimetostop = 0;
                             }
 
                             if (direction == "to") {
-                                arrival = tools.addsecondstodate(depart, routetostop.traveltime);
-                                depart = null;
+                                arrival = tools.addsecondstodate(arrival, - routefromstop.traveltime);
                             }
                             else if (direction == "from") {
-                                depart = tools.addsecondstodate(arrival, - routetostop.traveltime);
-                                arrival = null;
+                                depart = tools.addsecondstodate(depart, routefromstop.traveltime);
                             }
-                            wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, depart, travaltimefromstop)
+                            wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, depart, routefromstop.traveltime)
                             .then(hitcherwouldcome => {
                                 return resolve(hitcherwouldcome);
                             })
