@@ -20,21 +20,17 @@ function logRejection(rejection) {
     }
 }
 
-function loghikersdistances(distances) {
-    console.log("distances:");
-    for (let index = 0; index < distances.tothehike.length; index++) {
-        const dest = distances.tothehike[index];
-        console.log("tothehike: source " + distances.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.fullname);
-    }
-
-    for (let index = 0; index < distances.fromthehike.length; index++) {
-        const dest = distances.fromthehike[index];
-        console.log("fromthehike: source " + distances.link.fullname + " distance " + dest.distance + " meters dest " + dest.link.fullname);
+function loghikersdistances(distances, direction) {
+    console.log("distances: " + distances.length);
+    for (let index = 0; index < distances[direction+"thehike"].length; index++) {
+        const dest = distances[direction+"thehike"][index];
+        console.log(direction + "thehike: source " + distances.link.fullname + " distance " + dest.distance + 
+            " meters dest " + dest.link.fullname);
     }
 }
 
 function logstopsdistances(stops, distances, direction) {
-    console.log("stop distances:");
+    console.log("stop distances: " + stops.length);
     for (let index = 0; index < stops.length; index++) {
         var stop = stops[index];
         var stopkey = stop.lat + "," + stop.lon;

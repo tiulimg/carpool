@@ -1341,7 +1341,9 @@ async function hikercalculate(res, hike) {
         if (hiker.seatsrequired > 0) {
             console.log("hikercalculate hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
                         " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
-                        " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed);
+                        " comesfrom " + hiker.comesfromdetailed + " returnsto " + hiker.returnstodetailed + " drivers to from " +
+                        hiker.mydriverto + " " + hiker.mydriverfrom + " route to from " + hiker.routetothehike + " " + 
+                        hiker.routefromthehike);
             await driverifcanmeet(res, hiker, hike, "to");
             if (hiker.mydriverto) {
                 await driverifcanmeet(res, hiker, hike, "from");
