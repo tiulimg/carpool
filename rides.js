@@ -520,13 +520,16 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     logservices.logRejection(error);
                     return resolve("No route found");
                 }
-                // console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
+                console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
+                    console.log("findroute NoRouteFound");
                     return resolve("No route found");
                 }
                 else if (responsebodyjson.response && responsebodyjson.response.route && responsebodyjson.response.route[0] &&
                     responsebodyjson.response.route[0].leg)
                 {
+                    console.log("findroute routefound");
+
                     var fasetsttime = 100000000000000000;
                     var bestroute;
                     var distance;
@@ -576,9 +579,12 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                         depart: departtime,
                         description: description,
                     };
+                    console.log("findroute route " + JSON.stringify(route));
+
                     return resolve(route);
                 }
                 else {
+                    console.log("findroute else");
                     return resolve("No route found");
                 }
             }
@@ -1398,7 +1404,6 @@ async function setcarpool(res, nearhikes) {
             // public transport for hikers that hadn't left with a ride
             await bustohike(true, hike, res);
                 
-            console.log("setcarpool CCC hikers " + hikers.length);
             removerouteinstructions(hikers);
             await dbservices.replaceallhikersforhike(res, hike.hikedate, hikers);
         };
@@ -1406,14 +1411,9 @@ async function setcarpool(res, nearhikes) {
 }
 
 function removerouteinstructions(hikers) {
-    console.log("removerouteinstructions begin hikers.length " + hikers.length);
-    for (let index = 0; hikers < hikers.length; index++) {
-        console.log("removerouteinstructions hiker " + index);
+    for (let index = 0; index < hikers.length; index++) {
         const hiker = hikers[index];
-        console.log("removerouteinstructions b4 " + hiker.routetothehike + " " + hiker.routefromthehike);
         delete hiker.routetothehike;
         delete hiker.routefromthehike;
-        console.log("removerouteinstructions after " + hiker.routetothehike + " " + hiker.routefromthehike);
     }
-    console.log("removerouteinstructions end ");
 }
