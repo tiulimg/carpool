@@ -8,7 +8,7 @@ module.exports = {
     wait: wait,
     addsecondstodate: addsecondstodate,
     secondsbetweendates: secondsbetweendates,
-    getday: getday,
+    onlydate: onlydate,
     normalize_phonenumber: normalize_phonenumber,
     datestringtoobject: datestringtoobject,
     get_near_hikes: get_near_hikes, 
