@@ -532,42 +532,56 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     var bestroute;
                     var distance;
                     var routedeparture;
+                    var hikeday;
+                    var departday;
+                    var currdepartday;
+                    if (arrivaltime) {
+                        hikeday = tools.onlydate(arrivaltime);
+                    }
+                    else {
+                        hikeday = tools.onlydate(departtime);
+                    }
                     for (let index = 0; index < responsebodyjson.response.route.length; index++) {
                         const route = responsebodyjson.response.route[index];
                         if (route.summary && route.summary.distance) {
-                            if (route.summary.trafficTime && route.summary.trafficTime < fastesttime) {
+                            var currroutedeparture = route.summary.departure;
+                            currdepartday = tools.onlydate(currroutedeparture);
+
+                            if (route.summary.trafficTime && route.summary.trafficTime < fastesttime &&
+                                hikeday == currdepartday) {
                                 fastesttime = route.summary.trafficTime;
                                 distance = route.summary.distance;
-                                routedeparture = route.summary.departure;
+                                routedeparture = currroutedeparture;
+                                departday = currdepartday;
                                 bestroute = route;
                             }
-                            else if (route.summary.travelTime && route.summary.travelTime < fastesttime) {
+                            else if (route.summary.travelTime && route.summary.travelTime < fastesttime &&
+                                hikeday == currdepartday) {
                                 fastesttime = route.summary.travelTime;
                                 distance = route.summary.distance;
-                                routedeparture = route.summary.departure;
+                                routedeparture = currroutedeparture;
+                                departday = currdepartday;
                                 bestroute = route;
                             }
                         }
                     }
+
+                    if (!bestroute) {
+                        return resolve("No route found - only on " + currdepartday);
+                    }
+
                     if (routedeparture) {
-                        var hikeday;
                         routedeparture = new Date(routedeparture).toISOString();
                         var arrivalafterroutedeparture = new Date(tools.addsecondstodate(routedeparture, fastesttime));
                         if (arrivaltime) {
                             fastesttimeincludingwaiting = tools.secondsbetweendates(arrivaltime, routedeparture);
-                            hikeday = tools.getday(arrivaltime);
                         }
                         else {
                             fastesttimeincludingwaiting = tools.secondsbetweendates(departtime, arrivalafterroutedeparture);
-                            hikeday = tools.getday(departtime);
                         }
-                        var departday = tools.getday(routedeparture);
                         console.log("findroute routedeparture " + routedeparture + " + fastesttime " + fastesttime + 
                             " arrivalafterroutedeparture " + arrivalafterroutedeparture + " fastesttimeincludingwaiting " + 
                             fastesttimeincludingwaiting + " hikeday " + hikeday + " departday " + departday);
-                        if (hikeday != departday) {
-                            return resolve("No route found - only on " + departday + " to month");
-                        }
 
                         if (fastesttime < fastesttimeincludingwaiting) {
                             fastesttime = fastesttimeincludingwaiting;

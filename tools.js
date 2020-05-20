@@ -74,9 +74,9 @@ function secondsbetweendates(date1, date2) {
     return Seconds_Between_Dates;
 }
 
-function getday(date) {
-    var d = new Date(date);
-    return d.getDate();
+function onlydate(datetimestring) {
+    var d = new Date(datetimestring);
+    return d.toDateString();
 }
 
 function normalize_phonenumber(phonenumber) {
