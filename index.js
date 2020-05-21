@@ -11,7 +11,6 @@ var replies = require("./replies");
 var register = require("./register_to_hikes");
 var ridesmodules = require("./rides");
 var tools = require("./tools");
-var Queuemodule = require("./promisequeue");
 var wanttomodify_obj = JSON.parse(fs.readFileSync('./wanttomodifytexts.json', 'utf8'));
 
 var ObjectID = mongodb.ObjectID;
