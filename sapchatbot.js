@@ -9,7 +9,7 @@ module.exports = {
     replaceconversationid: replaceconversationid,
 }
 
-function getconversations(conversationid, phonenumber) {
+function getconversations(res, conversationid, phonenumber) {
     return new Promise((resolve, reject) => {
         var url = "https://api.cai.tools.sap/connect/v1/conversations";
         request({
