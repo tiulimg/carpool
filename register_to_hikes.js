@@ -15,11 +15,11 @@ module.exports = {
 function register_to_hikes(language, res, params, memory)
 {
     var fs = require('fs');
-    fs.readFile('./register_hikes_post_data.text', function (err, post_data) {
+    fs.readFile('./resources/register_hikes_post_data.text', function (err, post_data) {
         if (err) return console.error(err);
         var form_post_data = post_data.toString();
 
-        fs.readFile('./register_hikes_draft_response.text', function (err, draft_data) {
+        fs.readFile('./resources/register_hikes_draft_response.text', function (err, draft_data) {
             if (err) return console.error(err);
             var draft_response = draft_data.toString();
 
@@ -34,11 +34,11 @@ function register_to_hikes(language, res, params, memory)
 function edithikes(language, res, params, memory) 
 {
     var fs = require('fs');
-    fs.readFile('./register_hikes_post_data.text', function (err, post_data) {
+    fs.readFile('./resources/register_hikes_post_data.text', function (err, post_data) {
         if (err) return console.error(err);
         var form_post_data = post_data.toString();
 
-        fs.readFile('./register_hikes_draft_response.text', function (err, draft_data) {
+        fs.readFile('./resources/register_hikes_draft_response.text', function (err, draft_data) {
             if (err) return console.error(err);
             var draft_response = draft_data.toString();
 

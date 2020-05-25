@@ -1,5 +1,5 @@
 var fs = require('fs');
-var replies_obj = JSON.parse(fs.readFileSync('./recast_conversation_reply.json', 'utf8'));
+var replies_obj = JSON.parse(fs.readFileSync('./resources/recast_conversation_reply.json', 'utf8'));
 
 module.exports = {
     get_recast_reply: get_recast_reply,
