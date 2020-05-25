@@ -1927,7 +1927,7 @@ app.post("/api/selecthikes", function(req, res) {
             var selectHike = "";
             var dateformats = ["DD.MM.YY", "DD.MM.YYYY", "DD-MM-YYYY","DD-MM-YY","DD/MM/YYYY","DD/MM/YY",
                 "DD.MM","DD/MM","DD-MM", "DD MM YYYY", "DD MM YY", "DD MM", "DD\\MM\\YYYY", "DD\\MM\\YY", "DD\\MM"];
-            if (typeof memory.selecthike !== 'undefined' && memory.selecthike != null) {
+            if (memory.selecthike && memory.selecthike2) {
                 var memorySelectHike = memory.selecthike.raw;
                 var hikedate = memory.selecthike2.replace(/[a-zA-Zא-ת \(\)  '`\"״שׁשׂ+אַאָאּבּגּדּהּוּזּטּיּךּכּלּמּנּסּףּפּצּקּרּשּתּוֹ]/g, "").trim();
                 var hikedate2 = hikedate.match(/\d{1,2}\.\d{1,2}\.\d{2}/g);
