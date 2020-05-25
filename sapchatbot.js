@@ -70,7 +70,7 @@ function replaceconversationid(res, conversationid, phonenumber) {
             if (!conversation) {
                 getconversations(res, conversationid, phonenumber)
                 .then(conversation => {
-                    return resolve(conversations);
+                    return resolve(conversation);
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
