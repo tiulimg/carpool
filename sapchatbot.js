@@ -26,7 +26,9 @@ function getconversations(conversationid, phonenumber) {
             }
             else {
                 var conversations = JSON.parse(response.body);
+                console.log("getconversations conversations " + conversations.length);
                 if (conversationid && conversations && phonenumber) {
+                    console.log("getconversations conversationid " + conversationid);
                     var conversation;
                     for (let index = 0; index < conversations.results.length; index++) {
                         const result = conversations.results[index];
@@ -40,6 +42,7 @@ function getconversations(conversationid, phonenumber) {
                         senderId = conversation.chatId;
                     }
                     if (senderId) {
+                        console.log("getconversations senderId " + senderId);
                         dbservices.replaceconversationid(res, conversationid, phonenumber, {
                             conversationid: conversationid,
                             phonenumber: phonenumber,
