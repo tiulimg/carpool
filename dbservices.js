@@ -28,6 +28,9 @@ module.exports = {
     getroutebylatlontime: getroutebylatlontime,
     insertnewroute: insertnewroute,
     deleteallroutes: deleteallroutes,
+    getconversationid: getconversationid,
+    replaceconversationid: replaceconversationid,
+    deleteoneconversationid: deleteoneconversationid, 
 }
 
 var ObjectID = mongodb.ObjectID;
@@ -40,6 +43,7 @@ var HIKE_COLLECTION = "hike";
 var LAST_REGISTER_COLLECTION = "last_register";
 var IRONNUMBERS_COLLECTION = "ironnumbers";
 var ROUTES_COLLECTION = "routes";
+var CONVERSATIONID_COLLECTION = "conversationid";
 
 function initialize(app) {
     return new Promise((resolve, reject) => {
@@ -259,7 +263,7 @@ function insertnewlastregister(res, lastregister) {
                 logservices.handleError(res, err.message, "Failed to create or update last register.");
             }
             else {
-                resolve();
+                return resolve();
             }
         });
     });
@@ -291,7 +295,7 @@ function deleteonelastregister(res, phonenumber) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to delete lastregister");
             }
-            resolve();
+            return resolve();
         });
     });
 }
@@ -302,7 +306,7 @@ function deletealllastregisters(res) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to delete last registers' details.");
             } else {
-                resolve();
+                return resolve();
             }
         });
     });
@@ -332,8 +336,9 @@ function updateironnumberbyphone(res, phonenumber, selectedhike) {
                     lastseen: now 
                 }
             }, 
-            { upsert : true });
-        resolve();
+            { upsert : true }
+        );
+        return resolve();
     });
 }
 
@@ -385,7 +390,7 @@ function insertnewroute(res, route) {
                         logservices.handleError(res, err.message, "Failed to create or update route.");
                     }
                     else {
-                        resolve();
+                        return resolve();
                     }
                 });
             }
@@ -405,5 +410,75 @@ function deleteallroutes(res) {
                 return resolve();
             }
         });
+    });
+}
+
+function getconversationid(res, phonenumber, conversationid) {
+    return new Promise((resolve, reject) => {
+        var filter = [];
+        if (phonenumber) {
+            filter.push({
+                phonenumber: phonenumber,
+            });
+        }
+        else if (conversationid) {
+            filter.push({
+                conversationid: conversationid,
+            });
+        }
+        else {
+            filter.push({phonenumber: false});
+        }
+
+        db.collection(CONVERSATIONID_COLLECTION).findOne({ $or: filter }, function(err, doc) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to get conversationid.");
+            } else {
+                return resolve(doc);
+            }
+        });
+    });
+}
+
+function replaceconversationid(res, conversationid, phonenumber, conversation) {
+    return new Promise((resolve, reject) => {
+        deleteoneconversationid(res, phonenumber, conversationid)
+        .then(() => {
+            db.collection(CONVERSATIONID_COLLECTION).insertOne(conversation, function(err, result) {
+                if (err) {
+                    logservices.handleError(res, err.message, "Failed to replace conversationid.");
+                } else {
+                    return resolve();
+                }
+            });
+        })
+    });
+}
+
+function deleteoneconversationid(res, phonenumber, conversationid) {
+    return new Promise((resolve, reject) => {
+        var filter = [];
+        if (phonenumber) {
+            filter.push({
+                phonenumber: phonenumber,
+            });
+        }
+        else if (conversationid) {
+            filter.push({
+                conversationid: conversationid,
+            });
+        }
+        if (filter.length > 0) {
+            db.collection(CONVERSATIONID_COLLECTION).deleteOne(
+                { $or: filter}, function(err, doc) {
+                if (err) {
+                    logservices.handleError(res, err.message, "Failed to delete conversationid");
+                }
+                return resolve();
+            });
+        }
+        else {
+            return resolve();
+        }
     });
 }

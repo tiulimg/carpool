@@ -6,11 +6,12 @@ var fs = require('fs');
 
 // Custom modules
 var dbservices = require("./dbservices");
+var tools = require("./tools");
 var logservices = require("./logservices");
 var replies = require("./replies");
 var register = require("./register_to_hikes");
 var ridesmodules = require("./rides");
-var tools = require("./tools");
+var sapchatbot = require("./sapchatbot");
 var wanttomodify_obj = JSON.parse(fs.readFileSync('./wanttomodifytexts.json', 'utf8'));
 
 var ObjectID = mongodb.ObjectID;
@@ -985,7 +986,13 @@ app.patch("/api/lastregister/:phone", function(req, res) {
                         recast_conversation_reply = 
                             register.setAvailableHikesReplyBut(recast_conversation_reply, docs, language, selectedHikes);
                     }
-                    res.status(200).json(recast_conversation_reply);
+                    sapchatbot.replaceconversationid(res, req.body.conversation.id, phonenumber)
+                    .then(() => {
+                        res.status(200).json(recast_conversation_reply);
+                    })
+                    .catch(rejection => {
+                        logservices.logRejection(rejection);
+                    });
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
@@ -1065,7 +1072,13 @@ app.put("/api/lastregister/:phone", function(req, res) {
                         delete memory.operation;
                         recast_conversation_reply = replies.get_recast_reply("REGISTERED_NO_HIKE",language,null,memory);
                     }
-                    res.status(200).json(recast_conversation_reply);
+                    sapchatbot.replaceconversationid(res, req.body.conversation.id, phonenumber)
+                    .then(() => {
+                        res.status(200).json(recast_conversation_reply);
+                    })
+                    .catch(rejection => {
+                        logservices.logRejection(rejection);
+                    });
                 })
             }
         })
