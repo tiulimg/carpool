@@ -63,14 +63,14 @@ function getconversations(res, conversationid, phonenumber) {
                                     phonenumber: phonenumber,
                                     senderId: senderId,
                                 }).then(() => {
-                                    return resolve(conversation);
+                                    return resolve(conversation.results);
                                 })
                                 .catch(rejection => {
                                     logservices.logRejection(rejection);
                                 });
                             }
                             else {
-                                return resolve(conversation);
+                                return resolve(conversation.results);
                             }
                         }
                         else {
