@@ -3,6 +3,7 @@ var Promise = require('promise');
 
 var dbservices = require("./dbservices");
 var logservices = require("./logservices");
+var tools = require("./tools");
 
 module.exports = {
     getconversations: getconversations,
@@ -76,24 +77,30 @@ function allchatstoenglish() {
             for (let index = 0; index < conversations.results.length; index++) {
                 const id = conversations.results[index].id;
                 
-                request({
-                    url: "https://api.cai.tools.sap/build/v1/users/zanzamer/bots/tiulimg/versions/v4-registration-to-hikes/" + 
-                        "builder/conversation_states/" + id,
-                    method: "PUT",
-                    headers: {
-                        Authorization: "Token " + process.env.SAP_TOKEN,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        language: "en",
-                    }),
-                }, function (error, response, body){
-                    if (error) {
-                        console.log(error);
-                    }
-                    else {
-                        console.log(JSON.stringify(response.body));
-                    }
+                tools.wait(index * 1000)
+                .then(() => {
+                    request({
+                        url: "https://api.cai.tools.sap/build/v1/users/zanzamer/bots/tiulimg/versions/v4-registration-to-hikes/" + 
+                            "builder/conversation_states/" + id,
+                        method: "PUT",
+                        headers: {
+                            Authorization: "Token " + process.env.SAP_TOKEN,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            language: "en",
+                        }),
+                    }, function (error, response, body){
+                        if (error) {
+                            console.log(error);
+                        }
+                        else {
+                            console.log(JSON.stringify(response.body));
+                        }
+                    });
+                })
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
                 });
             }
             return resolve();
