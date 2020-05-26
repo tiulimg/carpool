@@ -77,7 +77,7 @@ function allchatstoenglish() {
             for (let index = 0; index < conversations.results.length; index++) {
                 const id = conversations.results[index].id;
                 
-                tools.wait(index * 1000)
+                tools.wait(index * 500)
                 .then(() => {
                     request({
                         url: "https://api.cai.tools.sap/build/v1/users/zanzamer/bots/tiulimg/versions/v4-registration-to-hikes/" + 
