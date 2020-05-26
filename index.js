@@ -12,6 +12,7 @@ var replies = require("./replies");
 var register = require("./register_to_hikes");
 var ridesmodules = require("./rides");
 var sapchatbot = require("./sapchatbot");
+var messageconnector = require("./messageconnector");
 var wanttomodify_obj = JSON.parse(fs.readFileSync('./wanttomodifytexts.json', 'utf8'));
 
 var ObjectID = mongodb.ObjectID;
@@ -2590,6 +2591,22 @@ app.patch("/api/calculaterides", function(req, res) {
 app.delete("/api/routes", function(req, res) {
     if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         dbservices.deleteallroutes(res)
+        .then(() => {
+            res.status(200).json("success");
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
+    }
+});
+
+/*  "/api/routes"
+*    DELETE: deletes all routes
+*/
+
+app.patch("/api/testsendmessage", function(req, res) {
+    if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
+        messageconnector.sendToFacebookMessenger(res, "3142507689098123", "Hi! מה קורה?")
         .then(() => {
             res.status(200).json("success");
         })
