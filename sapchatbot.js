@@ -34,7 +34,7 @@ function getconversations(res, conversationid, phonenumber) {
                 } catch (error) {
                     console.log("getconversations " + response.body);
                 }
-                console.log("getconversations conversations " + conversations + " " + JSON.stringify(conversations));
+                console.log("getconversations conversations " + conversations);
 
                 if (conversations && conversations.results) {
                     console.log("getconversations has results");
@@ -53,18 +53,21 @@ function getconversations(res, conversationid, phonenumber) {
                         var senderId;
                         if (conversation) {
                             senderId = conversation.chatId;
-                        }
-                        if (senderId && phonenumber) {
-                            dbservices.replaceconversationid(res, conversationid, phonenumber, {
-                                conversationid: conversationid,
-                                phonenumber: phonenumber,
-                                senderId: senderId,
-                            }).then(() => {
+                            if (senderId && phonenumber) {
+                                dbservices.replaceconversationid(res, conversationid, phonenumber, {
+                                    conversationid: conversationid,
+                                    phonenumber: phonenumber,
+                                    senderId: senderId,
+                                }).then(() => {
+                                    return resolve(conversation);
+                                })
+                                .catch(rejection => {
+                                    logservices.logRejection(rejection);
+                                });
+                            }
+                            else {
                                 return resolve(conversation);
-                            })
-                            .catch(rejection => {
-                                logservices.logRejection(rejection);
-                            });
+                            }
                         }
                         else {
                             return resolve(conversations);
@@ -88,7 +91,7 @@ function saveconversationidtoall(res) {
         .then(conversations => {
             console.log("saveconversationidtoall conversations " + conversations);
             if (conversations) {
-                console.log("saveconversationidtoall conversations " + conversations.length);
+                console.log("saveconversationidtoall conversations " + conversations.results.length);
                 for (let index = 0; index < conversations.results.length; index++) {
                     const id = conversations.results[index].id;
                     console.log("saveconversationidtoall id " + id);
