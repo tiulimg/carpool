@@ -34,7 +34,11 @@ function getconversations(res, conversationid, phonenumber) {
                 } catch (error) {
                     console.log("getconversations " + response.body);
                 }
+                console.log("getconversations conversations " + conversations);
+
                 if (conversationid && conversations && conversations.results) {
+                    console.log("getconversations has results");
+
                     var conversation;
                     for (let index = 0; index < conversations.results.length; index++) {
                         const result = conversations.results[index];
@@ -43,6 +47,8 @@ function getconversations(res, conversationid, phonenumber) {
                             break;
                         }
                     }
+                    console.log("getconversations conversation " + conversation);
+
                     var senderId;
                     if (conversation) {
                         senderId = conversation.chatId;
@@ -80,22 +86,28 @@ function saveconversationidtoall(res) {
     return new Promise((resolve, reject) => {
         getconversations()
         .then(conversations => {
+            console.log("saveconversationidtoall conversations " + conversations);
             if (conversations) {
+                console.log("saveconversationidtoall conversations " + conversations.length);
                 for (let index = 0; index < conversations.results.length; index++) {
                     const id = conversations.results[index].id;
+                    console.log("saveconversationidtoall id " + id);
                     tools.wait((index * 1000) + 500)
                     .then(() => {
                         return getconversations(res, id, null);
                     })
                     .then(conversation => {
+                        console.log("saveconversationidtoall conversation " + conversation + " " + JSON.stringify(conversation));
                         if (conversation && conversation.memory) {
+                            console.log("saveconversationidtoall has memory");
                             var memory = conversation.memory;
                             var phonenumber = memory.phonenumber;
                             if (phonenumber) {
+                                console.log("saveconversationidtoall has phonenumber");
                                 phonenumber = tools.normalize_phonenumber(phonenumber);
                                 tools.wait((index * 1000) + 1000)
                                 .then(() => {
-                                    getconversations(res, id, phonenumber)
+                                    return getconversations(res, id, phonenumber);
                                 })
                                 .catch(rejection => {
                                     logservices.logRejection(rejection);
