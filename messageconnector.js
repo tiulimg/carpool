@@ -47,7 +47,6 @@ function sendToTelegram(res, senderId, message) {
             "chat_id": senderId,
             "text": message,
         };
-        console.log("sendToTelegram request ");
 
         request({
             url: url,

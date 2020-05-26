@@ -7,6 +7,7 @@ var tools = require("./tools");
 
 module.exports = {
     getconversations: getconversations,
+    saveconversationidtoall: saveconversationidtoall,
     allchatstoenglish: allchatstoenglish,
     chattoenglish: chattoenglish,
 }
@@ -66,6 +67,34 @@ function getconversations(res, conversationid, phonenumber) {
                     return resolve(conversations);
                 }
             }
+        });
+    });
+}
+
+function saveconversationidtoall(res) {
+    return new Promise((resolve, reject) => {
+        getconversations()
+        .then(conversations => {
+            for (let index = 0; index < conversations.results.length; index++) {
+                const conversation = conversations.results[index];
+                const id = conversation.id;
+                
+                var memory = conversation.memory;
+                var phonenumber = memory.phonenumber;
+                if (phonenumber) {
+                    phonenumber = tools.normalize_phonenumber(phonenumber);
+                    tools.wait(index * 500)
+                    .then(() => {
+                        getconversations(res, id, phonenumber)
+                    })
+                    .catch(rejection => {
+                        logservices.logRejection(rejection);
+                    });
+                }
+            }
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
         });
     });
 }
