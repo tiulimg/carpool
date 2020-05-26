@@ -20,6 +20,8 @@ function sendToFacebookMessenger(res, senderId, message) {
             },
             "tag": "CONFIRMED_EVENT_UPDATE",
         };
+        console.log("sendToFacebookMessenger request ");
+
         request({
             url: url,
             method: "POST",
@@ -30,8 +32,10 @@ function sendToFacebookMessenger(res, senderId, message) {
         }, function (error, response, body){
             if (error) {
                 console.log(error);
-                return null;
+                return reject(error);
             }
+            console.log("sendToFacebookMessenger response.body " + JSON.stringify(response.body));
+            return resolve();
         });
     });
 }

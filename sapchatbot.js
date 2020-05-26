@@ -39,7 +39,6 @@ function getconversations(res, conversationid, phonenumber) {
                         senderId = conversation.chatId;
                     }
                     if (senderId) {
-                        console.log("getconversations senderId " + senderId);
                         dbservices.replaceconversationid(res, conversationid, phonenumber, {
                             conversationid: conversationid,
                             phonenumber: phonenumber,
