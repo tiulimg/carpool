@@ -986,7 +986,7 @@ app.patch("/api/lastregister/:phone", function(req, res) {
                         recast_conversation_reply = 
                             register.setAvailableHikesReplyBut(recast_conversation_reply, docs, language, selectedHikes);
                     }
-                    sapchatbot.replaceconversationid(res, req.body.conversation.id, phonenumber)
+                    sapchatbot.getconversations(res, req.body.conversation.id, phonenumber)
                     .then(() => {
                         res.status(200).json(recast_conversation_reply);
                     })
@@ -1072,7 +1072,7 @@ app.put("/api/lastregister/:phone", function(req, res) {
                         delete memory.operation;
                         recast_conversation_reply = replies.get_recast_reply("REGISTERED_NO_HIKE",language,null,memory);
                     }
-                    sapchatbot.replaceconversationid(res, req.body.conversation.id, phonenumber)
+                    sapchatbot.getconversations(res, req.body.conversation.id, phonenumber)
                     .then(() => {
                         res.status(200).json(recast_conversation_reply);
                     })
@@ -1319,7 +1319,18 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                     }
                     memory.operation = "newhike";
                     console.log("memory.stage " + JSON.stringify(memory.stage));
-                    res.status(200).json(recast_conversation_reply);
+                    if (memory.howdidihear2) {
+                        sapchatbot.getconversations(res, req.body.conversation.id, phonenumber)
+                        .then(() => {
+                            res.status(200).json(recast_conversation_reply);
+                        })
+                        .catch(rejection => {
+                            logservices.logRejection(rejection);
+                        });
+                    }
+                    else {
+                        res.status(200).json(recast_conversation_reply);
+                    }
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);

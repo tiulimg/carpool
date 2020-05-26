@@ -6,7 +6,6 @@ var logservices = require("./logservices");
 
 module.exports = {
     getconversations: getconversations,
-    replaceconversationid: replaceconversationid,
 }
 
 function getconversations(res, conversationid, phonenumber) {
@@ -60,26 +59,6 @@ function getconversations(res, conversationid, phonenumber) {
                     return resolve(conversations);
                 }
             }
-        });
-    });
-}
-
-function replaceconversationid(res, conversationid, phonenumber) {
-    return new Promise((resolve, reject) => {
-        dbservices.getconversationid(res, phonenumber, conversationid)
-        .then(conversation => {
-            if (!conversation) {
-                getconversations(res, conversationid, phonenumber)
-                .then(conversation => {
-                    return resolve(conversation);
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
-            }
-        })
-        .catch(rejection => {
-            logservices.logRejection(rejection);
         });
     });
 }
