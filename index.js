@@ -2620,8 +2620,7 @@ app.delete("/api/routes", function(req, res) {
 
 app.patch("/api/testsendmessage", function(req, res) {
     if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
-        // messageconnector.sendToFacebookMessenger(res, "3142507689098123", "מה קורה? נרשמת לטיול בחולות ניצנים ב-4-5.6, תבוא בע\"ה?")
-        sapchatbot.allchatstoenglish()
+        messageconnector.sendToTelegram(res, "555659347", "מה קורה? נרשמת לטיול בחולות ניצנים ב-4-5.6, תבוא בע\"ה?")
         .then(() => {
             res.status(200).json("success");
         })
