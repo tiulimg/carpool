@@ -54,10 +54,8 @@ function getconversations(res, conversationid, phonenumber) {
     
                         var senderId;
                         if (conversation) {
-                            console.log("getconversations has conversation");
                             senderId = conversation.chatId;
                             if (senderId && phonenumber) {
-                                console.log("getconversations insert conversationid");
 
                                 dbservices.replaceconversationid(res, conversationid, phonenumber, {
                                     conversationid: conversationid,
@@ -139,11 +137,9 @@ function saveconversationidtoall(res) {
                             var phonenumber = memory.phonenumber;
                             if (phonenumber) {
                                 console.log("saveconversationidtoall conversation " + conversation + " " + JSON.stringify(conversation));
-                                console.log("saveconversationidtoall has phonenumber");
                                 phonenumber = tools.normalize_phonenumber(phonenumber);
                                 tools.wait((index * 1000) + 1000)
                                 .then(() => {
-                                    console.log("saveconversationidtoall insert conversationid");
                                     return getconversations(res, id, phonenumber);
                                 })
                                 .catch(rejection => {
@@ -212,27 +208,32 @@ function chattoenglish(res, conversationid) {
     return new Promise((resolve, reject) => {
         getconversations(res, conversationid)
         .then(conversation => {
-            const id = conversation.id;
-            request({
-                url: "https://api.cai.tools.sap/build/v1/users/zanzamer/bots/tiulimg/versions/v4-registration-to-hikes/" + 
-                    "builder/conversation_states/" + id,
-                method: "PUT",
-                headers: {
-                    Authorization: "Token " + process.env.SAP_TOKEN,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    language: "en",
-                }),
-            }, function (error, response, body){
-                if (error) {
-                    console.log(error);
-                }
-                else {
-                    console.log(JSON.stringify(response.body));
-                    return resolve();
-                }
-            });
+            if (conversation && conversation.id) {
+                const id = conversation.id;
+                request({
+                    url: "https://api.cai.tools.sap/build/v1/users/zanzamer/bots/tiulimg/versions/v4-registration-to-hikes/" + 
+                        "builder/conversation_states/" + id,
+                    method: "PUT",
+                    headers: {
+                        Authorization: "Token " + process.env.SAP_TOKEN,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        language: "en",
+                    }),
+                }, function (error, response, body){
+                    if (error) {
+                        console.log(error);
+                    }
+                    else {
+                        console.log(JSON.stringify(response.body));
+                        return resolve();
+                    }
+                });
+            }
+            else {
+                return resolve();
+            }
         })
         .catch(rejection => {
             logservices.logRejection(rejection);
