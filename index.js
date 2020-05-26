@@ -1946,10 +1946,12 @@ app.post("/api/selecthikes", function(req, res) {
                     }
                 }
                 console.log("last memorySelectHike " + memorySelectHike);
-                selectHike = tools.findhike(docs, memorySelectHike, hikedate2[0]);
+                if (hikedate2) {
+                    selectHike = tools.findhike(docs, memorySelectHike, hikedate2[0]);
+                }
                 console.log("selectHike " + JSON.stringify(selectHike));
 
-                if (typeof selectHike !== 'undefined' && selectHike != null && selectHike != "") {
+                if (selectHike && selectHike != "") {
                     switch (language) {
                         case "he":
                             var indexhe = selectedHikes.indexOf(selectHike.hikenamehebrew);
