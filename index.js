@@ -47,7 +47,21 @@ dbservices.initialize(app)
 app.post("/api/debug", function(req, res) {
     console.log("req.url: " + JSON.stringify(req.url));
     console.log("req.body: " + JSON.stringify(req.body));
-    res.status(200).json("OK");
+    var memory = req.body.conversation.memory;
+    var language = tools.set_language(memory);
+    if (language == "he") {
+        recast_conversation_reply = replies.get_recast_reply("HEBREW_BOT_FAULT",language,null,memory);
+        sapchatbot.chattoenglish(res, req.body.conversation.id)
+        .then(() => {
+            res.status(200).json(recast_conversation_reply);
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
+    }
+    else {
+        res.status(200).json("OK");
+    }
 });
 
 /*  "/api/areridessetuped"
@@ -66,7 +80,7 @@ app.patch("/api/areridessetuped", function(req, res) {
         memory.rideshadsetuped = setuped;
         if (setuped) {
             if (!memory.phonenumber) {
-                recast_conversation_reply = replies.get_recast_reply("GETRIDEDETAILS_ENTERPHONE",language,null,memory);    
+                recast_conversation_reply = replies.get_recast_reply("GETRIDEDETAILS_ENTERPHONE",language,null,memory);
                 memory.stage = "getridedetails_getphone";
             }
             else if (!memory.password) {
@@ -2600,13 +2614,14 @@ app.delete("/api/routes", function(req, res) {
     }
 });
 
-/*  "/api/routes"
-*    DELETE: deletes all routes
+/*  "/api/testsendmessage"
+*    PATCH: test message
 */
 
 app.patch("/api/testsendmessage", function(req, res) {
     if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
-        messageconnector.sendToFacebookMessenger(res, "3142507689098123", "מה קורה? נרשמת לטיול בחולות ניצנים ב-4-5.6, תבוא בע\"ה?")
+        // messageconnector.sendToFacebookMessenger(res, "3142507689098123", "מה קורה? נרשמת לטיול בחולות ניצנים ב-4-5.6, תבוא בע\"ה?")
+        sapchatbot.allchatstoenglish()
         .then(() => {
             res.status(200).json("success");
         })

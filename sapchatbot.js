@@ -6,6 +6,8 @@ var logservices = require("./logservices");
 
 module.exports = {
     getconversations: getconversations,
+    allchatstoenglish: allchatstoenglish,
+    chattoenglish: chattoenglish,
 }
 
 function getconversations(res, conversationid, phonenumber) {
@@ -25,7 +27,7 @@ function getconversations(res, conversationid, phonenumber) {
             }
             else {
                 var conversations = JSON.parse(response.body);
-                if (conversationid && conversations && phonenumber) {
+                if (conversationid && conversations) {
                     var conversation;
                     for (let index = 0; index < conversations.results.length; index++) {
                         const result = conversations.results[index];
@@ -39,16 +41,21 @@ function getconversations(res, conversationid, phonenumber) {
                         senderId = conversation.chatId;
                     }
                     if (senderId) {
-                        dbservices.replaceconversationid(res, conversationid, phonenumber, {
-                            conversationid: conversationid,
-                            phonenumber: phonenumber,
-                            senderId: senderId,
-                        }).then(() => {
+                        if (phonenumber) {
+                            dbservices.replaceconversationid(res, conversationid, phonenumber, {
+                                conversationid: conversationid,
+                                phonenumber: phonenumber,
+                                senderId: senderId,
+                            }).then(() => {
+                                return resolve(conversation);
+                            })
+                            .catch(rejection => {
+                                logservices.logRejection(rejection);
+                            });
+                        }
+                        else {
                             return resolve(conversation);
-                        })
-                        .catch(rejection => {
-                            logservices.logRejection(rejection);
-                        });
+                        }
                     }
                     else {
                         return resolve(conversations);
@@ -63,11 +70,45 @@ function getconversations(res, conversationid, phonenumber) {
 }
 
 function allchatstoenglish() {
-    getconversations()
-    .then(conversations => {
-        for (let index = 0; index < conversations.results.length; index++) {
-            const id = conversations.results[index].id;
-            
+    return new Promise((resolve, reject) => {
+        getconversations()
+        .then(conversations => {
+            for (let index = 0; index < conversations.results.length; index++) {
+                const id = conversations.results[index].id;
+                
+                request({
+                    url: "https://api.cai.tools.sap/build/v1/users/zanzamer/bots/tiulimg/versions/v4-registration-to-hikes/" + 
+                        "builder/conversation_states/" + id,
+                    method: "PUT",
+                    headers: {
+                        Authorization: "Token " + process.env.SAP_TOKEN,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        language: "en",
+                    }),
+                }, function (error, response, body){
+                    if (error) {
+                        console.log(error);
+                    }
+                    else {
+                        console.log(JSON.stringify(response.body));
+                    }
+                });
+            }
+            return resolve();
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
+    });
+}
+
+function chattoenglish(res, conversationid) {
+    return new Promise((resolve, reject) => {
+        getconversations(res, conversationid)
+        .then(conversation => {
+            const id = conversation.id;
             request({
                 url: "https://api.cai.tools.sap/build/v1/users/zanzamer/bots/tiulimg/versions/v4-registration-to-hikes/" + 
                     "builder/conversation_states/" + id,
@@ -85,12 +126,12 @@ function allchatstoenglish() {
                 }
                 else {
                     console.log(JSON.stringify(response.body));
+                    return resolve();
                 }
             });
-        }
-    })
-    .catch(rejection => {
-        logservices.logRejection(rejection);
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
     });
 }
-
