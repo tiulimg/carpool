@@ -103,7 +103,13 @@ function getconversationstate(id) {
                     console.log(error);
                 }
                 else {
-                    return resolve();
+                    var conversation;
+                    try {
+                        conversation = JSON.parse(response.body);
+                    } catch (error) {
+                        console.log("getconversationstate " + response.body);
+                    }
+                    return resolve(conversation.results);
                 }
             });
         }
