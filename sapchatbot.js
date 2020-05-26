@@ -34,27 +34,27 @@ function getconversations(res, conversationid, phonenumber) {
                 } catch (error) {
                     console.log("getconversations " + response.body);
                 }
-                console.log("getconversations conversations " + conversations);
+                console.log("getconversations conversations " + conversations + " " + JSON.stringify(conversations));
 
-                if (conversationid && conversations && conversations.results) {
+                if (conversations && conversations.results) {
                     console.log("getconversations has results");
 
-                    var conversation;
-                    for (let index = 0; index < conversations.results.length; index++) {
-                        const result = conversations.results[index];
-                        if (result.id == conversationid) {
-                            conversation = result;
-                            break;
+                    if (conversationid) {
+                        var conversation;
+                        for (let index = 0; index < conversations.results.length; index++) {
+                            const result = conversations.results[index];
+                            if (result.id == conversationid) {
+                                conversation = result;
+                                break;
+                            }
                         }
-                    }
-                    console.log("getconversations conversation " + conversation);
-
-                    var senderId;
-                    if (conversation) {
-                        senderId = conversation.chatId;
-                    }
-                    if (senderId) {
-                        if (phonenumber) {
+                        console.log("getconversations conversation " + conversation);
+    
+                        var senderId;
+                        if (conversation) {
+                            senderId = conversation.chatId;
+                        }
+                        if (senderId && phonenumber) {
                             dbservices.replaceconversationid(res, conversationid, phonenumber, {
                                 conversationid: conversationid,
                                 phonenumber: phonenumber,
@@ -67,8 +67,8 @@ function getconversations(res, conversationid, phonenumber) {
                             });
                         }
                         else {
-                            return resolve(conversation);
-                        }
+                            return resolve(conversations);
+                        }    
                     }
                     else {
                         return resolve(conversations);
