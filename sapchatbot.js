@@ -14,7 +14,11 @@ module.exports = {
 
 function getconversations(res, conversationid, phonenumber) {
     return new Promise((resolve, reject) => {
-        var url = "https://api.cai.tools.sap/connect/v1/conversations";
+        var specificconversation = "";
+        if (conversationid && !phonenumber) {
+            specificconversation = "/" + conversationid;
+        }
+        var url = "https://api.cai.tools.sap/connect/v1/conversations" + specificconversation;
         request({
             url: url,
             method: "GET",
