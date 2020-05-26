@@ -76,7 +76,7 @@ function saveconversationidtoall(res) {
         getconversations()
         .then(conversations => {
             for (let index = 0; index < conversations.results.length; index++) {
-                const id = conversation.id;
+                const id = conversations.results[index].id;
                 getconversations(res, id, null)
                 .then(conversation => {
                     var memory = conversation.memory;
