@@ -28,7 +28,12 @@ function getconversations(res, conversationid, phonenumber) {
                 return null;
             }
             else {
-                var conversations = JSON.parse(response.body);
+                var conversations;
+                try {
+                    conversations = JSON.parse(response.body);
+                } catch (error) {
+                    console.log("getconversations " + response.body);
+                }
                 if (conversationid && conversations) {
                     var conversation;
                     for (let index = 0; index < conversations.results.length; index++) {
@@ -75,28 +80,30 @@ function saveconversationidtoall(res) {
     return new Promise((resolve, reject) => {
         getconversations()
         .then(conversations => {
-            for (let index = 0; index < conversations.results.length; index++) {
-                const id = conversations.results[index].id;
-                getconversations(res, id, null)
-                .then(conversation => {
-                    var memory = conversation.memory;
-                    if (memory) {
-                        var phonenumber = memory.phonenumber;
-                        if (phonenumber) {
-                            phonenumber = tools.normalize_phonenumber(phonenumber);
-                            tools.wait(index * 500)
-                            .then(() => {
-                                getconversations(res, id, phonenumber)
-                            })
-                            .catch(rejection => {
-                                logservices.logRejection(rejection);
-                            });
+            if (conversations) {
+                for (let index = 0; index < conversations.results.length; index++) {
+                    const id = conversations.results[index].id;
+                    getconversations(res, id, null)
+                    .then(conversation => {
+                        var memory = conversation.memory;
+                        if (memory) {
+                            var phonenumber = memory.phonenumber;
+                            if (phonenumber) {
+                                phonenumber = tools.normalize_phonenumber(phonenumber);
+                                tools.wait(index * 500)
+                                .then(() => {
+                                    getconversations(res, id, phonenumber)
+                                })
+                                .catch(rejection => {
+                                    logservices.logRejection(rejection);
+                                });
+                            }
                         }
-                    }
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
+                    })
+                    .catch(rejection => {
+                        logservices.logRejection(rejection);
+                    });
+                }
             }
             return resolve();
         })
@@ -110,34 +117,36 @@ function allchatstoenglish() {
     return new Promise((resolve, reject) => {
         getconversations()
         .then(conversations => {
-            for (let index = 0; index < conversations.results.length; index++) {
-                const id = conversations.results[index].id;
-                
-                tools.wait(index * 500)
-                .then(() => {
-                    request({
-                        url: "https://api.cai.tools.sap/build/v1/users/zanzamer/bots/tiulimg/versions/v4-registration-to-hikes/" + 
-                            "builder/conversation_states/" + id,
-                        method: "PUT",
-                        headers: {
-                            Authorization: "Token " + process.env.SAP_TOKEN,
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            language: "en",
-                        }),
-                    }, function (error, response, body){
-                        if (error) {
-                            console.log(error);
-                        }
-                        else {
-                            console.log(JSON.stringify(response.body));
-                        }
+            if (conversations) {
+                for (let index = 0; index < conversations.results.length; index++) {
+                    const id = conversations.results[index].id;
+                    
+                    tools.wait(index * 500)
+                    .then(() => {
+                        request({
+                            url: "https://api.cai.tools.sap/build/v1/users/zanzamer/bots/tiulimg/versions/v4-registration-to-hikes/" + 
+                                "builder/conversation_states/" + id,
+                            method: "PUT",
+                            headers: {
+                                Authorization: "Token " + process.env.SAP_TOKEN,
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                language: "en",
+                            }),
+                        }, function (error, response, body){
+                            if (error) {
+                                console.log(error);
+                            }
+                            else {
+                                console.log(JSON.stringify(response.body));
+                            }
+                        });
+                    })
+                    .catch(rejection => {
+                        logservices.logRejection(rejection);
                     });
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
+                }
             }
             return resolve();
         })
