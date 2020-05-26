@@ -54,8 +54,11 @@ function getconversations(res, conversationid, phonenumber) {
     
                         var senderId;
                         if (conversation) {
+                            console.log("getconversations has conversation");
                             senderId = conversation.chatId;
                             if (senderId && phonenumber) {
+                                console.log("getconversations insert conversationid");
+
                                 dbservices.replaceconversationid(res, conversationid, phonenumber, {
                                     conversationid: conversationid,
                                     phonenumber: phonenumber,
@@ -131,16 +134,16 @@ function saveconversationidtoall(res) {
                         return getconversationstate(id);
                     })
                     .then(conversation => {
-                        console.log("saveconversationidtoall conversation " + conversation + " " + JSON.stringify(conversation));
                         if (conversation && conversation.memory) {
-                            console.log("saveconversationidtoall has memory");
                             var memory = conversation.memory;
                             var phonenumber = memory.phonenumber;
                             if (phonenumber) {
+                                console.log("saveconversationidtoall conversation " + conversation + " " + JSON.stringify(conversation));
                                 console.log("saveconversationidtoall has phonenumber");
                                 phonenumber = tools.normalize_phonenumber(phonenumber);
                                 tools.wait((index * 1000) + 1000)
                                 .then(() => {
+                                    console.log("saveconversationidtoall insert conversationid");
                                     return getconversations(res, id, phonenumber);
                                 })
                                 .catch(rejection => {
