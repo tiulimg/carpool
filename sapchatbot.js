@@ -34,7 +34,7 @@ function getconversations(res, conversationid, phonenumber) {
                 } catch (error) {
                     console.log("getconversations " + response.body);
                 }
-                if (conversationid && conversations) {
+                if (conversationid && conversations && conversations.results) {
                     var conversation;
                     for (let index = 0; index < conversations.results.length; index++) {
                         const result = conversations.results[index];
@@ -69,7 +69,7 @@ function getconversations(res, conversationid, phonenumber) {
                     }
                 }
                 else {
-                    return resolve(conversations);
+                    return resolve(null);
                 }
             }
         });
@@ -83,14 +83,17 @@ function saveconversationidtoall(res) {
             if (conversations) {
                 for (let index = 0; index < conversations.results.length; index++) {
                     const id = conversations.results[index].id;
-                    getconversations(res, id, null)
+                    tools.wait((index * 1000) + 500)
+                    .then(() => {
+                        return getconversations(res, id, null);
+                    })
                     .then(conversation => {
-                        var memory = conversation.memory;
-                        if (memory) {
+                        if (conversation && conversation.memory) {
+                            var memory = conversation.memory;
                             var phonenumber = memory.phonenumber;
                             if (phonenumber) {
                                 phonenumber = tools.normalize_phonenumber(phonenumber);
-                                tools.wait(index * 500)
+                                tools.wait((index * 1000) + 1000)
                                 .then(() => {
                                     getconversations(res, id, phonenumber)
                                 })
