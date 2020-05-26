@@ -7,6 +7,7 @@ var tools = require("./tools");
 
 module.exports = {
     getconversations: getconversations,
+    getconversationstate: getconversationstate,
     saveconversationidtoall: saveconversationidtoall,
     allchatstoenglish: allchatstoenglish,
     chattoenglish: chattoenglish,
@@ -38,10 +39,8 @@ function getconversations(res, conversationid, phonenumber) {
                 } catch (error) {
                     console.log("getconversations " + response.body);
                 }
-                console.log("getconversations conversations " + conversations);
 
                 if (conversations && conversations.results) {
-                    console.log("getconversations has results");
 
                     if (conversationid) {
                         var conversation;
@@ -52,7 +51,6 @@ function getconversations(res, conversationid, phonenumber) {
                                 break;
                             }
                         }
-                        console.log("getconversations conversation " + conversation);
     
                         var senderId;
                         if (conversation) {
@@ -89,19 +87,42 @@ function getconversations(res, conversationid, phonenumber) {
     });
 }
 
+function getconversationstate(id) {
+    return new Promise((resolve, reject) => {
+        if (id) {
+            request({
+                url: "https://api.cai.tools.sap/build/v1/users/zanzamer/bots/tiulimg/versions/v4-registration-to-hikes/" + 
+                    "builder/conversation_states/" + id,
+                method: "GET",
+                headers: {
+                    Authorization: "Token " + process.env.SAP_TOKEN,
+                    "Content-Type": "application/json",
+                },
+            }, function (error, response, body){
+                if (error) {
+                    console.log(error);
+                }
+                else {
+                    return resolve();
+                }
+            });
+        }
+        else {
+            return resolve();
+        }
+    });
+}
+
 function saveconversationidtoall(res) {
     return new Promise((resolve, reject) => {
         getconversations()
         .then(conversations => {
-            console.log("saveconversationidtoall conversations " + conversations);
             if (conversations) {
-                console.log("saveconversationidtoall conversations " + conversations.results.length);
                 for (let index = 0; index < conversations.results.length; index++) {
                     const id = conversations.results[index].id;
-                    console.log("saveconversationidtoall id " + id);
                     tools.wait((index * 1000) + 500)
                     .then(() => {
-                        return getconversations(res, id, null);
+                        return getconversationstate(id);
                     })
                     .then(conversation => {
                         console.log("saveconversationidtoall conversation " + conversation + " " + JSON.stringify(conversation));
