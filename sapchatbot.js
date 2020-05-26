@@ -76,22 +76,29 @@ function saveconversationidtoall(res) {
         getconversations()
         .then(conversations => {
             for (let index = 0; index < conversations.results.length; index++) {
-                const conversation = conversations.results[index];
                 const id = conversation.id;
-                
-                var memory = conversation.memory;
-                var phonenumber = memory.phonenumber;
-                if (phonenumber) {
-                    phonenumber = tools.normalize_phonenumber(phonenumber);
-                    tools.wait(index * 500)
-                    .then(() => {
-                        getconversations(res, id, phonenumber)
-                    })
-                    .catch(rejection => {
-                        logservices.logRejection(rejection);
-                    });
-                }
+                getconversations(res, id, null)
+                .then(conversation => {
+                    var memory = conversation.memory;
+                    if (memory) {
+                        var phonenumber = memory.phonenumber;
+                        if (phonenumber) {
+                            phonenumber = tools.normalize_phonenumber(phonenumber);
+                            tools.wait(index * 500)
+                            .then(() => {
+                                getconversations(res, id, phonenumber)
+                            })
+                            .catch(rejection => {
+                                logservices.logRejection(rejection);
+                            });
+                        }
+                    }
+                })
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                });
             }
+            return resolve();
         })
         .catch(rejection => {
             logservices.logRejection(rejection);
