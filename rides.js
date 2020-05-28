@@ -757,6 +757,7 @@ function transporttohikebydirection(hiker, hike, direction, res, mode) {
 
 function carstohike(hike, res) {
     return new Promise((resolve, reject) => {
+        console.log("carstohike " + hike.drivers.length);
         var promises = [];
         for (let index = 0; index < hike.drivers.length; index++) {
             const hiker = hike.drivers[index];

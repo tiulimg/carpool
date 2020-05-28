@@ -21,7 +21,7 @@ function logRejection(rejection) {
 }
 
 function loghikersdistances(distances, direction) {
-    console.log("distances: " + distances.length);
+    console.log("hikers distances: " + distances[direction+"thehike"].length);
     for (let index = 0; index < distances[direction+"thehike"].length; index++) {
         const dest = distances[direction+"thehike"][index];
         console.log(direction + "thehike: source " + distances.link.fullname + " distance " + dest.distance + 
