@@ -684,44 +684,34 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
     });
 }
 
-function bustohike(hitcherswithoutdrivers, hike, res) {
-    return new Promise((resolve, reject) => {
-        console.log("bustohike start");
-        var promises = [];
-        for (let index = 0; index < hike.hitchers.length; index++) {
-            const hiker = hike.hitchers[index];
-            if (hike.startlatitude && hike.endlatitude &&
-                (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
-                 hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
-                if (!hiker.mydriverto && !hiker.routetothehike && hiker.comesfromlocation) {
-                    promises.push(
-                        transporttohikebydirection(hiker, hike, "to", res, "publicTransportTimeTable")
-                        .then(route => {
-                            hiker.routetothehike = route;
-                        })
-                        .catch(rejection => {
-                            logservices.logRejection(rejection);
-                        })
-                    );
-                }
-                if (!hiker.mydriverfrom && !hiker.routefromthehike && hiker.returnstolocation) {
-                    promises.push(
-                        transporttohikebydirection(hiker, hike, "from", res, "publicTransportTimeTable")
-                        .then(route => {
-                            hiker.routefromthehike = route;
-                        })
-                        .catch(rejection => {
-                            logservices.logRejection(rejection);
-                        })
-                    );
-                }
+async function bustohike(hitcherswithoutdrivers, hike, res) {
+    console.log("bustohike start");
+    for (let index = 0; index < hike.hitchers.length; index++) {
+        const hiker = hike.hitchers[index];
+        if (hike.startlatitude && hike.endlatitude &&
+            (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
+                hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
+            if (!hiker.mydriverto && !hiker.routetothehike && hiker.comesfromlocation) {
+                await transporttohikebydirection(hiker, hike, "to", res, "publicTransportTimeTable")
+                .then(route => {
+                    hiker.routetothehike = route;
+                })
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                });
+            }
+            if (!hiker.mydriverfrom && !hiker.routefromthehike && hiker.returnstolocation) {
+                await transporttohikebydirection(hiker, hike, "from", res, "publicTransportTimeTable")
+                .then(route => {
+                    hiker.routefromthehike = route;
+                })
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                });
             }
         }
-        Promise.all(promises).then(() => {
-            console.log("bustohike end");
-            return resolve();
-        });
-    });
+    }
+    console.log("bustohike end");
 }
 
 function transporttohikebydirection(hiker, hike, direction, res, mode) {
@@ -759,44 +749,34 @@ function transporttohikebydirection(hiker, hike, direction, res, mode) {
     });
 }
 
-function carstohike(hike, res) {
-    return new Promise((resolve, reject) => {
-        console.log("carstohike start");
-        var promises = [];
-        for (let index = 0; index < hike.drivers.length; index++) {
-            const hiker = hike.drivers[index];
-            console.log("carstohike index " + index);
+async function carstohike(hike, res) {
+    console.log("carstohike start");
+    for (let index = 0; index < hike.drivers.length; index++) {
+        const hiker = hike.drivers[index];
+        console.log("carstohike index " + index);
 
-            if (hike.startlatitude && hike.endlatitude) {
-                if (!hiker.routetothehike && hiker.comesfromlocation) {
-                    promises.push(
-                        transporttohikebydirection(hiker, hike, "to", res, "car")
-                        .then(route => {
-                            hiker.routetothehike = route;
-                        })
-                        .catch(rejection => {
-                            logservices.logRejection(rejection);
-                        })
-                    );
-                }
-                if (!hiker.routefromthehike && hiker.returnstolocation) {
-                    promises.push(
-                        transporttohikebydirection(hiker, hike, "from", res, "car")
-                        .then(route => {
-                            hiker.routefromthehike = route;
-                        })
-                        .catch(rejection => {
-                            logservices.logRejection(rejection);
-                        })
-                    );
-                }
+        if (hike.startlatitude && hike.endlatitude) {
+            if (!hiker.routetothehike && hiker.comesfromlocation) {
+                await transporttohikebydirection(hiker, hike, "to", res, "car")
+                .then(route => {
+                    hiker.routetothehike = route;
+                })
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                });
+            }
+            if (!hiker.routefromthehike && hiker.returnstolocation) {
+                await transporttohikebydirection(hiker, hike, "from", res, "car")
+                .then(route => {
+                    hiker.routefromthehike = route;
+                })
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                });
             }
         }
-        Promise.all(promises).then(() => {
-            console.log("carstohike end");
-            return resolve();
-        });
-    });
+    }
+    console.log("carstohike end");
 }
 
 function updateavailableplaces(hike) {
