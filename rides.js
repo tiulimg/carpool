@@ -1391,7 +1391,7 @@ async function driverifcanmeet(res, hiker, hike, direction) {
                 neardriver.seatsrequired + " availableplaces " + neardriver.availableplaces + 
                 " neardriver.availableplaces"+direction+"thehike " + neardriver["availableplaces"+direction+"thehike"] + 
                 " comesfrom " + neardriver.comesfromdetailed + " returnsto " + 
-                neardriver.returnstodetailed);
+                neardriver.returnstodetailed + " route "+direction+" " + neardriver["route"+direction+"thehike"]);
                 if (neardriver["availableplaces"+direction+"thehike"] >= hiker["seatsrequired"+direction+"thehike"]) {
                     var canmeet = await canhitcherreachdriver(res, hiker, neardriver, direction, hike);
                     console.log("canmeet " + canmeet);
