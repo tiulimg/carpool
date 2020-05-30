@@ -423,6 +423,7 @@ function translateaddresstolocation(address) {
 
 function findhikerslocation(hikers) {
     return new Promise((resolve, reject) => {
+        console.log("findhikerslocation start");
         var timer = 0;
         var promises = [];
         for (let hikerindex = 0; hikerindex < hikers.length; hikerindex++) {
@@ -465,6 +466,7 @@ function findhikerslocation(hikers) {
             timer++;
         }
         Promise.all(promises).then(() => {
+            console.log("findhikerslocation end");
             return resolve(hikers);
         });
     });
@@ -684,6 +686,7 @@ function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depa
 
 function bustohike(hitcherswithoutdrivers, hike, res) {
     return new Promise((resolve, reject) => {
+        console.log("bustohike start");
         var promises = [];
         for (let index = 0; index < hike.hitchers.length; index++) {
             const hiker = hike.hitchers[index];
@@ -715,6 +718,7 @@ function bustohike(hitcherswithoutdrivers, hike, res) {
             }
         }
         Promise.all(promises).then(() => {
+            console.log("bustohike end");
             return resolve();
         });
     });
@@ -742,7 +746,7 @@ function transporttohikebydirection(hiker, hike, direction, res, mode) {
         }
         var description = mode + " " + direction + " the hike " + hike.hikenamehebrew + " for hiker " + hiker.fullname + 
             " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed;
-        // console.log("transporttohikebydirection " + description);
+        console.log("transporttohikebydirection " + description);
 
         findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null, description)
         .then(route => {
@@ -757,10 +761,11 @@ function transporttohikebydirection(hiker, hike, direction, res, mode) {
 
 function carstohike(hike, res) {
     return new Promise((resolve, reject) => {
-        console.log("carstohike " + hike.drivers.length);
+        console.log("carstohike start");
         var promises = [];
         for (let index = 0; index < hike.drivers.length; index++) {
             const hiker = hike.drivers[index];
+            console.log("carstohike index " + index);
 
             if (hike.startlatitude && hike.endlatitude) {
                 if (!hiker.routetothehike && hiker.comesfromlocation) {
@@ -788,6 +793,7 @@ function carstohike(hike, res) {
             }
         }
         Promise.all(promises).then(() => {
+            console.log("carstohike end");
             return resolve();
         });
     });
@@ -1353,6 +1359,7 @@ function stopsinrectangle(driverlat, driverlon, hikelat, hikelon) {
 }
 
 async function hikercalculate(res, hike) {
+    console.log("hikercalculate start");
     for (let index = 0; index < hike.hitchers.length; index++) {
         const hiker = hike.hitchers[index];
         if (hiker.seatsrequired > 0) {
@@ -1373,6 +1380,7 @@ async function hikercalculate(res, hike) {
             }
         }
     }
+    console.log("hikercalculate end");
 }
 
 function setavailableplaces(hike) {
@@ -1424,24 +1432,36 @@ async function setcarpool(res, nearhikes) {
             console.log("start calculation for " + hike.hikenamehebrew);
             hikeproperties(hike, hikers);
 
+            console.log("setcarpool b4 findhikerslocation");
             await findhikerslocation(hikers);
+            console.log("setcarpool after findhikerslocation");
             setavailableplaces(hike);
             setrequiredseats(hike);
 
             // public transport for hikers that don't need a ride
+            console.log("setcarpool b4 bustohike1");
             await bustohike(false, hike, res);
+            console.log("setcarpool after bustohike1");
             
+            console.log("setcarpool b4 carstohike");
             await carstohike(hike, res);
+            console.log("setcarpool after carstohike");
+            console.log("setcarpool b4 hikercalculate");
             await hikercalculate(res, hike);
+            console.log("setcarpool after hikercalculate");
                 
             updateavailableplaces(hike);
             logservices.logcalculationresult(hikers);
 
             // public transport for hikers that hadn't left with a ride
+            console.log("setcarpool b4 bustohike2");
             await bustohike(true, hike, res);
+            console.log("setcarpool after bustohike2");
                 
             removerouteinstructions(hikers);
+            console.log("setcarpool b4 replaceallhikersforhike");
             await dbservices.replaceallhikersforhike(res, hike.hikedate, hikers);
+            console.log("setcarpool after replaceallhikersforhike");
         };
     }
 }
