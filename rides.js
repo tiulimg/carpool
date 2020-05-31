@@ -609,7 +609,6 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     route.traveltime = fastesttime;
                     route.maneuver = maneuver;
 
-                    console.log("findroute route result " + JSON.stringify(route));
                     return resolve(route);
                 }
                 else {
@@ -655,7 +654,6 @@ async function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arriva
                 var route = await findroute(
                     startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon, description);
                 transportcachearray[transportincachekey] = route;
-                console.log("findroutecachedb route " + JSON.stringify(route));
                 await dbservices.insertnewroute(res, route);
                 return route;
             } catch (error) {
@@ -709,7 +707,6 @@ async function transporttohikebydirection(hiker, hike, direction, res, mode) {
 
     var route = await findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null, description);
     hiker["route"+direction+"thehike"] = route;
-    console.log("transporttohikebydirection route " + JSON.stringify(route));
     return route;
 }
 
