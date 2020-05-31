@@ -562,7 +562,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                         }
                         console.log("findroute routeresultdeparture " + routeresultdeparture + " + fastesttime " + fastesttime + 
                             " arrivalafterroutedeparture " + arrivalafterroutedeparture + " fastesttimeincludingwaiting " + 
-                            fastesttimeincludingwaiting + " hikeday " + hikeday + " departday " + departday);
+                            fastesttimeincludingwaiting);
 
                         if (fastesttime < fastesttimeincludingwaiting) {
                             fastesttime = fastesttimeincludingwaiting;
