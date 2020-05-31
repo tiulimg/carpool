@@ -428,19 +428,26 @@ async function findhikerslocation(hikers) {
         const hiker = hikers[hikerindex];
         if (!hiker.comesfromlocation) {
             await tools.wait(100*timer);
-            var comesfromlocation = await translateaddresstolocation(hiker.comesfromdetailed);
-            console.log("comesfromlocation " + JSON.stringify(comesfromlocation) + " link " +
-                "https://www.google.com/maps?z=12&t=m&q="+comesfromlocation.lat+","+comesfromlocation.lon);
-            hiker.comesfromlocation = comesfromlocation;
+            try {
+                var comesfromlocation = await translateaddresstolocation(hiker.comesfromdetailed);
+                console.log("comesfromlocation " + JSON.stringify(comesfromlocation) + " link " +
+                    "https://www.google.com/maps?z=12&t=m&q="+comesfromlocation.lat+","+comesfromlocation.lon);
+                hiker.comesfromlocation = comesfromlocation;
+            } catch (error) {
+                console.log("findhikerslocation error " + error);
+            }
         }
         if (!hiker.returnstolocation) {
             await tools.wait(100*timer);
-            var returnstolocation = await translateaddresstolocation(hiker.returnstodetailed);
-            console.log("returnstolocation " + JSON.stringify(returnstolocation) + " link " +
-                "https://www.google.com/maps?z=12&t=m&q="+returnstolocation.lat+","+returnstolocation.lon);
-            hiker.returnstolocation = returnstolocation;
+            try {
+                var returnstolocation = await translateaddresstolocation(hiker.returnstodetailed);
+                console.log("returnstolocation " + JSON.stringify(returnstolocation) + " link " +
+                    "https://www.google.com/maps?z=12&t=m&q="+returnstolocation.lat+","+returnstolocation.lon);
+                hiker.returnstolocation = returnstolocation;
+            } catch (error) {
+                console.log("findhikerslocation error " + error);
+            }
         }
-
         timer++;
     }
     console.log("findhikerslocation end");
@@ -638,11 +645,15 @@ async function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arriva
             return routefromdb;
         }
         else {
-            var route = await findroute(
-                startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon, description);
-            transportcachearray[transportincachekey] = route;
-            await dbservices.insertnewroute(res, route);
-            return route;
+            try {
+                var route = await findroute(
+                    startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon, description);
+                transportcachearray[transportincachekey] = route;
+                await dbservices.insertnewroute(res, route);
+                return route;
+            } catch (error) {
+                return error;
+            }
         }
     }
 }
