@@ -387,8 +387,9 @@ function insertnewroute(res, route) {
             route.middlelat, route.middlelon)
         .then(foundroute => {
             console.log("insertnewroute after getroutebylatlontime");
-            console.log("insertnewroute foundroute " + foundroute);
+            console.log("insertnewroute foundroute " + foundroute + " " + route);
             if (!foundroute) {
+                console.log("insertnewroute CC");
                 db.collection(ROUTES_COLLECTION).insertOne(route, function(err, doc) {
                     console.log("insertnewroute AA err " + err + " doc " + doc);
                     if (err) {
@@ -399,6 +400,7 @@ function insertnewroute(res, route) {
                         return resolve();
                     }
                 });
+                console.log("insertnewroute DD");
             }
             else {
                 console.log("insertnewroute BB");
