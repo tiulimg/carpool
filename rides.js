@@ -674,12 +674,10 @@ async function bustohike(hitcherswithoutdrivers, hike, res) {
             (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                 hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
             if (!hiker.mydriverto && !hiker.routetothehike && hiker.comesfromlocation) {
-                var route = await transporttohikebydirection(hiker, hike, "to", res, "publicTransportTimeTable");
-                hiker.routetothehike = route;
+                await transporttohikebydirection(hiker, hike, "to", res, "publicTransportTimeTable");
             }
             if (!hiker.mydriverfrom && !hiker.routefromthehike && hiker.returnstolocation) {
-                var route = await transporttohikebydirection(hiker, hike, "from", res, "publicTransportTimeTable");
-                hiker.routefromthehike = route;
+                await transporttohikebydirection(hiker, hike, "from", res, "publicTransportTimeTable");
             }
         }
     }
@@ -712,6 +710,7 @@ async function transporttohikebydirection(hiker, hike, direction, res, mode) {
     var route = await findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null, description);
     hiker["route"+direction+"thehike"] = route;
     console.log("transporttohikebydirection route " + JSON.stringify(route));
+    return route;
 }
 
 async function carstohike(hike, res) {
@@ -722,16 +721,12 @@ async function carstohike(hike, res) {
 
         if (hike.startlatitude && hike.endlatitude) {
             if (!hiker.routetothehike && hiker.comesfromlocation) {
-                var route = await transporttohikebydirection(hiker, hike, "to", res, "car");
-                hiker.routetothehike = route;
-                console.log("carstohike route " + JSON.stringify(route));
+                await transporttohikebydirection(hiker, hike, "to", res, "car");
                 console.log("carstohike hiker " + hiker.fullname + " hiker.routetothehike " + hiker.routetothehike + 
                     hiker.routetothehike.traveltime);
             }
             if (!hiker.routefromthehike && hiker.returnstolocation) {
-                var route = await transporttohikebydirection(hiker, hike, "from", res, "car");
-                hiker.routefromthehike = route;
-                console.log("carstohike route " + JSON.stringify(route));
+                await transporttohikebydirection(hiker, hike, "from", res, "car");
                 console.log("carstohike hiker " + hiker.fullname + " hiker.routefromthehike " + hiker.routefromthehike + 
                     hiker.routefromthehike.traveltime);
             }
