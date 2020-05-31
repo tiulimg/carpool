@@ -75,11 +75,8 @@ function secondsbetweendates(date1, date2) {
 }
 
 function onlydate(datetimestring) {
-    console.log("onlydate datetimestring " + datetimestring);
     var d = new Date(datetimestring);
-    console.log("onlydate d " + d);
     d = d.toDateString();
-    console.log("onlydate d.toDateString " + d);
     return d;
 }
 

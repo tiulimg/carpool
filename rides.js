@@ -422,7 +422,6 @@ function translateaddresstolocation(address) {
 }
 
 async function findhikerslocation(hikers) {
-    console.log("findhikerslocation start");
     var timer = 0;
     for (let hikerindex = 0; hikerindex < hikers.length; hikerindex++) {
         const hiker = hikers[hikerindex];
@@ -450,7 +449,6 @@ async function findhikerslocation(hikers) {
         }
         timer++;
     }
-    console.log("findhikerslocation end");
 }
 
 function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,middlelat,middlelon,description) { // mode = car | publicTransport
@@ -533,10 +531,10 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     var currdepartday;
                     var currroutedeparture;
                     if (arrivaltime) {
-                        currroutedeparture = hikeday = tools.onlydate(arrivaltime);
+                        hikeday = tools.onlydate(arrivaltime);
                     }
                     else {
-                        currroutedeparture = hikeday = tools.onlydate(departtime);
+                        hikeday = tools.onlydate(departtime);
                     }
                     for (let index = 0; index < responsebodyjson.response.route.length; index++) {
                         const routeresult = responsebodyjson.response.route[index];
@@ -1381,9 +1379,7 @@ async function setcarpool(res, nearhikes) {
             console.log("start calculation for " + hike.hikenamehebrew);
             hikeproperties(hike, hikers);
 
-            console.log("setcarpool b4 findhikerslocation");
             await findhikerslocation(hikers);
-            console.log("setcarpool after findhikerslocation");
             setavailableplaces(hike);
             setrequiredseats(hike);
 
