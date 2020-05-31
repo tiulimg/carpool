@@ -876,6 +876,12 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
 
 function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
     return new Promise((resolve, reject) => {
+        if (!driver.wouldntstopat) {
+            driver.wouldntstopat = [];
+        }
+        else if (driver.wouldntstopat[stop.name]) {
+            return resolve(false);
+        }
         var arrival = hike.starttime;
         var depart = null;
         var startlat;
@@ -951,6 +957,7 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                             });
                         }
                         else {
+                            driver.wouldntstopat.push(stop.name);
                             return resolve(false);
                         }
                     })
@@ -959,10 +966,12 @@ function woulddriverstop(res, driver, stop, direction, hike, hitcher) {
                     });
                 }
                 else {
+                    driver.wouldntstopat.push(stop.name);
                     return resolve(false);
                 }
             }
             else {
+                driver.wouldntstopat.push(stop.name);
                 return resolve(false);
             }
         })
