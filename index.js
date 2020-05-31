@@ -2577,17 +2577,24 @@ app.patch("/api/findhikerslocation", function(req, res) {
 */
 
 app.patch("/api/calculaterides", function(req, res) {
+    var lock = {
+        stillrunning: true,
+        starttime: new Date(),
+    };
     if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         dbservices.gethikes(res)
         .then(hikes => {
+            tools.wakeupDyno(lock);
             var nearhikes = tools.get_near_hikes(hikes);
             if (nearhikes.length > 0) {
                 ridesmodules.setcarpool(res, nearhikes)
                 .then(() => {
                     register.updateCarpool(res);
+                    lock.stillrunning = false;
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
+                    lock.stillrunning = false;
                 });
             }
             res.status(200).json("Working...");

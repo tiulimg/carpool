@@ -1,4 +1,5 @@
 var Promise = require('promise');
+var request = require('request');
 
 var logservices = require("./logservices");
 
@@ -6,6 +7,7 @@ module.exports = {
     checkpwd: checkpwd,
     checkspecialpwd: checkspecialpwd,
     wait: wait,
+    wakeupDyno: wakeupDyno,
     addsecondstodate: addsecondstodate,
     secondsbetweendates: secondsbetweendates,
     onlydate: onlydate,
@@ -55,6 +57,18 @@ function checkspecialpwd(res, pwd, specialpwd) {
 function wait(ms)
 {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function wakeupDyno(lock) {
+    request({
+        url: "http://tiulimg-carpool.herokuapp.com/favicon.ico",
+        method: "GET",
+    }, function (error, response, body){
+        var now = new Date();
+        if (lock.stillrunning && (secondsbetweendates(lock.starttime, now) < 60 * 60)) {
+            wakeupDyno(lock);
+        }
+    });
 }
 
 function addsecondstodate(datestring, seconds) {
@@ -290,7 +304,7 @@ function friendstext_from_friendsdetails(friendsdetails) {
     var friends = "";
     if (friendsdetails) {
         for (let index = 0; index < friendsdetails.length; index++) {
-            const friend = friendsdetails[index];
+            var friend = friendsdetails[index];
             if (friend.age) {
                 friends += (index + 1) + ": " + friend.name + " - " + friend.age + ", " + friend.savesthedate + "\n";
             }
@@ -484,7 +498,7 @@ function getHikerAreas(hikers) {
     var phones = [];
 
     for (let index = 0; index < hikers.length; index++) {
-        const hiker = hikers[index];
+        var hiker = hikers[index];
         if (phones.indexOf(hiker.phone) != -1) {
             continue;
         }
