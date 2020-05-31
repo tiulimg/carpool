@@ -424,7 +424,7 @@ function translateaddresstolocation(address) {
 async function findhikerslocation(hikers) {
     var timer = 0;
     for (let hikerindex = 0; hikerindex < hikers.length; hikerindex++) {
-        const hiker = hikers[hikerindex];
+        var hiker = hikers[hikerindex];
         if (!hiker.comesfromlocation) {
             await tools.wait(100*timer);
             try {
@@ -667,7 +667,7 @@ async function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arriva
 async function bustohike(hitcherswithoutdrivers, hike, res) {
     console.log("bustohike start");
     for (let index = 0; index < hike.hitchers.length; index++) {
-        const hiker = hike.hitchers[index];
+        var hiker = hike.hitchers[index];
         if (hike.startlatitude && hike.endlatitude &&
             (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                 hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
@@ -714,17 +714,21 @@ async function transporttohikebydirection(hiker, hike, direction, res, mode) {
 async function carstohike(hike, res) {
     console.log("carstohike start");
     for (let index = 0; index < hike.drivers.length; index++) {
-        const hiker = hike.drivers[index];
+        var hiker = hike.drivers[index];
         console.log("carstohike index " + index);
 
         if (hike.startlatitude && hike.endlatitude) {
             if (!hiker.routetothehike && hiker.comesfromlocation) {
                 var route = await transporttohikebydirection(hiker, hike, "to", res, "car");
                 hiker.routetothehike = route;
+                console.log("carstohike hiker " + hiker.fullname + " hiker.routetothehike " + hiker.routetothehike + 
+                    hiker.routetothehike.traveltime);
             }
             if (!hiker.routefromthehike && hiker.returnstolocation) {
                 var route = await transporttohikebydirection(hiker, hike, "from", res, "car");
                 hiker.routefromthehike = route;
+                console.log("carstohike hiker " + hiker.fullname + " hiker.routefromthehike " + hiker.routefromthehike + 
+                    hiker.routefromthehike.traveltime);
             }
         }
     }
@@ -733,7 +737,7 @@ async function carstohike(hike, res) {
 
 function updateavailableplaces(hike) {
     for (let index = 0; index < hike.drivers.length; index++) {
-        const hiker = hike.drivers[index];
+        var hiker = hike.drivers[index];
         hiker.availableplaces = hiker.availableplacestothehike < hiker.availableplacesfromthehike ? 
             hiker.availableplacestothehike : hiker.availableplacesfromthehike;
     }
@@ -785,6 +789,8 @@ async function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
     var driverloc;
     var arrival = null;
     var depart = null;
+    console.log("canhitcherreachdriver route"+direction+"thehike " + neardriver["route"+direction+"thehike"] + " " + 
+        neardriver["route"+direction+"thehike"].traveltime);
     if (neardriver["route"+direction+"thehike"] && neardriver["route"+direction+"thehike"].traveltime) {
         if (direction == "to") {
             hikerloc = hiker.comesfromlocation;
@@ -1296,7 +1302,7 @@ async function hikercalculate(res, hike) {
     console.log("hikercalculate start");
     for (let index = 0; index < hike.hitchers.length; index++) {
         console.log("hikercalculate index " + index);
-        const hiker = hike.hitchers[index];
+        var hiker = hike.hitchers[index];
         if (hiker.seatsrequired > 0) {
             console.log("hikercalculate hiker: " + hiker.fullname + " isdriver " + hiker.amidriver + 
                         " seats " + hiker.seatsrequired + " availableplaces " + hiker.availableplaces + 
@@ -1325,7 +1331,7 @@ async function hikercalculate(res, hike) {
 
 function setavailableplaces(hike) {
     for (let index = 0; index < hike.drivers.length; index++) {
-        const driver = hike.drivers[index];
+        var driver = hike.drivers[index];
         driver.availableplacestothehike = driver.availableplaces - driver.myhitchersto.length;
         driver.availableplacesfromthehike = driver.availableplaces - driver.myhitchersfrom.length;
     }
@@ -1333,7 +1339,7 @@ function setavailableplaces(hike) {
 
 function setrequiredseats(hike) {
     for (let index = 0; index < hike.hitchers.length; index++) {
-        const hitcher = hike.hitchers[index];
+        var hitcher = hike.hitchers[index];
         hitcher.seatsrequiredtothehike = hitcher.seatsrequired;
         hitcher.seatsrequiredfromthehike = hitcher.seatsrequired;
     }
@@ -1373,7 +1379,7 @@ async function driverifcanmeet(res, hiker, hike, direction) {
 
 async function setcarpool(res, nearhikes) {
     for (let index = 0; index < nearhikes.length; index++) {
-        const hike = nearhikes[index];
+        var hike = nearhikes[index];
         var hikers = await dbservices.gethikersbyhikedate(res, hike.hikedate);
         if (hikers && hikers.length > 0){
             console.log("start calculation for " + hike.hikenamehebrew);
@@ -1413,7 +1419,7 @@ async function setcarpool(res, nearhikes) {
 
 function removerouteinstructions(hikers) {
     for (let index = 0; index < hikers.length; index++) {
-        const hiker = hikers[index];
+        var hiker = hikers[index];
         delete hiker.routetothehike;
         delete hiker.routefromthehike;
     }
