@@ -421,55 +421,29 @@ function translateaddresstolocation(address) {
     });
 }
 
-function findhikerslocation(hikers) {
-    return new Promise((resolve, reject) => {
-        console.log("findhikerslocation start");
-        var timer = 0;
-        var promises = [];
-        for (let hikerindex = 0; hikerindex < hikers.length; hikerindex++) {
-            const hiker = hikers[hikerindex];
-            if (!hiker.comesfromlocation) {
-                promises.push(
-                    tools.wait(100*timer)
-                    .then(() => {
-                        return translateaddresstolocation(hiker.comesfromdetailed);
-                    })
-                    .then(comesfromlocation => {
-                        console.log("comesfromlocation " + JSON.stringify(comesfromlocation) + " link " +
-                            "https://www.google.com/maps?z=12&t=m&q="+
-                            comesfromlocation.lat+","+comesfromlocation.lon);
-                        hiker.comesfromlocation = comesfromlocation;
-                    })
-                    .catch(rejection => {
-                        logservices.logRejection(rejection);
-                    })
-                );
-            }
-            if (!hiker.returnstolocation) {
-                promises.push(
-                    tools.wait(100*timer)
-                    .then(() => {
-                        return translateaddresstolocation(hiker.returnstodetailed);
-                    })
-                    .then(returnstolocation => {
-                        console.log("returnstolocation " + JSON.stringify(returnstolocation) + " link " +
-                            "https://www.google.com/maps?z=12&t=m&q="+
-                            returnstolocation.lat+","+returnstolocation.lon);
-                        hiker.returnstolocation = returnstolocation;
-                    })
-                    .catch(rejection => {
-                        logservices.logRejection(rejection);
-                    })
-                );
-            }
-
-            timer++;
+async function findhikerslocation(hikers) {
+    console.log("findhikerslocation start");
+    var timer = 0;
+    for (let hikerindex = 0; hikerindex < hikers.length; hikerindex++) {
+        const hiker = hikers[hikerindex];
+        if (!hiker.comesfromlocation) {
+            await tools.wait(100*timer);
+            var comesfromlocation = await translateaddresstolocation(hiker.comesfromdetailed);
+            console.log("comesfromlocation " + JSON.stringify(comesfromlocation) + " link " +
+                "https://www.google.com/maps?z=12&t=m&q="+comesfromlocation.lat+","+comesfromlocation.lon);
+            hiker.comesfromlocation = comesfromlocation;
         }
-        Promise.all(promises).then(() => {
-            console.log("findhikerslocation end");
-            return resolve(hikers);
-        });
-    });
+        if (!hiker.returnstolocation) {
+            await tools.wait(100*timer);
+            var returnstolocation = await translateaddresstolocation(hiker.returnstodetailed);
+            console.log("returnstolocation " + JSON.stringify(returnstolocation) + " link " +
+                "https://www.google.com/maps?z=12&t=m&q="+returnstolocation.lat+","+returnstolocation.lon);
+            hiker.returnstolocation = returnstolocation;
+        }
+
+        timer++;
+    }
+    console.log("findhikerslocation end");
 }
 
 function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,middlelat,middlelon,description) { // mode = car | publicTransport
@@ -536,17 +510,20 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     var hikeday;
                     var departday;
                     var currdepartday;
+                    var currroutedeparture;
                     if (arrivaltime) {
-                        hikeday = tools.onlydate(arrivaltime);
+                        currroutedeparture = hikeday = tools.onlydate(arrivaltime);
                     }
                     else {
-                        hikeday = tools.onlydate(departtime);
+                        currroutedeparture = hikeday = tools.onlydate(departtime);
                     }
                     for (let index = 0; index < responsebodyjson.response.route.length; index++) {
                         const route = responsebodyjson.response.route[index];
                         if (route.summary && route.summary.distance) {
-                            var currroutedeparture = route.summary.departure;
-                            currdepartday = tools.onlydate(currroutedeparture);
+                            if (mode == "publicTransportTimeTable" && route.summary.departure) {
+                                currroutedeparture = route.summary.departure;
+                                currdepartday = tools.onlydate(currroutedeparture);
+                            }
 
                             if (route.summary.trafficTime && route.summary.trafficTime < fastesttime &&
                                 hikeday == currdepartday) {
@@ -632,56 +609,42 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
     });
 }
 
-function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depart, middlelat, middlelon, description) { 
-    return new Promise((resolve, reject) => {
-        if (startlat == endlat && startlon == endlon) {
-            return resolve({
-                traveltime: 0
-            });
-        }
-        arrivaldepart = arrival;
-        if (depart) {
-            arrivaldepart = depart;
-        }
-        var transportcachearray = publictransportcache;
-        if (mode == "car") {
-            transportcachearray = carroutecache;
-        }
-        var transportincachekey = mode+":"+startlat+","+startlon+":"+endlat+","+endlon+":"+arrivaldepart;
-        if (middlelat) {
-            transportincachekey = mode+":"+startlat+","+startlon+":"+middlelat+","+middlelon+":"+endlat+","+endlon+":"+arrivaldepart;
-        }
-        var transportincache = transportcachearray[transportincachekey];
-        if (transportincache) {
-            return resolve(transportincache);
+async function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arrival,depart, middlelat, middlelon, description) { 
+    if (startlat == endlat && startlon == endlon) {
+        return {
+            traveltime: 0
+        };
+    }
+    arrivaldepart = arrival;
+    if (depart) {
+        arrivaldepart = depart;
+    }
+    var transportcachearray = publictransportcache;
+    if (mode == "car") {
+        transportcachearray = carroutecache;
+    }
+    var transportincachekey = mode+":"+startlat+","+startlon+":"+endlat+","+endlon+":"+arrivaldepart;
+    if (middlelat) {
+        transportincachekey = mode+":"+startlat+","+startlon+":"+middlelat+","+middlelon+":"+endlat+","+endlon+":"+arrivaldepart;
+    }
+    var transportincache = transportcachearray[transportincachekey];
+    if (transportincache) {
+        return transportincache;
+    }
+    else {
+        var routefromdb = 
+            await dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon);
+        if (routefromdb) {
+            return routefromdb;
         }
         else {
-            dbservices.getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon)
-            .then(routefromdb => {
-                if (routefromdb) {
-                    return resolve(routefromdb);
-                }
-                else {
-                    findroute(
-                        startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon, description)
-                    .then(route => {
-                        transportcachearray[transportincachekey] = route;
-                        dbservices.insertnewroute(res, route)
-                        .catch(rejection => {
-                            logservices.logRejection(rejection);
-                        });
-                        return resolve(route);
-                    })
-                    .catch(rejection => {
-                        logservices.logRejection(rejection);
-                    })
-                }
-            })
-            .catch(rejection => {
-                logservices.logRejection(rejection);
-            });
+            var route = await findroute(
+                startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon, description);
+            transportcachearray[transportincachekey] = route;
+            await dbservices.insertnewroute(res, route);
+            return route;
         }
-    });
+    }
 }
 
 async function bustohike(hitcherswithoutdrivers, hike, res) {
@@ -692,61 +655,43 @@ async function bustohike(hitcherswithoutdrivers, hike, res) {
             (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                 hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
             if (!hiker.mydriverto && !hiker.routetothehike && hiker.comesfromlocation) {
-                await transporttohikebydirection(hiker, hike, "to", res, "publicTransportTimeTable")
-                .then(route => {
-                    hiker.routetothehike = route;
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
+                var route = await transporttohikebydirection(hiker, hike, "to", res, "publicTransportTimeTable");
+                hiker.routetothehike = route;
             }
             if (!hiker.mydriverfrom && !hiker.routefromthehike && hiker.returnstolocation) {
-                await transporttohikebydirection(hiker, hike, "from", res, "publicTransportTimeTable")
-                .then(route => {
-                    hiker.routefromthehike = route;
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
+                var route = await transporttohikebydirection(hiker, hike, "from", res, "publicTransportTimeTable");
+                hiker.routefromthehike = route;
             }
         }
     }
     console.log("bustohike end");
 }
 
-function transporttohikebydirection(hiker, hike, direction, res, mode) {
-    return new Promise((resolve, reject) => {
-        var arrival = hike.starttime;
-        var depart = null;
-        var startlat;
-        var startlon;
-        var endlat = hike.startlatitude;
-        var endlon = hike.startlongitude;
-        if (direction == "to") {
-            startlat = hiker.comesfromlocation.lat;
-            startlon = hiker.comesfromlocation.lon;
-        }
-        if (direction == "from") {
-            startlat = hike.endlatitude;
-            startlon = hike.startlongitude;
-            endlat = hiker.returnstolocation.lat;
-            endlon = hiker.returnstolocation.lon;
-            arrival = null;
-            depart = hike.endtime;
-        }
-        var description = mode + " " + direction + " the hike " + hike.hikenamehebrew + " for hiker " + hiker.fullname + 
-            " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed;
-        console.log("transporttohikebydirection " + description);
+async function transporttohikebydirection(hiker, hike, direction, res, mode) {
+    var arrival = hike.starttime;
+    var depart = null;
+    var startlat;
+    var startlon;
+    var endlat = hike.startlatitude;
+    var endlon = hike.startlongitude;
+    if (direction == "to") {
+        startlat = hiker.comesfromlocation.lat;
+        startlon = hiker.comesfromlocation.lon;
+    }
+    if (direction == "from") {
+        startlat = hike.endlatitude;
+        startlon = hike.startlongitude;
+        endlat = hiker.returnstolocation.lat;
+        endlon = hiker.returnstolocation.lon;
+        arrival = null;
+        depart = hike.endtime;
+    }
+    var description = mode + " " + direction + " the hike " + hike.hikenamehebrew + " for hiker " + hiker.fullname + 
+        " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed;
+    console.log("transporttohikebydirection " + description);
 
-        findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null, description)
-        .then(route => {
-            hiker["route"+direction+"thehike"] = route;
-            return resolve(route);
-        })
-        .catch(rejection => {
-            logservices.logRejection(rejection);
-        });
-    });
+    var route = await findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null, description);
+    hiker["route"+direction+"thehike"] = route;
 }
 
 async function carstohike(hike, res) {
@@ -757,22 +702,12 @@ async function carstohike(hike, res) {
 
         if (hike.startlatitude && hike.endlatitude) {
             if (!hiker.routetothehike && hiker.comesfromlocation) {
-                await transporttohikebydirection(hiker, hike, "to", res, "car")
-                .then(route => {
-                    hiker.routetothehike = route;
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
+                var route = await transporttohikebydirection(hiker, hike, "to", res, "car");
+                hiker.routetothehike = route;
             }
             if (!hiker.routefromthehike && hiker.returnstolocation) {
-                await transporttohikebydirection(hiker, hike, "from", res, "car")
-                .then(route => {
-                    hiker.routefromthehike = route;
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
+                var route = await transporttohikebydirection(hiker, hike, "from", res, "car");
+                hiker.routefromthehike = route;
             }
         }
     }
