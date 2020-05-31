@@ -344,16 +344,7 @@ function translateaddresstolocation(address) {
                     var responsebodyjson = JSON.parse(response.body);
                     //console.log("translateaddresstolocation algolia responsebodyjson " + JSON.stringify(responsebodyjson));
                     if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
-                        if (responsebodyjson.hits[0].locale_names && responsebodyjson.hits[0].locale_names.default &&
-                            responsebodyjson.hits[0].locale_names.default[0]) {
-                            locationname = responsebodyjson.hits[0].locale_names.default[0];
-                        }
-                        location = {
-                            lat: responsebodyjson.hits[0]._geoloc.lat,
-                            lon: responsebodyjson.hits[0]._geoloc.lng,
-                            locationname: locationname,
-                        }
-                        locationscache[address] = location;
+                        location = parsegeolocation(responsebodyjson, address);
                         return resolve(location);
                     }
                     else {
@@ -368,12 +359,7 @@ function translateaddresstolocation(address) {
                         }
 
                         if (address != shortaddress) {
-                            var url = "https://places-dsn.algolia.net/1/places/query";
-                            var headers = {
-                                'X-Algolia-Application-Id': ALGOLIA_APPID,
-                                'X-Algolia-API-Key': ALGOLIA_KEY, 
-                            }
-                            var requestbody = JSON.stringify({"query": shortaddress, "countries": "il"});
+                            requestbody = JSON.stringify({"query": shortaddress, "countries": "il"});
                             console.log("translateaddresstolocation algolia address " + shortaddress + " request " + url);
                             request({
                                 url: url,
@@ -391,17 +377,7 @@ function translateaddresstolocation(address) {
                                     var responsebodyjson = JSON.parse(response.body);
                                     //console.log("translateaddresstolocation algolia responsebodyjson " + JSON.stringify(responsebodyjson));
                                     if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
-                                        var locationname = null;
-                                        if (responsebodyjson.hits[0].locale_names && responsebodyjson.hits[0].locale_names.default &&
-                                            responsebodyjson.hits[0].locale_names.default[0]) {
-                                            locationname = responsebodyjson.hits[0].locale_names.default[0];
-                                        }
-                                        location = {
-                                            lat: responsebodyjson.hits[0]._geoloc.lat,
-                                            lon: responsebodyjson.hits[0]._geoloc.lng,
-                                            locationname: locationname,
-                                        }
-                                        locationscache[address] = location;
+                                        location = parsegeolocation(responsebodyjson, address);
                                         return resolve(location);
                                     }
                                     else {
@@ -419,6 +395,21 @@ function translateaddresstolocation(address) {
             });
         }
     });
+}
+
+function parsegeolocation(responsebodyjson, address) {
+    var locationname = null;
+    if (responsebodyjson.hits[0].locale_names && responsebodyjson.hits[0].locale_names.default &&
+        responsebodyjson.hits[0].locale_names.default[0]) {
+        locationname = responsebodyjson.hits[0].locale_names.default[0];
+    }
+    location = {
+        lat: responsebodyjson.hits[0]._geoloc.lat,
+        lon: responsebodyjson.hits[0]._geoloc.lng,
+        locationname: locationname,
+    }
+    locationscache[address] = location;
+    return location;
 }
 
 async function findhikerslocation(hikers) {
@@ -512,9 +503,17 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                 }
                 //console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
-                    route.result = "No route found - NoRouteFound";
-                    console.log("findroute route.result " + route.result);
-                    return resolve(route);
+                    if (responsebodyjson.details == "No timetable route found.") {
+                        mode = "publicTransport";
+                        console.log("trying without timetable, url: " + url);
+                        return findroute(
+                            startlat,startlon, endlat, endlon, mode, arrivaltime, departtime, middlelat, middlelon, description);
+                    }
+                    else {
+                        route.result = "No route found - NoRouteFound";
+                        console.log("findroute route.result " + route.result);
+                        return resolve(route);
+                    }
                 }
                 else if (responsebodyjson.response && responsebodyjson.response.route && responsebodyjson.response.route[0] &&
                     responsebodyjson.response.route[0].leg)
@@ -682,7 +681,9 @@ async function transporttohikebydirection(hiker, hike, direction, res, mode) {
     // console.log("transporttohikebydirection " + description);
 
     var route = await findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null, description);
-    hiker["route"+direction+"thehike"] = route;
+    if (mode != "publicTransportTimeTable" || route.traveltime <= hike.maximumpublictransporttime) {
+        hiker["route"+direction+"thehike"] = route;
+    }
     return route;
 }
 
@@ -1370,5 +1371,6 @@ function removerouteinstructions(hikers) {
         var hiker = hikers[index];
         delete hiker.routetothehike;
         delete hiker.routefromthehike;
+        delete hike.wouldntstopat;
     }
 }
