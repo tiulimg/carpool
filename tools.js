@@ -60,15 +60,17 @@ function wait(ms)
 }
 
 function wakeupDyno(lock) {
-    setTimeout(request({
-        url: "http://tiulimg-carpool.herokuapp.com/favicon.ico",
-        method: "GET",
-    }, function (error, response, body){
-        var now = new Date();
-        if (lock.stillrunning && (secondsbetweendates(lock.starttime, now) < 60 * 60)) {
-            wakeupDyno(lock);
-        }
-    }), 30 * 60 * 1000);
+    setTimeout(function() {
+        request({
+            url: "http://tiulimg-carpool.herokuapp.com/favicon.ico",
+            method: "GET",
+        }, function (error, response, body){
+            var now = new Date();
+            if (lock.stillrunning && (secondsbetweendates(lock.starttime, now) < 60 * 60)) {
+                wakeupDyno(lock);
+            }
+        });
+    }, 30 * 60 * 1000);
 }
 
 function addsecondstodate(datestring, seconds) {
