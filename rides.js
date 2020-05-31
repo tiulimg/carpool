@@ -651,7 +651,9 @@ async function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arriva
                     startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon, description);
                 console.log("findroutecachedb after findroute");
                 transportcachearray[transportincachekey] = route;
+                console.log("findroutecachedb b4 insertnewroute");
                 await dbservices.insertnewroute(res, route);
+                console.log("findroutecachedb after insertnewroute");
                 return route;
             } catch (error) {
                 console.log("findroutecachedb error " + error);
