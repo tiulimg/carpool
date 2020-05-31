@@ -387,8 +387,10 @@ function insertnewroute(res, route) {
             route.middlelat, route.middlelon)
         .then(foundroute => {
             console.log("insertnewroute after getroutebylatlontime");
+            console.log("insertnewroute foundroute " + foundroute);
             if (!foundroute) {
                 db.collection(ROUTES_COLLECTION).insertOne(route, function(err, doc) {
+                    console.log("insertnewroute AA err " + err + " doc " + doc);
                     if (err) {
                         logservices.handleError(res, err.message, "Failed to create or update route.");
                     }
@@ -399,6 +401,7 @@ function insertnewroute(res, route) {
                 });
             }
             else {
+                console.log("insertnewroute BB");
                 console.log("insertnewroute end");
                 return resolve();
             }
