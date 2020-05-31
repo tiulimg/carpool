@@ -646,12 +646,15 @@ async function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arriva
         }
         else {
             try {
+                console.log("findroutecachedb b4 findroute");
                 var route = await findroute(
                     startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon, description);
+                console.log("findroutecachedb after findroute");
                 transportcachearray[transportincachekey] = route;
                 await dbservices.insertnewroute(res, route);
                 return route;
             } catch (error) {
+                console.log("findroutecachedb error " + error);
                 return error;
             }
         }
@@ -666,11 +669,15 @@ async function bustohike(hitcherswithoutdrivers, hike, res) {
             (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                 hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
             if (!hiker.mydriverto && !hiker.routetothehike && hiker.comesfromlocation) {
+                console.log("bustohike b4 transporttohikebydirection1");
                 var route = await transporttohikebydirection(hiker, hike, "to", res, "publicTransportTimeTable");
+                console.log("bustohike after transporttohikebydirection1");
                 hiker.routetothehike = route;
             }
             if (!hiker.mydriverfrom && !hiker.routefromthehike && hiker.returnstolocation) {
+                console.log("bustohike b4 transporttohikebydirection2");
                 var route = await transporttohikebydirection(hiker, hike, "from", res, "publicTransportTimeTable");
+                console.log("bustohike after transporttohikebydirection2");
                 hiker.routefromthehike = route;
             }
         }
@@ -701,7 +708,9 @@ async function transporttohikebydirection(hiker, hike, direction, res, mode) {
         " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed;
     console.log("transporttohikebydirection " + description);
 
+    console.log("transporttohikebydirection b4 findroutecachedb");
     var route = await findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null, description);
+    console.log("transporttohikebydirection after findroutecachedb");
     hiker["route"+direction+"thehike"] = route;
 }
 
@@ -713,11 +722,15 @@ async function carstohike(hike, res) {
 
         if (hike.startlatitude && hike.endlatitude) {
             if (!hiker.routetothehike && hiker.comesfromlocation) {
+                console.log("carstohike b4 transporttohikebydirection1");
                 var route = await transporttohikebydirection(hiker, hike, "to", res, "car");
+                console.log("carstohike after transporttohikebydirection1");
                 hiker.routetothehike = route;
             }
             if (!hiker.routefromthehike && hiker.returnstolocation) {
+                console.log("carstohike b4 transporttohikebydirection2");
                 var route = await transporttohikebydirection(hiker, hike, "from", res, "car");
+                console.log("carstohike after transporttohikebydirection2");
                 hiker.routefromthehike = route;
             }
         }
