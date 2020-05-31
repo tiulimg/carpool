@@ -719,13 +719,9 @@ async function carstohike(hike, res) {
         if (hike.startlatitude && hike.endlatitude) {
             if (!hiker.routetothehike && hiker.comesfromlocation) {
                 await transporttohikebydirection(hiker, hike, "to", res, "car");
-                console.log("carstohike hiker " + hiker.fullname + " hiker.routetothehike " + hiker.routetothehike + 
-                    hiker.routetothehike.traveltime);
             }
             if (!hiker.routefromthehike && hiker.returnstolocation) {
                 await transporttohikebydirection(hiker, hike, "from", res, "car");
-                console.log("carstohike hiker " + hiker.fullname + " hiker.routefromthehike " + hiker.routefromthehike + 
-                    hiker.routefromthehike.traveltime);
             }
         }
     }
@@ -786,8 +782,6 @@ async function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
     var driverloc;
     var arrival = null;
     var depart = null;
-    console.log("canhitcherreachdriver route"+direction+"thehike " + neardriver["route"+direction+"thehike"] + " " + 
-        neardriver["route"+direction+"thehike"].traveltime);
     if (neardriver["route"+direction+"thehike"] && neardriver["route"+direction+"thehike"].traveltime) {
         if (direction == "to") {
             hikerloc = hiker.comesfromlocation;
@@ -806,44 +800,35 @@ async function canhitcherreachdriver(res, hiker, neardriver, direction, hike) {
             " comesfrom " + neardriver.comesfromdetailed + " returns to " + neardriver.returnstodetailed + 
             " in arrival " + arrival + " depart " + depart;
 
-        findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, "publicTransportTimeTable", arrival, depart, 
-            null, null, description)
-        .then(routetodriver => {
-            console.log("routetodriver " + routetodriver + " " + routetodriver.traveltime + " drivertohike " + 
-                neardriver["route"+direction+"thehike"].traveltime + " hike.maximumpublictransporttime " + 
-                hike.maximumpublictransporttime);
-            if (routetodriver.traveltime == 0 || routetodriver.traveltime) {
-                // (routetodriver.traveltime && 
-                //  (routetodriver.traveltime + neardriver["route"+direction+"thehike"].traveltime < hike.maximumpublictransporttime) ||
-                //   routetodriver.traveltime * 4 < neardriver["route"+direction+"thehike"].traveltime)) {
+        var routetodriver = await findroutecachedb(res, hikerloc.lat, hikerloc.lon, driverloc.lat, driverloc.lon, 
+            "publicTransportTimeTable", arrival, depart, null, null, description);
+
+        console.log("routetodriver " + routetodriver + " " + routetodriver.traveltime + " drivertohike " + 
+            neardriver["route"+direction+"thehike"].traveltime + " hike.maximumpublictransporttime " + 
+            hike.maximumpublictransporttime);
+        if (routetodriver.traveltime == 0 || routetodriver.traveltime) {
+            // (routetodriver.traveltime && 
+            //  (routetodriver.traveltime + neardriver["route"+direction+"thehike"].traveltime < hike.maximumpublictransporttime) ||
+            //   routetodriver.traveltime * 4 < neardriver["route"+direction+"thehike"].traveltime)) {
+            result = true;
+        }
+        else {
+            var driverstops = stopsinthewaytohike(neardriver, hike, direction);
+            console.log("stopsinthewaytohike " + driverstops.length);
+            var stopsnearhitcher = tools.sortbyDistancesToStops(hiker, driverstops, direction);
+            var driverandhitcherwouldstopat = await neareststopfairdeviation(res, neardriver, stopsnearhitcher, direction, hike, hiker);
+            if (driverandhitcherwouldstopat) {
+                console.log("stopsnearhitcher " + stopsnearhitcher.length + " driverandhitcherwouldstopat " + 
+                    JSON.stringify(driverandhitcherwouldstopat));
+            }
+            if (driverandhitcherwouldstopat) {
+                hiker["stop"+direction+"thehike"] = driverandhitcherwouldstopat;
                 result = true;
             }
             else {
-                var driverstops = stopsinthewaytohike(neardriver, hike, direction);
-                console.log("stopsinthewaytohike " + driverstops.length);
-                var stopsnearhitcher = tools.sortbyDistancesToStops(hiker, driverstops, direction);
-                neareststopfairdeviation(res, neardriver, stopsnearhitcher, direction, hike, hiker)
-                .then(driverandhitcherwouldstopat => {
-                    if (driverandhitcherwouldstopat) {
-                        console.log("stopsnearhitcher " + stopsnearhitcher.length + " driverandhitcherwouldstopat " + 
-                            JSON.stringify(driverandhitcherwouldstopat));
-                    }
-                    if (driverandhitcherwouldstopat) {
-                        hiker["stop"+direction+"thehike"] = driverandhitcherwouldstopat;
-                        result = true;
-                    }
-                    else {
-                        result = false;
-                    }
-                })
-                .catch(rejection => {
-                    logservices.logRejection(rejection);
-                });
+                result = false;
             }
-        })
-        .catch(rejection => {
-            logservices.logRejection(rejection);
-        });
+        }
     }
     else {
         result = false;
@@ -1345,9 +1330,7 @@ function setrequiredseats(hike) {
 async function driverifcanmeet(res, hiker, hike, direction) {
     console.log("driverifcanmeet start " + hiker.fullname);
     if (!hiker["mydriver"+direction] && !hiker["route"+direction+"thehike"] && hike.startlatitude) {
-        console.log("driverifcanmeet b4 getDistancesBetweenHikers");
         var distances = tools.getDistancesBetweenHikers(hiker, hike.drivers, direction);
-        console.log("driverifcanmeet after getDistancesBetweenHikers");
         for (let index = 0; index < distances[direction+"thehike"].length; index++) {
             console.log("driverifcanmeet index " + index);
             const neardriverdistance = distances[direction+"thehike"][index];
@@ -1387,29 +1370,19 @@ async function setcarpool(res, nearhikes) {
             setrequiredseats(hike);
 
             // public transport for hikers that don't need a ride
-            console.log("setcarpool b4 bustohike1");
             await bustohike(false, hike, res);
-            console.log("setcarpool after bustohike1");
             
-            console.log("setcarpool b4 carstohike");
             await carstohike(hike, res);
-            console.log("setcarpool after carstohike");
-            console.log("setcarpool b4 hikercalculate");
             await hikercalculate(res, hike);
-            console.log("setcarpool after hikercalculate");
                 
             updateavailableplaces(hike);
             logservices.logcalculationresult(hikers);
 
             // public transport for hikers that hadn't left with a ride
-            console.log("setcarpool b4 bustohike2");
             await bustohike(true, hike, res);
-            console.log("setcarpool after bustohike2");
                 
             removerouteinstructions(hikers);
-            console.log("setcarpool b4 replaceallhikersforhike");
             await dbservices.replaceallhikersforhike(res, hike.hikedate, hikers);
-            console.log("setcarpool after replaceallhikersforhike");
         };
     }
 }
