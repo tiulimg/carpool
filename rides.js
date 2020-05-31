@@ -493,6 +493,18 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
             }
             else
             {
+                var route = {
+                    startlat: startlat,
+                    startlon: startlon,
+                    endlat: endlat,
+                    endlon: endlon,
+                    middlelat: middlelat,
+                    middlelon: middlelon,
+                    mode: mode,
+                    arrival: arrivaltime,
+                    depart: departtime,
+                    description: description,
+                };
                 var responsebodyjson;
                 try {
                     responsebodyjson = JSON.parse(response.body);
@@ -500,11 +512,13 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     console.log("url bad " + url);
                     console.log("body " + response.body);
                     logservices.logRejection(error);
-                    return resolve("No route found");
+                    route.result = "No route found - JSON parse error " + response.body;
+                    return resolve(route);
                 }
                 //console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
-                    return resolve("No route found");
+                    route.result = "No route found - NoRouteFound";
+                    return resolve(route);
                 }
                 else if (responsebodyjson.response && responsebodyjson.response.route && responsebodyjson.response.route[0] &&
                     responsebodyjson.response.route[0].leg)
@@ -552,7 +566,8 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     }
 
                     if (!bestroute) {
-                        return resolve("No route found - only on " + currdepartday);
+                        route.result = "No route found - only on " + currdepartday;
+                        return resolve(route);
                     }
 
                     if (routedeparture) {
@@ -589,27 +604,16 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                         }
                     }
 
-                    var route = {
-                        length: distance,
-                        traveltime: fastesttime,
-                        maneuver: maneuver,
-                        startlat: startlat,
-                        startlon: startlon,
-                        endlat: endlat,
-                        endlon: endlon,
-                        middlelat: middlelat,
-                        middlelon: middlelon,
-                        mode: mode,
-                        arrival: arrivaltime,
-                        depart: departtime,
-                        description: description,
-                    };
+                    route.length = distance;
+                    route.traveltime = fastesttime;
+                    route.maneuver = maneuver;
 
                     return resolve(route);
                 }
                 else {
                     console.log("body " + response.body);
-                    return resolve("No route found");
+                    route.result = "No route found - no leg " + response.body;
+                    return resolve(route);
                 }
             }
         });

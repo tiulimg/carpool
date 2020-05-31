@@ -407,8 +407,10 @@ function insertnewroute(res, route) {
                 console.log("insertnewroute end");
                 return resolve();
             }
+            console.log("insertnewroute EE");
         })
         .catch(rejection => {
+            console.log("insertnewroute FF");
             logservices.logRejection(rejection);
         });
     });
