@@ -609,6 +609,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     route.traveltime = fastesttime;
                     route.maneuver = maneuver;
 
+                    console.log("findroute route result " + JSON.stringify(route));
                     return resolve(route);
                 }
                 else {
@@ -654,6 +655,7 @@ async function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arriva
                 var route = await findroute(
                     startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon, description);
                 transportcachearray[transportincachekey] = route;
+                console.log("findroutecachedb route " + JSON.stringify(route));
                 await dbservices.insertnewroute(res, route);
                 return route;
             } catch (error) {
@@ -709,6 +711,7 @@ async function transporttohikebydirection(hiker, hike, direction, res, mode) {
 
     var route = await findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null, description);
     hiker["route"+direction+"thehike"] = route;
+    console.log("transporttohikebydirection route " + JSON.stringify(route));
 }
 
 async function carstohike(hike, res) {
@@ -721,12 +724,14 @@ async function carstohike(hike, res) {
             if (!hiker.routetothehike && hiker.comesfromlocation) {
                 var route = await transporttohikebydirection(hiker, hike, "to", res, "car");
                 hiker.routetothehike = route;
+                console.log("carstohike route " + JSON.stringify(route));
                 console.log("carstohike hiker " + hiker.fullname + " hiker.routetothehike " + hiker.routetothehike + 
                     hiker.routetothehike.traveltime);
             }
             if (!hiker.routefromthehike && hiker.returnstolocation) {
                 var route = await transporttohikebydirection(hiker, hike, "from", res, "car");
                 hiker.routefromthehike = route;
+                console.log("carstohike route " + JSON.stringify(route));
                 console.log("carstohike hiker " + hiker.fullname + " hiker.routefromthehike " + hiker.routefromthehike + 
                     hiker.routefromthehike.traveltime);
             }
