@@ -862,7 +862,7 @@ function wouldhitchercometostop(res, hitcher, stop, direction, hike, arrival, de
             console.log("wouldhitchercometostop routetostop " + routetostop + " " + routetostop.traveltime + " + traveltimefromstop " + 
                 traveltimefromstop + " <? hike.maximumpublictransporttime " + hike.maximumpublictransporttime + 
                 " description " + description);
-            if (traveltimevsmaxpublictransport(routetostop.traveltime, traveltimefropstop)) {
+            if (traveltimevsmaxpublictransport(routetostop.traveltime, traveltimefromstop)) {
                 stop.busroutetostoptime = routetostop.traveltime;
                 return resolve(true);
             }
