@@ -426,7 +426,6 @@ async function findhikerslocation(hikers) {
     for (let hikerindex = 0; hikerindex < hikers.length; hikerindex++) {
         var hiker = hikers[hikerindex];
         if (!hiker.comesfromlocation) {
-            await tools.wait(100*timer);
             try {
                 var comesfromlocation = await translateaddresstolocation(hiker.comesfromdetailed);
                 console.log("comesfromlocation " + JSON.stringify(comesfromlocation) + " link " +
@@ -437,7 +436,6 @@ async function findhikerslocation(hikers) {
             }
         }
         if (!hiker.returnstolocation) {
-            await tools.wait(100*timer);
             try {
                 var returnstolocation = await translateaddresstolocation(hiker.returnstodetailed);
                 console.log("returnstolocation " + JSON.stringify(returnstolocation) + " link " +
