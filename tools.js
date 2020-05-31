@@ -60,7 +60,7 @@ function wait(ms)
 }
 
 function wakeupDyno(lock) {
-    request({
+    setTimeout(request({
         url: "http://tiulimg-carpool.herokuapp.com/favicon.ico",
         method: "GET",
     }, function (error, response, body){
@@ -68,7 +68,7 @@ function wakeupDyno(lock) {
         if (lock.stillrunning && (secondsbetweendates(lock.starttime, now) < 60 * 60)) {
             wakeupDyno(lock);
         }
-    });
+    }), 30 * 60 * 1000);
 }
 
 function addsecondstodate(datestring, seconds) {
