@@ -532,11 +532,6 @@
             ],
             "buttons_he": [ "מבין ומקבל" ],
             "buttons_en": [ "I understand and accept" ]
-        },
-        {
-            "key": "HEBREW_BOT_FAULT",
-            "he": "יש עכשיו תקלה ברובוט שהוא לא מצליח להפעיל פעולות בעברית. שיניתי את השפה של השיחה לאנגלית, נסה באנגלית?",
-            "en": "There is now a malfunction in the chatbot that it fails to run actions in Hebrew. I changed the language of the conversation to English, try English?"
         }
     ]
 }

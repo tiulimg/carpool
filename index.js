@@ -49,19 +49,7 @@ app.post("/api/debug", function(req, res) {
     console.log("req.body: " + JSON.stringify(req.body));
     var memory = req.body.conversation.memory;
     var language = tools.set_language(memory);
-    if (language == "he") {
-        recast_conversation_reply = replies.get_recast_reply("HEBREW_BOT_FAULT",language,null,memory);
-        sapchatbot.chattoenglish(res, req.body.conversation.id)
-        .then(() => {
-            res.status(200).json(recast_conversation_reply);
-        })
-        .catch(rejection => {
-            logservices.logRejection(rejection);
-        });
-    }
-    else {
-        res.status(200).json("OK");
-    }
+    res.status(200).json("OK");
 });
 
 /*  "/api/areridessetuped"
