@@ -107,6 +107,7 @@ function getconversationstate(id) {
                     var conversation;
                     try {
                         conversation = JSON.parse(response.body);
+                        console.log(conversation);
                     } catch (error) {
                         console.log("getconversationstate " + response.body);
                     }
@@ -132,6 +133,7 @@ function saveconversationidtoall(res) {
                         return getconversationstate(id);
                     })
                     .then(conversation => {
+                        aaa++;
                         if (conversation && conversation.memory) {
                             var memory = conversation.memory;
                             var phonenumber = memory.phonenumber;
