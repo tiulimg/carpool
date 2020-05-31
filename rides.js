@@ -509,15 +509,15 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                 try {
                     responsebodyjson = JSON.parse(response.body);
                 } catch (error) {
-                    console.log("url bad " + url);
-                    console.log("body " + response.body);
                     logservices.logRejection(error);
                     route.result = "No route found - JSON parse error " + response.body;
+                    console.log("findroute route.result " + route.result);
                     return resolve(route);
                 }
                 //console.log("findroute here responsebodyjson " + JSON.stringify(responsebodyjson));
                 if (responsebodyjson && responsebodyjson.subtype && responsebodyjson.subtype == "NoRouteFound") {
                     route.result = "No route found - NoRouteFound";
+                    console.log("findroute route.result " + route.result);
                     return resolve(route);
                 }
                 else if (responsebodyjson.response && responsebodyjson.response.route && responsebodyjson.response.route[0] &&
@@ -527,7 +527,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     var fastesttimeincludingwaiting = 1000000000000000;
                     var bestroute;
                     var distance;
-                    var routedeparture;
+                    var routeresultdeparture;
                     var hikeday;
                     var departday;
                     var currdepartday;
@@ -539,47 +539,50 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                         currroutedeparture = hikeday = tools.onlydate(departtime);
                     }
                     for (let index = 0; index < responsebodyjson.response.route.length; index++) {
-                        const route = responsebodyjson.response.route[index];
-                        if (route.summary && route.summary.distance) {
-                            if (mode == "publicTransportTimeTable" && route.summary.departure) {
-                                currroutedeparture = route.summary.departure;
+                        const routeresult = responsebodyjson.response.route[index];
+                        if (routeresult.summary && routeresult.summary.distance) {
+                            if (routeresult.summary.departure) {
+                                currroutedeparture = routeresult.summary.departure;
                                 currdepartday = tools.onlydate(currroutedeparture);
                             }
 
-                            if (route.summary.trafficTime && route.summary.trafficTime < fastesttime &&
-                                hikeday == currdepartday) {
-                                fastesttime = route.summary.trafficTime;
-                                distance = route.summary.distance;
-                                routedeparture = currroutedeparture;
-                                departday = currdepartday;
-                                bestroute = route;
-                            }
-                            else if (route.summary.travelTime && route.summary.travelTime < fastesttime &&
-                                hikeday == currdepartday) {
-                                fastesttime = route.summary.travelTime;
-                                distance = route.summary.distance;
-                                routedeparture = currroutedeparture;
-                                departday = currdepartday;
-                                bestroute = route;
+                            if (!currdepartday || hikeday == currdepartday) {
+                                if (routeresult.summary.trafficTime && routeresult.summary.trafficTime < fastesttime)
+                                {
+                                    fastesttime = routeresult.summary.trafficTime;
+                                    distance = routeresult.summary.distance;
+                                    routeresultdeparture = currroutedeparture;
+                                    departday = currdepartday;
+                                    bestroute = routeresult;
+                                }
+                                else if (routeresult.summary.travelTime && routeresult.summary.travelTime < fastesttime)
+                                {
+                                    fastesttime = routeresult.summary.travelTime;
+                                    distance = routeresult.summary.distance;
+                                    routeresultdeparture = currroutedeparture;
+                                    departday = currdepartday;
+                                    bestroute = routeresult;
+                                }
                             }
                         }
                     }
 
                     if (!bestroute) {
                         route.result = "No route found - only on " + currdepartday;
+                        console.log("findroute route.result " + route.result);
                         return resolve(route);
                     }
 
-                    if (routedeparture) {
-                        routedeparture = new Date(routedeparture).toISOString();
-                        var arrivalafterroutedeparture = new Date(tools.addsecondstodate(routedeparture, fastesttime));
+                    if (routeresultdeparture) {
+                        routeresultdeparture = new Date(routeresultdeparture).toISOString();
+                        var arrivalafterroutedeparture = new Date(tools.addsecondstodate(routeresultdeparture, fastesttime));
                         if (arrivaltime) {
-                            fastesttimeincludingwaiting = tools.secondsbetweendates(arrivaltime, routedeparture);
+                            fastesttimeincludingwaiting = tools.secondsbetweendates(arrivaltime, routeresultdeparture);
                         }
                         else {
                             fastesttimeincludingwaiting = tools.secondsbetweendates(departtime, arrivalafterroutedeparture);
                         }
-                        console.log("findroute routedeparture " + routedeparture + " + fastesttime " + fastesttime + 
+                        console.log("findroute routeresultdeparture " + routeresultdeparture + " + fastesttime " + fastesttime + 
                             " arrivalafterroutedeparture " + arrivalafterroutedeparture + " fastesttimeincludingwaiting " + 
                             fastesttimeincludingwaiting + " hikeday " + hikeday + " departday " + departday);
 
@@ -588,9 +591,9 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                         }
                     }
 
+                    var maneuver = [];
                     for (let indexleg = 0; indexleg < bestroute.leg.length; indexleg++) {
                         const leg = bestroute.leg[indexleg];
-                        var maneuver = [];
                         for (let index = 0; index < leg.maneuver.length; index++) {
                             const step = leg.maneuver[index];
                             var instruction = step.instruction.replace(/<[^>]+>/g, '');
@@ -611,8 +614,8 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     return resolve(route);
                 }
                 else {
-                    console.log("body " + response.body);
                     route.result = "No route found - no leg " + response.body;
+                    console.log("findroute route.result " + route.result);
                     return resolve(route);
                 }
             }
@@ -650,14 +653,10 @@ async function findroutecachedb(res, startlat,startlon,endlat,endlon,mode,arriva
         }
         else {
             try {
-                console.log("findroutecachedb b4 findroute");
                 var route = await findroute(
                     startlat, startlon, endlat, endlon, mode, arrival, depart, middlelat, middlelon, description);
-                console.log("findroutecachedb after findroute");
                 transportcachearray[transportincachekey] = route;
-                console.log("findroutecachedb b4 insertnewroute");
                 await dbservices.insertnewroute(res, route);
-                console.log("findroutecachedb after insertnewroute");
                 return route;
             } catch (error) {
                 console.log("findroutecachedb error " + error);
@@ -675,15 +674,11 @@ async function bustohike(hitcherswithoutdrivers, hike, res) {
             (hiker.needaride == "אני מגיע באוטובוס או אופנוע, אחר" ||
                 hiker.needaride == "I come in bus, a motorcycle or other" || hitcherswithoutdrivers)) {
             if (!hiker.mydriverto && !hiker.routetothehike && hiker.comesfromlocation) {
-                console.log("bustohike b4 transporttohikebydirection1");
                 var route = await transporttohikebydirection(hiker, hike, "to", res, "publicTransportTimeTable");
-                console.log("bustohike after transporttohikebydirection1");
                 hiker.routetothehike = route;
             }
             if (!hiker.mydriverfrom && !hiker.routefromthehike && hiker.returnstolocation) {
-                console.log("bustohike b4 transporttohikebydirection2");
                 var route = await transporttohikebydirection(hiker, hike, "from", res, "publicTransportTimeTable");
-                console.log("bustohike after transporttohikebydirection2");
                 hiker.routefromthehike = route;
             }
         }
@@ -714,9 +709,7 @@ async function transporttohikebydirection(hiker, hike, direction, res, mode) {
         " comesfrom " + hiker.comesfromdetailed + " returns to " + hiker.returnstodetailed;
     console.log("transporttohikebydirection " + description);
 
-    console.log("transporttohikebydirection b4 findroutecachedb");
     var route = await findroutecachedb(res, startlat, startlon, endlat, endlon, mode, arrival, depart, null, null, description);
-    console.log("transporttohikebydirection after findroutecachedb");
     hiker["route"+direction+"thehike"] = route;
 }
 
@@ -728,15 +721,11 @@ async function carstohike(hike, res) {
 
         if (hike.startlatitude && hike.endlatitude) {
             if (!hiker.routetothehike && hiker.comesfromlocation) {
-                console.log("carstohike b4 transporttohikebydirection1");
                 var route = await transporttohikebydirection(hiker, hike, "to", res, "car");
-                console.log("carstohike after transporttohikebydirection1");
                 hiker.routetothehike = route;
             }
             if (!hiker.routefromthehike && hiker.returnstolocation) {
-                console.log("carstohike b4 transporttohikebydirection2");
                 var route = await transporttohikebydirection(hiker, hike, "from", res, "car");
-                console.log("carstohike after transporttohikebydirection2");
                 hiker.routefromthehike = route;
             }
         }

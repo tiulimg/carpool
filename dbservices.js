@@ -381,36 +381,24 @@ function getroutebylatlontime(res, startlat, startlon, endlat, endlon, mode, arr
 
 function insertnewroute(res, route) {
     return new Promise((resolve, reject) => {
-        console.log("insertnewroute start");
-        console.log("insertnewroute b4 getroutebylatlontime");
         getroutebylatlontime(res, route.startlat, route.startlon, route.endlat, route.endlon, route.mode, route.arrival, route.depart,
             route.middlelat, route.middlelon)
         .then(foundroute => {
-            console.log("insertnewroute after getroutebylatlontime");
-            console.log("insertnewroute foundroute " + foundroute + " " + route);
             if (!foundroute) {
-                console.log("insertnewroute CC");
                 db.collection(ROUTES_COLLECTION).insertOne(route, function(err, doc) {
-                    console.log("insertnewroute AA err " + err + " doc " + doc);
                     if (err) {
                         logservices.handleError(res, err.message, "Failed to create or update route.");
                     }
                     else {
-                        console.log("insertnewroute end");
                         return resolve();
                     }
                 });
-                console.log("insertnewroute DD");
             }
             else {
-                console.log("insertnewroute BB");
-                console.log("insertnewroute end");
                 return resolve();
             }
-            console.log("insertnewroute EE");
         })
         .catch(rejection => {
-            console.log("insertnewroute FF");
             logservices.logRejection(rejection);
         });
     });
