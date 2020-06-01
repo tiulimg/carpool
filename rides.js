@@ -439,6 +439,7 @@ async function findhikerslocation(hikers) {
         }
     }
     console.log("findhikerslocation end");
+    return hikers;
 }
 
 function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,middlelat,middlelon,description) { // mode = car | publicTransport
