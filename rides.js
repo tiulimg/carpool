@@ -413,10 +413,8 @@ function parsegeolocation(responsebodyjson, address) {
 }
 
 async function findhikerslocation(hikers) {
-    console.log("findhikerslocation start hikers.length " + hikers.length);
     for (let hikerindex = 0; hikerindex < hikers.length; hikerindex++) {
         var hiker = hikers[hikerindex];
-        console.log("findhikerslocation index " + hikerindex);
         if (!hiker.comesfromlocation) {
             try {
                 var comesfromlocation = await translateaddresstolocation(hiker.comesfromdetailed);
@@ -438,7 +436,6 @@ async function findhikerslocation(hikers) {
             }
         }
     }
-    console.log("findhikerslocation end");
     return hikers;
 }
 
