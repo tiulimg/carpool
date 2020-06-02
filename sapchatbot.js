@@ -135,7 +135,7 @@ async function saveconversationidtoall(res) {
                 phonenumber = memory.phonenumber;
                 if (phonenumber) {
                     found = true;
-                    console.log("saveconversationidtoall " + id + " found phonenumber");
+                    console.log("saveconversationidtoall " + id + " found phonenumber " + phonenumber);
                     phonenumber = tools.normalize_phonenumber(phonenumber);
                     await tools.wait(500);
                     await getconversations(res, id, phonenumber);
@@ -166,7 +166,7 @@ async function saveconversationidtoall(res) {
                         }
                     }
                     if (phonenumber) {
-                        console.log("saveconversationidtoall " + id + " found phonenumber");
+                        console.log("saveconversationidtoall " + id + " found phonenumber " + phonenumber);
                         phonenumber = tools.normalize_phonenumber(phonenumber);
                         await tools.wait(500);
                         await getconversations(res, id, phonenumber);
