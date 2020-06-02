@@ -142,10 +142,11 @@ async function saveconversationidtoall(res) {
                 }
             }
             if (!found) {
-                console.log("saveconversationidtoall " + id + " not found phonenumber " + JSON.stringify(conversation));
+                console.log("saveconversationidtoall " + id + " not found phonenumber");
                 await tools.wait(500);
                 var conversation = await getconversations(res, id);
-                if (conversation && conversation.messages && conversation.participants) {
+                if (conversation && conversation.results && conversation.results.messages && conversation.results.participants) {
+                    conversation = onversation.results;
                     var bots = [];
                     for (let indexparticipant = 0; indexparticipant < conversation.participants.length; indexparticipant++) {
                         const participant = conversation.participants[indexparticipant];
