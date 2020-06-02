@@ -142,7 +142,7 @@ async function saveconversationidtoall(res) {
                 }
             }
             if (!found) {
-                var phonenumber;
+                phonenumber = null;
                 console.log("saveconversationidtoall " + id + " not found phonenumber " + phonenumber);
                 await tools.wait(500);
                 var conversation = await getconversations(res, id);
