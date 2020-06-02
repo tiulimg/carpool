@@ -158,7 +158,7 @@ async function saveconversationidtoall(res) {
                         const message = conversation.messages[indexmessage];
                         if (bots.indexOf(message.participant) == -1 && message.attachment.type == "text") {
                             var content = message.attachment.content;
-                            var isphone = content.match(/\d+{10}/);
+                            var isphone = content.match(/(\d+){10}/);
                             console.log("saveconversationidtoall " + id + " phone " + isphone + " text " + content);
                             if (isphone) {
                                 phonenumber = isphone[0];
