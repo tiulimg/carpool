@@ -120,87 +120,59 @@ function getconversationstate(id) {
     });
 }
 
-function saveconversationidtoall(res) {
-    return new Promise((resolve, reject) => {
-        getconversations()
-        .then(conversations => {
-            if (conversations) {
-                for (let index = 0; index < conversations.results.length; index++) {
-                    const id = conversations.results[index].id;
-                    tools.wait((index * 1000) + 500)
-                    .then(() => {
-                        return getconversationstate(id);
-                    })
-                    .then(conversation => {
-                        var found = false;
-                        if (conversation && conversation.memory) {
-                            var memory = conversation.memory;
-                            var phonenumber = memory.phonenumber;
-                            if (phonenumber) {
-                                found = true;
-                                console.log("saveconversationidtoall conversation " + conversation + " " + JSON.stringify(conversation));
-                                phonenumber = tools.normalize_phonenumber(phonenumber);
-                                tools.wait((index * 1000) + 1000)
-                                .then(() => {
-                                    return getconversations(res, id, phonenumber);
-                                })
-                                .catch(rejection => {
-                                    logservices.logRejection(rejection);
-                                });
-                            }
-                        }
-                        if (!found) {
-                            tools.wait((index * 2000) + 500)
-                            .then(() => {
-                                return getconversations(res, id);
-                            })
-                            .then(conversation => {
-                                if (conversation && conversation.messages && conversation.participants) {
-                                    var bots = [];
-                                    for (let indexparticipant = 0; indexparticipant < conversation.participants.length; indexparticipant++) {
-                                        const participant = conversation.participants[indexparticipant];
-                                        if (participant.isBot) {
-                                            bots.push(participant.id);
-                                        }
-                                    }
-                                    var phonenumber;
-                                    for (let indexmessage = 0; indexmessage < conversation.messages.length; indexmessage++) {
-                                        const message = conversation.messages[indexmessage];
-                                        if (bots.indexOf(message.participant) == -1 && message.attachment.type == "text") {
-                                            var content = message.attachment.content;
-                                            var isphone = content.match(/\d+{10}/);
-                                            if (isphone) {
-                                                phonenumber = isphone[0];
-                                            }
-                                        }
-                                    }
-                                    if (phonenumber) {
-                                        tools.wait((index * 2000) + 500)
-                                        .then(() => {
-                                            return getconversations(res, id, phonenumber);
-                                        })
-                                        .catch(rejection => {
-                                            logservices.logRejection(rejection);
-                                        });
-                                    }
-                                }
-                            })
-                            .catch(rejection => {
-                                logservices.logRejection(rejection);
-                            });
-                        }
-                    })
-                    .catch(rejection => {
-                        logservices.logRejection(rejection);
-                    });
+async function saveconversationidtoall(res) {
+    var conversations = await getconversations();
+    if (conversations && conversations.results) {
+        for (let index = 0; index < conversations.results.length; index++) {
+            const id = conversations.results[index].id;
+            console.log("saveconversationidtoall id " + id + " index " + index);
+            await tools.wait(500);
+            var conversationstate = await getconversationstate(id);
+            var found = false;
+            var phonenumber;
+            if (conversationstate && conversationstate.memory) {
+                console.log("saveconversationidtoall " + id + " has memory");
+                var memory = conversationstate.memory;
+                phonenumber = memory.phonenumber;
+                if (phonenumber) {
+                    found = true;
+                    console.log("saveconversationidtoall conversationstate " + conversationstate + " " + 
+                        JSON.stringify(conversationstate));
+                    phonenumber = tools.normalize_phonenumber(phonenumber);
+                    await tools.wait(500);
+                    await getconversations(res, id, phonenumber);
                 }
             }
-            return resolve();
-        })
-        .catch(rejection => {
-            logservices.logRejection(rejection);
-        });
-    });
+            if (!found) {
+                console.log("saveconversationidtoall " + id + " not found phonenumber");
+                await tools.wait(500);
+                var conversation = await getconversations(res, id);
+                if (conversation && conversation.messages && conversation.participants) {
+                    var bots = [];
+                    for (let indexparticipant = 0; indexparticipant < conversation.participants.length; indexparticipant++) {
+                        const participant = conversation.participants[indexparticipant];
+                        if (participant.isBot) {
+                            bots.push(participant.id);
+                        }
+                    }
+                    for (let indexmessage = 0; indexmessage < conversation.messages.length; indexmessage++) {
+                        const message = conversation.messages[indexmessage];
+                        if (bots.indexOf(message.participant) == -1 && message.attachment.type == "text") {
+                            var content = message.attachment.content;
+                            var isphone = content.match(/\d+{10}/);
+                            if (isphone) {
+                                phonenumber = isphone[0];
+                            }
+                        }
+                    }
+                    if (phonenumber) {
+                        await tools.wait(500);
+                        await getconversations(res, id, phonenumber);
+                    }
+                }
+            }
+        }
+    }
 }
 
 function allchatstoenglish() {
