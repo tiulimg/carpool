@@ -131,13 +131,11 @@ async function saveconversationidtoall(res) {
             var found = false;
             var phonenumber;
             if (conversationstate && conversationstate.memory) {
-                console.log("saveconversationidtoall " + id + " has memory");
                 var memory = conversationstate.memory;
                 phonenumber = memory.phonenumber;
                 if (phonenumber) {
                     found = true;
-                    console.log("saveconversationidtoall conversationstate " + conversationstate + " " + 
-                        JSON.stringify(conversationstate));
+                    console.log("saveconversationidtoall " + id + " found phonenumber");
                     phonenumber = tools.normalize_phonenumber(phonenumber);
                     await tools.wait(500);
                     await getconversations(res, id, phonenumber);
@@ -160,12 +158,15 @@ async function saveconversationidtoall(res) {
                         if (bots.indexOf(message.participant) == -1 && message.attachment.type == "text") {
                             var content = message.attachment.content;
                             var isphone = content.match(/\d+{10}/);
+                            console.log("saveconversationidtoall " + id + " phone " + isphone + " text " + content);
                             if (isphone) {
                                 phonenumber = isphone[0];
                             }
                         }
                     }
                     if (phonenumber) {
+                        console.log("saveconversationidtoall " + id + " found phonenumber");
+                        phonenumber = tools.normalize_phonenumber(phonenumber);
                         await tools.wait(500);
                         await getconversations(res, id, phonenumber);
                     }

@@ -2617,12 +2617,10 @@ app.patch("/api/testsendmessage", function(req, res) {
     if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         // messageconnector.sendToTelegram(res, "555659347", "מה קורה? נרשמת לטיול בחולות ניצנים ב-4-5.6, תבוא בע\"ה?")
         sapchatbot.saveconversationidtoall(res)
-        .then(() => {
-            res.status(200).json("success");
-        })
         .catch(rejection => {
             logservices.logRejection(rejection);
         });
+        res.status(200).json("success");
     }
 });
 
