@@ -146,7 +146,7 @@ async function saveconversationidtoall(res) {
                 await tools.wait(500);
                 var conversation = await getconversations(res, id);
                 if (conversation && conversation.results && conversation.results.messages && conversation.results.participants) {
-                    conversation = onversation.results;
+                    conversation = conversation.results;
                     var bots = [];
                     for (let indexparticipant = 0; indexparticipant < conversation.participants.length; indexparticipant++) {
                         const participant = conversation.participants[indexparticipant];
