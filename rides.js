@@ -505,8 +505,13 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     if (responsebodyjson.details == "No timetable route found.") {
                         mode = "publicTransport";
                         console.log("trying without timetable, url: " + url);
-                        return findroute(
-                            startlat,startlon, endlat, endlon, mode, arrivaltime, departtime, middlelat, middlelon, description);
+                        findroute(startlat,startlon, endlat, endlon, mode, arrivaltime, departtime, middlelat, middlelon, description)
+                        .then(resultroute => {
+                            return resolve(resultroute);
+                        })
+                        .catch(rejection => {
+                            logservices.logRejection(rejection);
+                        });
                     }
                     else {
                         route.result = "No route found - NoRouteFound";
@@ -585,6 +590,7 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     route.traveltime = fastesttime;
                     route.maneuver = maneuver;
 
+                    console.log("findroute result found");
                     return resolve(route);
                 }
                 else {
