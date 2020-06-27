@@ -590,7 +590,6 @@ function findroute(startlat,startlon,endlat,endlon,mode,arrivaltime,departtime,m
                     route.traveltime = fastesttime;
                     route.maneuver = maneuver;
 
-                    console.log("findroute result found");
                     return resolve(route);
                 }
                 else {
@@ -1376,6 +1375,6 @@ function removerouteinstructions(hikers) {
         var hiker = hikers[index];
         delete hiker.routetothehike;
         delete hiker.routefromthehike;
-        delete hike.wouldntstopat;
+        delete hiker.wouldntstopat;
     }
 }
