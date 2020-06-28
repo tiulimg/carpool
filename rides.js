@@ -1083,6 +1083,7 @@ function removehitcherfromdriver(hitcher, driver, direction) {
         const currhitcher = driver["myhitchers"+direction][index];
         if (currhitcher.phone == hitcher.phone) {
             driver["myhitchers"+direction].splice(index, 1);
+            driver["availableplaces"+direction+"thehike"]++;
             index--;
         }
     }
