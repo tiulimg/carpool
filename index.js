@@ -1963,6 +1963,9 @@ app.post("/api/selecthikes", function(req, res) {
                 if (hikedate2) {
                     selectHike = tools.findhike(docs, memorySelectHike, hikedate2[0]);
                 }
+                else {
+                    selectHike = tools.findhike(docs, memorySelectHike);
+                }
                 console.log("selectHike " + JSON.stringify(selectHike));
 
                 if (selectHike && selectHike != "") {
