@@ -1344,6 +1344,9 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                         }
                         prevvariable = memory_variable;
                     }
+                    if (memory.stage == "haslastregister") {
+                        memory.stage = "registertohikes_modify";
+                    }
                     memory.operation = "newhike";
                     console.log("memory.stage " + JSON.stringify(memory.stage));
                     if (memory.howdidihear2) {
