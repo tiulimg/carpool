@@ -1315,14 +1315,14 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                     var prevvariable = "myname";
                     console.log("memory " + JSON.stringify(memory));
                     for (var memory_variable in stages) {
-                        console.log("memory_variable " + memory_variable + " prevvariable " + prevvariable);
+                        console.log("memory_variable " + memory_variable + " prevvariable " + prevvariable + " " + 
+                            memory[prevvariable].toLowerCase());
                         if (!memory[memory_variable]) {
                             var prevvaluedependency = previousvaluesdependencies[stages[memory_variable]];
                             if (prevvaluedependency != null && prevvaluedependency.length > 0 && 
                                 prevvaluedependency.indexOf(memory[prevvariable].toLowerCase()) == -1) {
                                 continue;
                             }
-                            memory.stage = stages[memory_variable];
                             if (memory.friendsdetails && memory.friendsdetails.length > 0 && memory_variable == "friendname") { 
                                 continue;
                             }
@@ -1330,6 +1330,7 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                                 (memory_variable == "friendsavesthedate" && !memory.friendage)) {
                                     continue;
                             }
+                            memory.stage = stages[memory_variable];
                             var buttons = replies.get_conversation_buttons(keys[memory.stage], language);
                             var reply_string = replies.get_conversation_string(keys[memory.stage],language);
                             recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, reply_string, buttons);
