@@ -327,7 +327,6 @@ function translateaddresstolocation(address) {
                 'X-Algolia-API-Key': ALGOLIA_KEY, 
             }
             var requestbody = JSON.stringify({"query": address, "countries": "il"}); 
-                //,"type": "city,address,busStop,trainStation,townhall,airport" });
             console.log("translateaddresstolocation algolia address " + address + " request " + url);
             request({
                 url: url,
@@ -343,7 +342,7 @@ function translateaddresstolocation(address) {
                 else
                 {
                     var responsebodyjson = JSON.parse(response.body);
-                    console.log("translateaddresstolocation algolia responsebodyjson " + JSON.stringify(responsebodyjson));
+                    //console.log("translateaddresstolocation algolia responsebodyjson " + JSON.stringify(responsebodyjson));
                     if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
                         location = parsegeolocation(responsebodyjson, address);
                         return resolve(location);
@@ -376,7 +375,7 @@ function translateaddresstolocation(address) {
                                 else
                                 {
                                     var responsebodyjson = JSON.parse(response.body);
-                                    console.log("translateaddresstolocation algolia responsebodyjson " + JSON.stringify(responsebodyjson));
+                                    // console.log("translateaddresstolocation algolia responsebodyjson " + JSON.stringify(responsebodyjson));
                                     if (responsebodyjson.hits && responsebodyjson.hits[0] && responsebodyjson.hits[0]._geoloc) {
                                         location = parsegeolocation(responsebodyjson, address);
                                         return resolve(location);

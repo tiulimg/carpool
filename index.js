@@ -1280,8 +1280,8 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                         "registertohikes_age": ["yes", "כן"],
                         "registertohikes_dofriendsjoin": [],
                         "registertohikes_friendsname": ["yes", "כן"],
-                        "registertohikes_friendsage": [],
-                        "registertohikes_friendssavedthedate": [],
+                        "registertohikes_friendsage": ["yes", "כן"],
+                        "registertohikes_friendssavedthedate": ["yes", "כן"],
                         "registertohikes_createpassword": [],
                         "registertohikes_howdidihear": [],
                         "registertohikes_playson": [],
@@ -2613,7 +2613,7 @@ app.delete("/api/routes", function(req, res) {
 *    PATCH: test message
 */
 
-app.patch("/api/testsendmessage", function(req, res) {
+app.patch("/api/verifyplanstocome", function(req, res) {
     if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         // messageconnector.sendToTelegram(res, "555659347", "מה קורה? נרשמת לטיול בחולות ניצנים ב-4-5.6, תבוא בע\"ה?")
         sapchatbot.saveconversationidtoall(res)
