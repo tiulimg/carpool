@@ -1316,7 +1316,7 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                     console.log("memory " + JSON.stringify(memory));
                     for (var memory_variable in stages) {
                         console.log("memory_variable " + memory_variable + " prevvariable " + prevvariable + " " + 
-                            memory[prevvariable].toLowerCase());
+                            memory[prevvariable]);
                         if (!memory[memory_variable]) {
                             var prevvaluedependency = previousvaluesdependencies[stages[memory_variable]];
                             if (prevvaluedependency != null && prevvaluedependency.length > 0 && 
