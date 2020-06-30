@@ -146,28 +146,26 @@ app.post("/api/wanttomodify", function(req, res) {
             }
         }
 
-        if (!memory.registertohikes) {
-            memory.registertohikes = {
-                "plays on": memory.playson2,
-                "available places": memory.availableplaces,
-                "name": memory.myname,
-                "share my age": memory.shareage2,
-                "friends joining": memory.friendstext,
-                "i'm gay": memory.isgay2,
-                "i fear of": memory.ifearof2,
-                "heard of the group": memory.howdidihear2,
-                "car/ride": memory.comewithcar2,
-                "can organize": memory.volunteer2,
-                "saved the date": memory.savedthedate2,
-                "hikes": memory.emptyhikes,
-                "returns to": memory.returnto2,
-                "phone number": memory.phonenumber,
-                "password": memory.password,
-                "comes from": memory.comefrom2,
-                "email": memory.email2,
-                "age": memory.age
-              };
-        }
+        memory.registertohikes = {
+            "plays on": memory.playson2,
+            "available places": memory.availableplaces,
+            "name": memory.myname,
+            "share my age": memory.shareage2,
+            "friends joining": memory.friendstext,
+            "i'm gay": memory.isgay2,
+            "i fear of": memory.ifearof2,
+            "heard of the group": memory.howdidihear2,
+            "car/ride": memory.comewithcar2,
+            "can organize": memory.volunteer2,
+            "saved the date": memory.savedthedate2,
+            "hikes": memory.emptyhikes,
+            "returns to": memory.returnto2,
+            "phone number": memory.phonenumber,
+            "password": memory.password,
+            "comes from": memory.comefrom2,
+            "email": memory.email2,
+            "age": memory.age
+            };
 
         for (var property in starts) {
             for (var index = 0; index < starts[property].texts.length; index++) {
