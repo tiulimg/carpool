@@ -2128,6 +2128,7 @@ app.get("/api/hikers", function(req, res) {
 app.put("/api/hikers", function(req, res) {
     if (tools.checkpwd(res, req.body.pwd)) {
         var hikers = req.body.hikers;
+        console.log("PUT HIKERS A");
         dbservices.replaceallhikers(res, hikers)
         .then(() => {
             res.status(200).json("success");
@@ -2637,8 +2638,22 @@ app.delete("/api/routes", function(req, res) {
     }
 });
 
-/*  "/api/testsendmessage"
-*    PATCH: test message
+/*  "/api/migratedb"
+*    PATCH: copy all data from old db to new db
+*/
+
+app.patch("/api/migratedb", function(req, res) {
+    if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
+        dbservices.migratedb(res)
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        });
+        res.status(200).json("success");
+    }
+});
+
+/*  "/api/verifyplanstocome"
+*    PATCH: send all registered hikers for a hike a message to ask if they plan to come as they've registered
 */
 
 app.patch("/api/verifyplanstocome", function(req, res) {
@@ -2662,7 +2677,6 @@ app.patch("/api/verifyplanstocome", function(req, res) {
         });
     }
 });
-
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
