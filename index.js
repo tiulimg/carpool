@@ -165,7 +165,7 @@ app.post("/api/wanttomodify", function(req, res) {
             "comes from": memory.comefrom2,
             "email": memory.email2,
             "age": memory.age
-            };
+        };
 
         for (var property in starts) {
             for (var index = 0; index < starts[property].texts.length; index++) {
@@ -2644,11 +2644,22 @@ app.delete("/api/routes", function(req, res) {
 app.patch("/api/verifyplanstocome", function(req, res) {
     if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         // messageconnector.sendToTelegram(res, "555659347", "מה קורה? נרשמת לטיול בחולות ניצנים ב-4-5.6, תבוא בע\"ה?")
-        sapchatbot.saveconversationidtoall(res)
+        dbservices.gethikes(res)
+        .then(hikes => {
+            var nearhikes = tools.get_near_hikes(hikes);
+            if (nearhikes.length > 0) {
+                sapchatbot.verifyplanstocome(res, nearhikes)
+                .then(() => {
+                    res.status(200).json("success");
+                })
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                });
+            }
+        })
         .catch(rejection => {
             logservices.logRejection(rejection);
         });
-        res.status(200).json("success");
     }
 });
 

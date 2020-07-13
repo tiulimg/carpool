@@ -4,6 +4,7 @@ var Promise = require('promise');
 var dbservices = require("./dbservices");
 var logservices = require("./logservices");
 var tools = require("./tools");
+var messageconnector = require("./messageconnector");
 
 module.exports = {
     getconversations: getconversations,
@@ -11,6 +12,7 @@ module.exports = {
     saveconversationidtoall: saveconversationidtoall,
     allchatstoenglish: allchatstoenglish,
     chattoenglish: chattoenglish,
+    verifyplanstocome: verifyplanstocome,
 }
 
 function getconversations(res, conversationid, phonenumber) {
@@ -256,4 +258,41 @@ function chattoenglish(res, conversationid) {
             logservices.logRejection(rejection);
         });
     });
+}
+
+function verifyplanstocome(res, hikes) {
+    for (let index = 0; index < nearhikes.length; index++) {
+        var hike = nearhikes[index];
+        var hikers = await dbservices.gethikersbyhikedate(res, hike.hikedate);
+        for (let indexhiker = 0; indexhiker < hikers.length; indexhiker++) {
+            const hiker = hikers[indexhiker];
+            var conversationid = await dbservices.getconversationid(res, hiker.phone);
+
+            var message = "היי 🙂 מה קורה?\n";
+            message += "זה טל, נרשמת לטיול ב-" + hike.hikenamehebrew + "\n";
+            if (hiker.myfriends && hiker.myfriends.length > 0) {
+                var withfriends = "";
+                message += "תבוא בע\"ה עם ";
+                for (let indexfriend = 0; indexfriend < hiker.myfriends.length; indexfriend++) {
+                    const friend = hiker.myfriends[indexfriend];
+                    message += friend + ", ";
+                }
+                message = message.substr(0, message.length - 2) + "?";
+            }
+            else {
+                message += "תבוא בע\"ה?";
+            }
+            console.log(message);
+            if (false && conversationid != null) {
+                var hyphen = conversationid.senderId.indexOf("-");
+                if (hyphen == -1) {
+                    messageconnector.sendToTelegram(res, conversationid.senderId, message);
+                }
+                else {
+                    var facebookId = conversationid.senderId.substr(0, hyphen);
+                    messageconnector.sendToFacebookMessenger(res, conversationid.senderId, message);
+                }
+            }
+        }
+    }
 }

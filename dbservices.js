@@ -164,17 +164,23 @@ function updatehikerchoosedrivers(res, direction, chosendrivers) {
 function replaceallhikers(res, hikers) {
     return new Promise((resolve, reject) => {
         db.collection(HIKERS_COLLECTION).deleteMany({}, function(err, result) {
+            console.log("PUT HIKERS B " + err);
             if (err) {
                 logservices.handleError(res, err.message, "Failed to delete all hikers");
             }
             else if (hikers && hikers.length > 0) {
                 db.collection(HIKERS_COLLECTION).insertMany(hikers, function(err, docs) {
+                    console.log("PUT HIKERS C " + err);
                     if (err) {
                         logservices.handleError(res, err.message, "Failed to insert all hikers.");
                     } else {
+                        console.log("PUT HIKERS C " + docs);
                         return resolve(docs);
                     }
                 });
+            }
+            else {
+                return resolve(null);
             }
         });
     });
@@ -429,17 +435,19 @@ function getconversationid(res, phonenumber, conversationid) {
                 conversationid: conversationid,
             });
         }
-        else {
-            filter.push({phonenumber: false});
-        }
 
-        db.collection(CONVERSATIONID_COLLECTION).findOne({ $or: filter }, function(err, doc) {
-            if (err) {
-                logservices.handleError(res, err.message, "Failed to get conversationid.");
-            } else {
-                return resolve(doc);
-            }
-        });
+        if (filter.length == 0) {
+            return resolve(null);
+        }
+        else {
+            db.collection(CONVERSATIONID_COLLECTION).findOne({ $or: filter }, function(err, doc) {
+                if (err) {
+                    logservices.handleError(res, err.message, "Failed to get conversationid.");
+                } else {
+                    return resolve(doc);
+                }
+            });
+        }
     });
 }
 
