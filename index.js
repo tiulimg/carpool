@@ -466,6 +466,8 @@ app.put("/api/wanttomodify", function(req, res) {
                     }
                     break;
             }
+            console.log("A " + fix_field + " " + paramstodelete[fix_field] + " " + memory[paramstodelete[fix_field]] + " " + 
+                memory[paramstodelete2[fix_field]] + " " + memory[paramstodelete3[fix_field]]);
             if (memory[paramstodelete[fix_field]]) {
                 delete memory[paramstodelete[fix_field]];
                 if (memory[paramstodelete2[fix_field]]) {
