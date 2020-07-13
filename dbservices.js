@@ -521,26 +521,16 @@ function deleteoneconversationid(res, phonenumber, conversationid) {
 
 function migratedb(res) {
     return new Promise((resolve, reject) => {
-        getlastregisters(res)
-        .then(lastregisters => {
-            newdb.collection(LAST_REGISTER_COLLECTION).insertMany(lastregisters, function(err, doc) {
+        getallconversationids(res)
+        .then(conversationids => {
+            newdb.collection(CONVERSATIONID_COLLECTION).insertMany(conversationids, function(err, doc) {
                 if (err) {
-                    logservices.handleError(res, err.message, "Failed to insert all last registers.");
+                    logservices.handleError(res, err.message, "Failed to insert all conversation ids.");
                 }
                 else {
-                    getallconversationids(res)
-                    .then(conversationids => {
-                        newdb.collection(CONVERSATIONID_COLLECTION).insertMany(conversationids, function(err, doc) {
-                            if (err) {
-                                logservices.handleError(res, err.message, "Failed to insert all conversation ids.");
-                            }
-                            else {
-                                return resolve();
-                            }
-                        });
-                    });
+                    return resolve();
                 }
             });
-        })
+        });
     });
 }
