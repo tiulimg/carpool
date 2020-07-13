@@ -260,7 +260,7 @@ function chattoenglish(res, conversationid) {
     });
 }
 
-function verifyplanstocome(res, hikes) {
+async function verifyplanstocome(res, hikes) {
     for (let index = 0; index < nearhikes.length; index++) {
         var hike = nearhikes[index];
         var hikers = await dbservices.gethikersbyhikedate(res, hike.hikedate);
