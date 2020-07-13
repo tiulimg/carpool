@@ -437,7 +437,7 @@ function deleteallroutes(res) {
 
 function getallconversationids(res) {
     return new Promise((resolve, reject) => {
-        db.collection(CONVERSATIONID_COLLECTION).find({}, function(err, docs) {
+        db.collection(CONVERSATIONID_COLLECTION).find({}).toArray(function(err, docs) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to get conversationids.");
             } else {
