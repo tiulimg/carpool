@@ -32,14 +32,12 @@ module.exports = {
     getconversationid: getconversationid,
     replaceconversationid: replaceconversationid,
     deleteoneconversationid: deleteoneconversationid,
-    migratedb: migratedb,
 }
 
 var ObjectID = mongodb.ObjectID;
 
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 var db;
-var newdb;
 
 var HIKERS_COLLECTION = "hikers";
 var HIKE_COLLECTION = "hike";
@@ -62,24 +60,11 @@ function initialize(app) {
             db = client.db();
             console.log("Database connection ready");
 
-            mongoClient = new mongodb.MongoClient(process.env.NEW_MONGODB_URI || "mongodb://localhost:27017/test",{ useUnifiedTopology: true });
-
-            mongoClient.connect(function (err, newclient) {
-                if (err) {
-                    console.log(err);
-                    process.exit(1);
-                }
-
-                // Save database object from the callback for reuse.
-                newdb = newclient.db();
-                console.log("New database connection ready");
-                
-                // Initialize the app.
-                var server = app.listen(process.env.PORT || 8080, function () {
-                    var port = server.address().port;
-                    console.log("App now running on port", port);
-                    return resolve();
-                });
+            // Initialize the app.
+            var server = app.listen(process.env.PORT || 8080, function () {
+                var port = server.address().port;
+                console.log("App now running on port", port);
+                return resolve();
             });
         });
     });
@@ -516,21 +501,5 @@ function deleteoneconversationid(res, phonenumber, conversationid) {
         else {
             return resolve();
         }
-    });
-}
-
-function migratedb(res) {
-    return new Promise((resolve, reject) => {
-        getallconversationids(res)
-        .then(conversationids => {
-            newdb.collection(CONVERSATIONID_COLLECTION).insertMany(conversationids, function(err, doc) {
-                if (err) {
-                    logservices.handleError(res, err.message, "Failed to insert all conversation ids.");
-                }
-                else {
-                    return resolve();
-                }
-            });
-        });
     });
 }
