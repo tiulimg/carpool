@@ -2639,13 +2639,13 @@ app.delete("/api/routes", function(req, res) {
     }
 });
 
-/*  "/api/migratedb"
-*    PATCH: copy all data from old db to new db
+/*  "/api/testsendmessage"
+*    PATCH: test a whatsapp message
 */
 
-app.patch("/api/migratedb", function(req, res) {
+app.patch("/api/testsendmessage", function(req, res) {
     if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
-        dbservices.migratedb(res)
+        messageconnector.sendToCallmebotWhatsapp(res, process.env.TAL_PHONE,"מה קורה? נרשמת לסדנת הומור היום, אתה בא?")
         .catch(rejection => {
             logservices.logRejection(rejection);
         });

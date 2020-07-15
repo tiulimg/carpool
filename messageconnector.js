@@ -6,6 +6,7 @@ var logservices = require("./logservices");
 module.exports = {
     sendToFacebookMessenger: sendToFacebookMessenger,
     sendToTelegram: sendToTelegram,
+    sendToCallmebotWhatsapp: sendToCallmebotWhatsapp,
 }
 
 function sendToFacebookMessenger(res, senderId, message) {
@@ -61,6 +62,30 @@ function sendToTelegram(res, senderId, message) {
                 return reject(error);
             }
             console.log("sendToTelegram response.body " + JSON.stringify(response.body));
+            return resolve();
+        });
+    });
+}
+
+function sendToCallmebotWhatsapp(res, phonenumber, message) {
+    return new Promise((resolve, reject) => {
+        var messageurlencoded = encodeURIComponent(message);
+        var phonenumberwithoutzero = phonenumber;
+        if (phonenumber[0] == '0') {
+            phonenumberwithoutzero = phonenumberwithoutzero.substr(1);
+        }
+        var url = "https://api.callmebot.com/whatsapp.php?phone=+972"+phonenumberwithoutzero+"&text="+messageurlencoded+"&apikey="+
+            process.env.CALLMEBOT_APIKEY;
+        
+        request({
+            url: url,
+            method: "GET",
+        }, function (error, response, body){
+            if (error) {
+                console.log(error);
+                return reject(error);
+            }
+            console.log("sendToCallmebotWhatsapp response.body " + JSON.stringify(response.body));
             return resolve();
         });
     });
