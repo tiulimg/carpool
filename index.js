@@ -14,7 +14,7 @@ var sapchatbot = require("./sapchatbot");
 var messageconnector = require("./messageconnector");
 const { start } = require("repl");
 const { env } = require("process");
-var wanttomodify_obj = JSON.parse(fs.readFileSync('./wanttomodifytexts.json', 'utf8'));
+var wanttomodify_obj = JSON.parse(fs.readFileSync('./resources/wanttomodifytexts.json', 'utf8'));
 
 var app = express();
 // Serve static files from the React app

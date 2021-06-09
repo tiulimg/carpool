@@ -133,12 +133,24 @@
     {
         "key": "password",
         "he": "בחר סיסמא להזדהות עם רובוט הטרמפים. \nלמשל: סיסמא Aa123456",
-        "en": "Choose a password to authenticate with the chatbot. \nFor example: Password Aa123456"
+        "en": "Choose a password to authenticate with the chatbot. \nFor example: Password Aa123456",
+        "buttons_he": [ 
+            {"text":"דלג", "val": "דלג"} 
+        ],
+        "buttons_en": [ 
+            {"text":"Skip", "val": "Skip"}
+        ]
     },
     {
         "key": "heard of the group",
         "he": "אם עוד לא היית בטיולים, איך שמעת על הקבוצה?",
-        "en": "If you didn't join us yet, how did you hear about the hiking group? "
+        "en": "If you didn't join us yet, how did you hear about the hiking group?",
+        "buttons_he": [ 
+            {"text":"דלג", "val": "דלג"} 
+        ],
+        "buttons_en": [ 
+            {"text":"Skip", "val": "Skip"}
+        ]
     },
     {
         "key": "i'm gay",
@@ -148,7 +160,13 @@
     {
         "key": "plays on",
         "he": "תתנדב להביא כלי נגינה כלשהו או תנגן אם נביא? על מה?",
-        "en": "Will you volunteer to bring a musical instrument or play at it if we would bring it? Which?"
+        "en": "Will you volunteer to bring a musical instrument or play at it if we would bring it? Which?",
+        "buttons_he": [ 
+            {"text":"דלג", "val": "דלג"} 
+        ],
+        "buttons_en": [ 
+            {"text":"Skip", "val": "Skip"}
+        ]
     },
     {
         "key": "can organize",
@@ -161,6 +179,12 @@
             "Any activity you would like to transfer or organize for the group?",
             "It should match the style of the group (for gay only, not on Shabbat, suitable for those in the closet, suitable for many people). We will be happy to help organize!",
             "For instance: I can organize a board games meeting"
+        ],
+        "buttons_he": [ 
+            {"text":"דלג", "val": "דלג"} 
+        ],
+        "buttons_en": [ 
+            {"text":"Skip", "val": "Skip"}
         ]
     }
 ]
