@@ -376,13 +376,16 @@ app.put("/api/wanttomodify", function(req, res) {
             delete stages[paramNotRelevant];
         }
 
-        if (memory.registertohikes["share my age"] == "לא" || 
-            memory.registertohikes["share my age"] == "No") {
+        if (["לא", "No", "דלג", "Skip"].includes(memory.registertohikes["share my age"])) {
             var paramNotRelevant = "age";
             var spliceindex = params.indexOf(paramNotRelevant);
             params.splice(spliceindex,1);
             delete paramstodelete[paramNotRelevant];
             delete stages[paramNotRelevant];
+        }
+        
+        if (!memory.password) {
+            memory.password = process.env.DEFAULT_PASSWORD;
         }
 
         var needtosubmit = true;
