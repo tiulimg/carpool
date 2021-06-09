@@ -1,0 +1,36 @@
+{
+  "name": "carpool",
+  "version": "1.0.0",
+  "description": "REST API Server for hikes carpool management",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "heroku-postbuild": "cd app && npm install && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tiulimg/carpool.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tiulimg/carpool/issues"
+  },
+  "homepage": "https://github.com/tiulimg/carpool#readme",
+  "dependencies": {
+    "bl": "^4.1.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "https-proxy-agent": "^2.2.4",
+    "lodash": "^4.17.21",
+    "mailgun-js": "^0.22.0",
+    "moment": "^2.29.1",
+    "mongodb": "^3.6.6",
+    "netmask": "^2.0.2",
+    "path": "^0.12.7",
+    "promise": "^8.1.0",
+    "react-helmet": "^5.2.1",
+    "request": "^2.88.2"
+  }
+}

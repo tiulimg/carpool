@@ -1,0 +1,166 @@
+[
+    {
+        "key": "email",
+        "he": "מה המייל שלך?",
+        "en": "What is your email?"
+    },
+    {
+        "key": "name",
+        "he": "מה שמך? אפשר גם שם בדוי\nלמשל: אני שגיא",
+        "en": "What is your name? Could be a fictive name also\nE.g. I'm Sagi"
+    },
+    {
+        "key": "hikes",
+        "he": "",
+        "en": ""
+    },
+    {
+        "key": "comes from",
+        "he": [
+            "מהיכן אתה מגיע לטיול?",
+            "מקום בעדיפות ראשונה ניתן לציין עם קו נטוי למשל \"רמת גן/חיפה\", איזור בתוך העיר ניתן לציין בסוגרים למשל \"חיפה (עיר תחתית)\"",
+            "אין לציין מהיכן אתה מעוניין לקבל טרמפ אלא מהיכן אתה יוצא בבוקר הטיול וצריך טרמפ.\n\nלמשל, אם אתה מבת ים ותכתוב לי שאתה צריך טרמפ מתל אביב, יש סיכוי שאסדר לך טרמפ מפתח תקווה אם לא יהיה מקום פנוי מתל אביב (אבל כן יהיה מראשלצ)."
+        ],
+        "en": [
+            "Where from are you coming to the hike?",
+            "A place in the first priority can be noted with a slash such as \"Ramat Gan / Haifa\", an area within the city can be noted in brackets such as \"Haifa (Lower City)\"",
+            "Don't write where you want to get a ride from but where do you come from on the morning of the hike and need a ride.\n\nFor example, if you are from Bat Yam and write to me that you need a ride from Tel Aviv, there is a chance that I will give you a ride of Petach Tikva, if there is no free space from Tel Aviv (but so will from Rishon Letzion)."
+        ]
+    },
+    {
+        "key": "returns to",
+        "he": "להיכן אתה חוזר אחרי הטיול?\nלמשל, אני חוזר לנתניה",
+        "en": "Where do you return to after the hike?\nFor instance: I return to Netanya"
+    },
+    {
+        "key": "car/ride",
+        "he": [
+            "האם אתה צריך טרמפ או מגיע ברכב?",
+            "אם לאחד החברים שמצטרף אליך יש רכב, אנא סמן שיש לך רכב. אפשרות נוספת - להרשם בנפרד."
+        ],
+        "en": [
+            "Do you need a ride or come with a car?",
+            "If one of your friends coming with you has a car, please indicate that you have a car. Another option - registering separately."
+        ],
+        "buttons_he":[
+            {"text":"אני מגיע ברכב", "val": "אני מגיע ברכב"}, 
+            {"text":"אני צריך טרמפ", "val": "אני צריך טרמפ"}, 
+            {"text":"צריך טרמפ אבל יש רכב", "val": "אני צריך טרמפ (אבל יש לי רכב)"}, 
+            {"text":"חבר יאסוף אותי", "val": "קבעתי כבר עם חבר אחר שאני מצטרף אליו (אפרט בהמשך הטופס מי זה)"}, 
+            {"text":"אוטובוס/אופנוע/אחר", "val": "אני מגיע באוטובוס או אופנוע, אחר"}, 
+            {"text":"אני יכול לשכור רכב", "val": "אשכור רכב אם יהיו טרמפיסטים"} 
+        ],
+        "buttons_en":[
+            {"text":"I come in my car", "val": "I come in my car"}, 
+            {"text":"I need a ride", "val": "I need a ride"}, 
+            {"text":"need a ride&have car", "val": "I need a ride but I do have a car"}, 
+            {"text":"Friend will pick me", "val": "I already setuped with a friend I'm joining (I will write who it is in the form)"}, 
+            {"text":"bus/motorcycle/other", "val": "I come in bus, a motorcycle or other"}, 
+            {"text":"I can rent a car", "val": "I will rent a car if there will be hitchhikers"}
+        ]
+    },
+    {
+        "key": "available places",
+        "he": [
+            "כמה מקומות פנויים יש לך?",
+            "נא השב גם אם אתה מעדיף להגיע בטרמפ עם חבר אחר"
+        ],
+        "en": [
+            "How many available places do you have?",
+            "Please fill even if you prefer to get a ride with another friend"
+        ]
+    },
+    {
+        "key": "phone number",
+        "he": "מה מספר הטלפון שלך?",
+        "en": "What is your phone number?"
+    },
+    {
+        "key": "saved the date",
+        "he": [
+            "האם שריינת את התאריך לטיול?",
+            "מי שלא בטוח שיוכל לבוא לטיול - לא שומר מקום בטרמפ"
+        ],
+        "en": [
+            "Have you saved the date of the hike?",
+            "Anyone who is not sure that he can come on a hike - does not save a place in the carpool"
+        ],
+        "buttons_he":[
+            {"text":"כן", "val": "כן"}, 
+            {"text":"אולי אהיה פנוי", "val": "אולי אוכל לבוא לטיול, לא בטוח שאני פנוי"}, 
+            {"text":"פנוי ויש לי חששות", "val": "אני שומר את התאריך הזה פנוי, אבל יש לי חששות לבוא לטיול"} 
+        ],
+        "buttons_en":[
+            {"text":"Yes", "val": "Yes"}, 
+            {"text":"I may be available", "val": "I could maybe join the hike"}, 
+            {"text":"available w concerns", "val": "I save the date but I do have concerns"}
+        ]
+    },
+    {
+        "key": "i fear of",
+        "he": [
+            "ממה אתה חושש?",
+            "ייתכן שיש מה לעשות ולהקל על חלק מהחששות. אשמח לעזור :)"
+        ],
+        "en": [
+            "What do you fear of?",
+            "We may have something to do and alleviate some of the concerns. I will be happy to help :)"
+        ]
+    },
+    {
+        "key": "share my age",
+        "he": "האם אתה רוצה לשתף בן כמה אתה (באופן אנונימי)?",
+        "en": "Would you like to share your age (anonymously)?",
+        "buttons_he": [ 
+            {"text":"כן", "val": "כן"}, 
+            {"text":"לא", "val": "לא"} 
+        ],
+        "buttons_en": [ 
+            {"text":"Yes", "val": "Yes"}, 
+            {"text":"No", "val": "No"}
+        ]
+    },
+    {
+        "key": "age",
+        "he": "בן כמה אתה?",
+        "en": "How old are you?"
+    },
+    {
+        "key": "friends joining",
+        "he": "",
+        "en": ""
+    },
+    {
+        "key": "password",
+        "he": "בחר סיסמא להזדהות עם רובוט הטרמפים. \nלמשל: סיסמא Aa123456",
+        "en": "Choose a password to authenticate with the chatbot. \nFor example: Password Aa123456"
+    },
+    {
+        "key": "heard of the group",
+        "he": "אם עוד לא היית בטיולים, איך שמעת על הקבוצה?",
+        "en": "If you didn't join us yet, how did you hear about the hiking group? "
+    },
+    {
+        "key": "i'm gay",
+        "he": "אתה גיי נכון? (ולא נשוי לאישה)",
+        "en": "Your'e gay, right? (and not married to a women)"
+    },
+    {
+        "key": "plays on",
+        "he": "תתנדב להביא כלי נגינה כלשהו או תנגן אם נביא? על מה?",
+        "en": "Will you volunteer to bring a musical instrument or play at it if we would bring it? Which?"
+    },
+    {
+        "key": "can organize",
+        "he": [
+            "יש פעילות כלשהי שהיית רוצה להעביר או לארגן בשביל הקבוצה?",
+            "היא צריכה להתאים לסגנון הקבוצה (עבור גייז בלבד, לא בשבת, מתאים גם למי שבארון, מתאים להרבה אנשים). נשמח לעזור לארגן!",
+            "למשל: אני יכול לארגן מפגש משחקי קופסא"
+        ],
+        "en": [
+            "Any activity you would like to transfer or organize for the group?",
+            "It should match the style of the group (for gay only, not on Shabbat, suitable for those in the closet, suitable for many people). We will be happy to help organize!",
+            "For instance: I can organize a board games meeting"
+        ]
+    }
+]
