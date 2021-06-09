@@ -469,13 +469,34 @@ app.put("/api/wanttomodify", function(req, res) {
                     }
                     break;
                 default:
-                    if (typeof reply_obj === 'string') {
-                        recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, reply_obj);
+                    var buttons = reply_wanttomodify_obj["buttons_" + language];
+                    if (buttons) {
+                        if (typeof reply_obj === 'string') {
+                            recast_conversation_reply = replies.push_quick_reply_to_recast(recast_conversation_reply, reply_obj);
+                        }
+                        else {
+                            for (let index = 0; index < reply_obj.length - 1; index++) {
+                                const element = reply_obj[index];
+                                recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, element);
+                            }
+                            recast_conversation_reply = 
+                                replies.push_quick_reply_to_recast(recast_conversation_reply, reply_obj[reply_obj.length - 1]);
+                        }
+                        for (let index = 0; index < buttons.length; index++) {
+                            const button = buttons[index];
+                            recast_conversation_reply = 
+                                replies.push_quick_reply_option_to_recast(recast_conversation_reply, button.text, button.val);
+                        }
                     }
                     else {
-                        for (let index = 0; index < reply_obj.length; index++) {
-                            const element = reply_obj[index];
-                            recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, element);
+                        if (typeof reply_obj === 'string') {
+                            recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, reply_obj);
+                        }
+                        else {
+                            for (let index = 0; index < reply_obj.length; index++) {
+                                const element = reply_obj[index];
+                                recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, element);
+                            }
                         }
                     }
                     break;
