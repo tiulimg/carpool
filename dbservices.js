@@ -36,6 +36,10 @@ module.exports = {
     savehistorylength: savehistorylength,
     deletehistorylength: deletehistorylength,
     gethistorylength: gethistorylength,
+    insertafterhikematch: insertafterhikematch,
+    deleteoneafterhikematch: deleteoneafterhikematch,
+    deleteallafterhikematch: deleteallafterhikematch,
+    findafterhikematch: findafterhikematch,
 }
 
 var ObjectID = mongodb.ObjectID;
@@ -50,6 +54,7 @@ var IRONNUMBERS_COLLECTION = "ironnumbers";
 var ROUTES_COLLECTION = "routes";
 var CONVERSATIONID_COLLECTION = "conversationid";
 var HISTORY_COLLECTION = "history";
+var AFTERHIKEMATCH_COLLECTION = "afterhikematch";
 
 function initialize(app) {
     return new Promise((resolve, reject) => {
@@ -558,6 +563,54 @@ function gethistorylength(res) {
             } else {
                 return resolve(docs);
             }
+        });
+    });
+}
+
+function insertafterhikematch(res, afterhikeform) {
+    return new Promise((resolve, reject) => {
+        db.collection(AFTERHIKEMATCH_COLLECTION).insertOne(afterhikeform, function(err, doc) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to create or update after hike form.");
+            }
+            else {
+                return resolve();
+            }
+        });
+    });
+}
+
+function deleteoneafterhikematch(res, whoami) {
+    return new Promise((resolve, reject) => {
+        db.collection(AFTERHIKEMATCH_COLLECTION).deleteOne(
+            { 'whoami': whoami }, function(err, doc) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to delete after hike match");
+            }
+            return resolve();
+        });
+    });
+}
+
+function deleteallafterhikematch(res) {
+    return new Promise((resolve, reject) => {
+        db.collection(AFTERHIKEMATCH_COLLECTION).deleteMany({}, function(err, doc) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to delete all after hike forms");
+            }
+            return resolve();
+        });
+    });
+}
+
+function findafterhikematch(res, whoami) {
+    return new Promise((resolve, reject) => {
+        db.collection(AFTERHIKEMATCH_COLLECTION).find(
+            { 'mymatches': { "$in": [ whoami ] } }).toArray(function(err, docs) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to find after hike match");
+            }
+            return resolve(docs);
         });
     });
 }

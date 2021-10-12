@@ -7,6 +7,7 @@ var fs = require('fs');
 var dbservices = require("./dbservices");
 var tools = require("./tools");
 var logservices = require("./logservices");
+var mail = require("./mail");
 var replies = require("./replies");
 var register = require("./register_to_hikes");
 var ridesmodules = require("./rides");
@@ -2824,6 +2825,73 @@ app.patch("/api/allhistory", function(req, res) {
                 res.status(200).json("deleted history length");
             })
         }
+    }
+});
+
+app.post("/api/afterhikematch", function(req, res) {
+    if (tools.checkpwd(res, req.query.pwd)) {
+        console.log(JSON.stringify(req.body));
+        afterhikerform = req.body;
+        afterhikerform = {
+            "whoami": afterhikerform["מי אני?"],
+            "mymatches": afterhikerform["מי מצא חן בעיניי?"],
+        };
+        dbservices.insertafterhikematch(res, afterhikerform)
+        .then(() => {
+            dbservices.findafterhikematch(res, afterhikerform["whoami"])
+            .then(matches => {
+                dbservices.gethikers(res, false)
+                .then(hikers => {
+                    mehiker = null;
+                    hiker_matches = [];
+                    for (let index = 0; index < hikers.length; index++) {
+                        const hiker = hikers[index];
+                        hiker_name = `${hiker["name"]}, הגעתי מ${hiker["comesfrom"]} `;
+                        if (hiker["mydriverfrom"]) {
+                            hiker_name += `עם ${hiker["mydriverfrom"]["name"]}`;
+                        }
+                        else {
+                            hiker_name += "לבד";
+                        }
+                        if (matches.includes(hiker_name)) {
+                            hiker_matches.push(hiker);
+                        }
+                        if (hiker_name == afterhikerform["whoami"]) {
+                            mehiker = hiker;
+                        }
+                    }
+
+                    if (mehiker) {
+                        for (let index = 0; index < hiker_matches.length; index++) {
+                            const hiker_match = hiker_matches[index];
+                            mail.emailAfterHikeMatch(
+                                mehiker["email"], hiker_match["email"], mehiker["name"], hiker_match["email"], 
+                                mehiker["phone"], hiker_match["phone"]);
+                        }                            
+                    }
+                    res.status(200).json("end matches");
+                })
+                .catch(rejection => {
+                    logservices.logRejection(rejection);
+                }); 
+            })
+            .catch(rejection => {
+                logservices.logRejection(rejection);
+            }); 
+        })
+        .catch(rejection => {
+            logservices.logRejection(rejection);
+        }); 
+    }
+});
+
+app.delete("/api/afterhikematch", function(req, res) {
+    if (tools.checkpwd(res, req.query.pwd)) {
+        console.log(JSON.stringify(req.body));
+        dbservices.deleteallafterhikematch(res)
+        .then(() => {
+            res.status(200).json("deleted after hike forms");
+        })
     }
 });
 
