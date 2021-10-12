@@ -2,6 +2,7 @@ var mongodb = require("mongodb");
 var Promise = require('promise');
 
 var tools = require("./tools");
+var logservices = require("./logservices");
 
 module.exports = {
     initialize: initialize,

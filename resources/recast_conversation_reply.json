@@ -231,8 +231,8 @@
         },
         {
             "key": "GETRIDEDETAILS_ENTERPASSWORD",
-            "he": "עם איזו סיסמא נרשמת פעם אחרונה לטיול?\nלמשל: סיסמא Aa123456",
-            "en": "With which password did you register for the last hike?\nE.g. Password Aa123456"
+            "he": "עם איזו סיסמא נרשמת פעם אחרונה לטיול? ציין את המילה סיסמא. \nלמשל: סיסמא Aa123456",
+            "en": "Using which password did you register for the last hike? Use the word Password\nE.g. Password Aa123456"
         },
         {
             "key": "RIDES_ARENT_SETUPED",

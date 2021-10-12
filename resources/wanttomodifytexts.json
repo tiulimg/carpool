@@ -132,8 +132,8 @@
     },
     {
         "key": "password",
-        "he": "בחר סיסמא להזדהות עם רובוט הטרמפים. \nלמשל: סיסמא Aa123456",
-        "en": "Choose a password to authenticate with the chatbot. \nFor example: Password Aa123456",
+        "he": "בחר סיסמא להזדהות עם רובוט הטרמפים. ציין את המילה סיסמא לפני כן. \nלמשל: סיסמא Aa123456",
+        "en": "Choose a password to authenticate with the chatbot. Metion the word Password before it.\nFor example: Password Aa123456",
         "buttons_he": [ 
             {"text":"דלג", "val": "דלג"} 
         ],
