@@ -606,10 +606,11 @@ function deleteallafterhikematch(res) {
     });
 }
 
-function findafterhikematch(res, whoami) {
+function findafterhikematch(res, afterhikerform) {
     return new Promise((resolve, reject) => {
         db.collection(AFTERHIKEMATCH_COLLECTION).find(
-            { 'mymatches': whoami }).toArray(function(err, docs) {
+            { $and: [ { 'mymatches': afterhikerform["whoami"] }, 
+                      { 'whoami': { $in: afterhikerform["mymatches"] } } ] }).toArray(function(err, docs) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to find after hike match");
             }
