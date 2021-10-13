@@ -1,19 +1,11 @@
-var nodemailer = require('nodemailer');
-
 module.exports = {
     emailAfterHikeMatch: emailAfterHikeMatch,
 };
     
 function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2name, hiker1phone, hiker2phone) {
     // create reusable transporter object using the default SMTP transport
-    var transport = nodemailer.createTransport({
-        host: "smtp.mailtrap.io",
-        port: 2525,
-        auth: {
-          user: "62607fb3fb9470",
-          pass: "643db5ef8a66fa"
-        }
-      });
+    const sgMail = require('@sendgrid/mail')
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
     // setup e-mail data with unicode symbols
     var mailOptions = {
@@ -31,12 +23,11 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
     };
 
     // send mail with defined transport object
-    transport.sendMail(mailOptions, function(error, info){
-        if(error){
-            return console.log(error);
-        }
-        console.log('Message sent: ' + info.response);
-    });
+    sgMail
+    .send(mailOptions)
+    .catch((error) => {
+        console.error(error)
+    })
 
     // setup e-mail data with unicode symbols
     var mailOptions = {
@@ -54,10 +45,9 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
     };
 
     // send mail with defined transport object
-    transport.sendMail(mailOptions, function(error, info){
-        if(error){
-            return console.log(error);
-        }
-        console.log('Message sent: ' + info.response);
-    });
+    sgMail
+    .send(mailOptions)
+    .catch((error) => {
+        console.error(error)
+    })
 }
