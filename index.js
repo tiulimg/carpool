@@ -2834,7 +2834,7 @@ app.post("/api/afterhikematch", function(req, res) {
         afterhikerform = req.body;
         afterhikerform = {
             "whoami": afterhikerform["מי אני?"],
-            "mymatches": afterhikerform["מי מצא חן בעיניי?"],
+            "mymatches": JSON.parse(afterhikerform["מי מצא חן בעיניי?"]),
         };
         dbservices.insertafterhikematch(res, afterhikerform)
         .then(() => {
