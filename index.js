@@ -2836,7 +2836,7 @@ app.post("/api/afterhikematch", function(req, res) {
             "whoami": afterhikerform["מי אני?"],
             "mymatches": JSON.parse(afterhikerform["מי מצא חן בעיניי?"]),
         };
-        dbservices.insertafterhikematch(res, afterhikerform)
+        dbservices.replaceafterhikematch(res, afterhikerform)
         .then(() => {
             dbservices.findafterhikematch(res, afterhikerform["whoami"])
             .then(matches => {
@@ -2870,9 +2870,9 @@ app.post("/api/afterhikematch", function(req, res) {
                     if (mehiker) {
                         for (let index = 0; index < hiker_matches.length; index++) {
                             const hiker_match = hiker_matches[index];
-                            mail.emailAfterHikeMatch(
-                                mehiker["email"], hiker_match["email"], mehiker["name"], hiker_match["name"], 
-                                mehiker["phone"], hiker_match["phone"]);
+                            // mail.emailAfterHikeMatch(
+                            //     mehiker["email"], hiker_match["email"], mehiker["name"], hiker_match["name"], 
+                            //     mehiker["phone"], hiker_match["phone"]);
                         }                            
                     }
                     res.status(200).json("end matches");

@@ -36,7 +36,7 @@ module.exports = {
     savehistorylength: savehistorylength,
     deletehistorylength: deletehistorylength,
     gethistorylength: gethistorylength,
-    insertafterhikematch: insertafterhikematch,
+    replaceafterhikematch: replaceafterhikematch,
     deleteoneafterhikematch: deleteoneafterhikematch,
     deleteallafterhikematch: deleteallafterhikematch,
     findafterhikematch: findafterhikematch,
@@ -567,16 +567,19 @@ function gethistorylength(res) {
     });
 }
 
-function insertafterhikematch(res, afterhikeform) {
+function replaceafterhikematch(res, afterhikeform) {
     return new Promise((resolve, reject) => {
-        db.collection(AFTERHIKEMATCH_COLLECTION).insertOne(afterhikeform, function(err, doc) {
-            if (err) {
-                logservices.handleError(res, err.message, "Failed to create or update after hike form.");
-            }
-            else {
-                return resolve();
-            }
-        });
+        deleteoneafterhikematch(res, afterhikeform["whoami"])
+        .then(() => {
+            db.collection(AFTERHIKEMATCH_COLLECTION).insertOne(afterhikeform, function(err, doc) {
+                if (err) {
+                    logservices.handleError(res, err.message, "Failed to create or update after hike form.");
+                }
+                else {
+                    return resolve();
+                }
+            });
+        })
     });
 }
 
