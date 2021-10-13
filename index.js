@@ -2838,7 +2838,7 @@ app.post("/api/afterhikematch", function(req, res) {
         };
         dbservices.replaceafterhikematch(res, afterhikerform)
         .then(() => {
-            dbservices.findafterhikematch(res, afterhikerform["whoami"])
+            dbservices.findafterhikematch(res, afterhikerform)
             .then(matches => {
                 console.log(`matches: ${JSON.stringify(matches)}`)
                 dbservices.gethikers(res, false)
