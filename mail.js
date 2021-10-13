@@ -31,7 +31,7 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
     };
 
     // send mail with defined transport object
-    transporter.sendMail(mailOptions, function(error, info){
+    transport.sendMail(mailOptions, function(error, info){
         if(error){
             return console.log(error);
         }
@@ -54,7 +54,7 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
     };
 
     // send mail with defined transport object
-    transporter.sendMail(mailOptions, function(error, info){
+    transport.sendMail(mailOptions, function(error, info){
         if(error){
             return console.log(error);
         }
