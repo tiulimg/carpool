@@ -6,7 +6,14 @@ module.exports = {
     
 function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2name, hiker1phone, hiker2phone) {
     // create reusable transporter object using the default SMTP transport
-    var transporter = nodemailer.createTransport(`smtps://tiulimg%40gmail.com:${process.env.MATCH_PASSWORD}@smtp.gmail.com`);
+    var transport = nodemailer.createTransport({
+        host: "smtp.mailtrap.io",
+        port: 2525,
+        auth: {
+          user: "62607fb3fb9470",
+          pass: "643db5ef8a66fa"
+        }
+      });
 
     // setup e-mail data with unicode symbols
     var mailOptions = {
