@@ -9,7 +9,7 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
 
     // setup e-mail data with unicode symbols
     var mailOptions = {
-        from: '"קבוצת טיולים" <zanzamer@gmail.com>', // sender address
+        from: '"קבוצת טיולים" <tiulimg@gmail.com>', // sender address
         //to: hiker1address, // list of receivers
         to: "tiulimg@gmail.com", // list of receivers
         subject: 'יש התאמה אחרי טיול ❤️', // Subject line
