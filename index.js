@@ -2840,6 +2840,7 @@ app.post("/api/afterhikematch", function(req, res) {
         .then(() => {
             dbservices.findafterhikematch(res, afterhikerform["whoami"])
             .then(matches => {
+                console.log(`matches: ${JSON.stringify(matches)}`)
                 dbservices.gethikers(res, false)
                 .then(hikers => {
                     mehiker = null;
@@ -2860,6 +2861,8 @@ app.post("/api/afterhikematch", function(req, res) {
                             mehiker = hiker;
                         }
                     }
+
+                    console.log(`mehiker ${JSON.stringify(mehiker)} hiker_matches: ${JSON.stringify(hiker_matches)}`)
 
                     if (mehiker) {
                         for (let index = 0; index < hiker_matches.length; index++) {
