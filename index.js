@@ -2829,7 +2829,7 @@ app.patch("/api/allhistory", function(req, res) {
 });
 
 app.post("/api/afterhikematch", function(req, res) {
-    if (tools.checkpwd(res, req.query.pwd)) {
+    if (tools.checkpwd(res, req.body.pwd)) {
         console.log(JSON.stringify(req.body));
         afterhikerform = req.body;
         afterhikerform = {
@@ -2886,7 +2886,7 @@ app.post("/api/afterhikematch", function(req, res) {
 });
 
 app.delete("/api/afterhikematch", function(req, res) {
-    if (tools.checkpwd(res, req.query.pwd)) {
+    if (tools.checkpwd(res, req.body.pwd)) {
         console.log(JSON.stringify(req.body));
         dbservices.deleteallafterhikematch(res)
         .then(() => {
