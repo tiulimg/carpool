@@ -2855,8 +2855,10 @@ app.post("/api/afterhikematch", function(req, res) {
                             hiker_name += "לבד";
                         }
                         curr_match = matches.filter(match => {
+                            console.log(`match["whoami"] ${match["whoami"]} hiker_name ${hiker_name}`)
                             return match["whoami"] ==  hiker_name
                         })
+                        console.log(`curr_match: ${curr_match}`)
                         if (curr_match) {
                             hiker_matches.push(hiker);
                         }
