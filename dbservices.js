@@ -606,7 +606,7 @@ function deleteallafterhikematch(res) {
 function findafterhikematch(res, whoami) {
     return new Promise((resolve, reject) => {
         db.collection(AFTERHIKEMATCH_COLLECTION).find(
-            { 'mymatches': { "$in": [ whoami ] } }).toArray(function(err, docs) {
+            { 'mymatches': whoami }).toArray(function(err, docs) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to find after hike match");
             }
