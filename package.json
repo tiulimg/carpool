@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/tiulimg/carpool#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.4.7",
     "bl": "^4.1.0",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
