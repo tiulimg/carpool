@@ -2855,7 +2855,8 @@ app.post("/api/afterhikematch", function(req, res) {
                             hiker_name += "לבד";
                         }
                         curr_match = matches.filter(match => {
-                            return match["whoami"] ==  hiker_name
+                            return (match["whoami"] == hiker_name && 
+                            match["mymatches"].contains(afterhikerform["whoami"])) 
                         })
                         if (curr_match.length > 0) {
                             hiker_matches.push(hiker);
