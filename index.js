@@ -2858,8 +2858,8 @@ app.post("/api/afterhikematch", function(req, res) {
                             console.log(`match["whoami"] ${match["whoami"]} hiker_name ${hiker_name}`)
                             return match["whoami"] ==  hiker_name
                         })
-                        console.log(`curr_match: ${curr_match}`)
-                        if (curr_match) {
+                        console.log(`curr_match: ` + curr_match)
+                        if (curr_match != null) {
                             hiker_matches.push(hiker);
                         }
                         if (hiker_name == afterhikerform["whoami"]) {
