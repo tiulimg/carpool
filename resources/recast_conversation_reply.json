@@ -13,8 +13,8 @@
         },
         {
             "key": "HIKER_NOT_REGISTERED",
-            "he": "נכון ל-_VAR0_ אתה לא רשום לטיול הקרוב עם הטלפון הזה. אם חבר אחר רשם אותך אז נסה עם הטלפון והסיסמא שלו.",
-            "en": "As of _VAR0_ you aren't registered to the near hike with that phone number. If another friend had registered you, try to use his phone number and password.",
+            "he": "נכון ל-_VAR0_ אתה לא רשום לטיול הקרוב עם הטלפון הזה. אם חבר אחר רשם אותך אז נסה עם הטלפון שלו.",
+            "en": "As of _VAR0_ you aren't registered to the near hike with that phone number. If another friend had registered you, try to use his phone number.",
             "buttons_he": [ 
                 {"text":"להרשם לטיול נוסף", "val": "להרשם לטיול נוסף"}, 
                 {"text":"התחל מחדש", "val": "התחל מחדש"} 
@@ -23,11 +23,6 @@
                 {"text":"Join a new hike", "val": "Join a new hike"}, 
                 {"text":"Start over", "val": "Start over"}
             ]
-        },
-        {
-            "key": "PASSWORD_INCORRECT_TRYEDIT",
-            "he": "הסיסמא שהכנסת אינה נכונה. אם אינך בטוח מהי, שאל אותי בוואטסאפ או במייל tiulimg@gmail.com",
-            "en": "You've entered an incorrect password. If your'e unsure what your password is, ask me at WhatsApp or at tiulimg@gmail.com"
         },
         {
             "key": "NO_HITCHHIKERS",
@@ -230,11 +225,6 @@
             "en": "What is your phone number?"
         },
         {
-            "key": "GETRIDEDETAILS_ENTERPASSWORD",
-            "he": "עם איזו סיסמא נרשמת פעם אחרונה לטיול? ציין את המילה סיסמא. \nלמשל: סיסמא Aa123456",
-            "en": "Using which password did you register for the last hike? Use the word Password\nE.g. Password Aa123456"
-        },
-        {
             "key": "RIDES_ARENT_SETUPED",
             "he": [
                 "עוד לא סודרו טרמפים. נסה שני לילות לפני הטיול",
@@ -278,8 +268,8 @@
         },
         {
             "key": "HIKER_NOT_REGISTERED_SPECIFIC_HIKE",
-            "he": "נכון ל-_VAR0_ אתה לא רשום לטיול ב-_VAR1_ עם הטלפון הזה. אם חבר אחר רשם אותך אז נסה עם הטלפון והסיסמא שלו.",
-            "en": "As of _VAR0_ you aren't registered to the hike at _VAR1_ with that phone number. If another friend had registered you, try to use his phone number and password.",
+            "he": "נכון ל-_VAR0_ אתה לא רשום לטיול ב-_VAR1_ עם הטלפון הזה. אם חבר אחר רשם אותך אז נסה עם הטלפון שלו.",
+            "en": "As of _VAR0_ you aren't registered to the hike at _VAR1_ with that phone number. If another friend had registered you, try to use his phone number.",
             "buttons_he": [ 
                 {"text":"להרשם לטיול נוסף", "val": "להרשם לטיול נוסף"}, 
                 {"text":"התחל מחדש", "val": "התחל מחדש"} 
@@ -291,8 +281,8 @@
         },
         {
             "key": "RIDES_NOT_ARRANGED",
-            "he": "נכון ל-_VAR0_ לא סודר לך טרמפ לאף טיול שאתה רשום אליו. אם חבר אחר רשם אותך אז נסה עם הטלפון והסיסמא שלו, או נסה שני לילות לפני הטיול. אתה רשום לטיולים ב-\n_VAR1_",
-            "en": "As of _VAR0_ you aren't arranged with a ride for any hike you're registered for. If another friend had registered you, try to use his phone number and password. You can check 2 nights before of the hike. Your'e currently registered to:\n_VAR1_",
+            "he": "נכון ל-_VAR0_ לא סודר לך טרמפ לאף טיול שאתה רשום אליו. אם חבר אחר רשם אותך אז נסה עם הטלפון שלו, או נסה שני לילות לפני הטיול. אתה רשום לטיולים ב-\n_VAR1_",
+            "en": "As of _VAR0_ you aren't arranged with a ride for any hike you're registered for. If another friend had registered you, try to use his phone number. You can check 2 nights before of the hike. Your'e currently registered to:\n_VAR1_",
             "buttons_he": [ 
                 {"text":"להרשם לטיול נוסף", "val": "להרשם לטיול נוסף"}, 
                 {"text":"התחל מחדש", "val": "התחל מחדש"} 
@@ -599,17 +589,7 @@
                 {"text":"He may join", "val": "He may join"}
             ]
         },
-        {
-            "key": "REGISTERTOHIKES_PASSWORD",
-            "he": "בחר סיסמא (חדשה) להזדהות עם רובוט הטרמפים.\nלמשל: סיסמא Aa123456\n(כתוב את המילה סיסמא)",
-            "en": "Choose a (new) password to authenticate with the chatbot.\nFor example: Password Aa123456\n(Write the word Password)",
-            "buttons_he": [ 
-                {"text":"דלג", "val": "דלג"} 
-            ],
-            "buttons_en": [ 
-                {"text":"Skip", "val": "Skip"}
-            ]
-        },
+
         {
             "key": "REGISTERTOHIKES_HOWDIDIHEAR",
             "he": "אם עוד לא היית בטיולים, איך שמעת על הקבוצה?",

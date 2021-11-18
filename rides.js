@@ -60,208 +60,197 @@ function patchridedetails(req, res, replies)
                 {
                     dbservices.getlastregisterbyphonenumber(res, phonenumber)
                     .then(doclast => {
-                        if (typeof(doclast) !== 'undefined' && doc != doclast && 
-                            typeof(doclast.password) !== 'undefined') {
-                            console.log('doc.userpassword ' + doc.userpassword + ' memory.password ' + memory.password + 
-                                ' last.password ' + doclast.password);
-                            if (doc.userpassword != memory.password && doclast.password != memory.password) {
-                                delete memory.password;
-                                recast_conversation_reply = 
-                                    replies.get_recast_reply("PASSWORD_INCORRECT_TRYEDIT",language,null,memory);   
-                            }
-                            else    
+                        if (typeof(doclast) !== 'undefined' && doc != doclast) {
+                            if (doc.amidriver)
                             {
-                                if (doc.amidriver)
-                                {
-                                    var hitchersto = gethitcherstext(language, doc.myhitchersto);
-                                    var hitchersfrom = gethitcherstext(language, doc.myhitchersfrom);
+                                var hitchersto = gethitcherstext(language, doc.myhitchersto);
+                                var hitchersfrom = gethitcherstext(language, doc.myhitchersfrom);
 
-                                    var reply_key = "NO_HITCHHIKERS";
-                                    var reply_vars = [];
-                                    if ((doc.myhitchersto == null || doc.myhitchersto.length == 0) &&
-                                        (doc.myhitchersfrom == null || doc.myhitchersfrom.length == 0))
-                                    {
-                                        reply_vars.push(nowstring);
-                                    }
-                                    else if (JSON.stringify(doc.myhitchersto) == JSON.stringify(doc.myhitchersfrom))
-                                    {
-                                        reply_key = "HITCHHIKERS_BACK_FORTH";
-                                        reply_vars.push(hitchersto);
-                                    }
-                                    else if (doc.myhitchersto != null && doc.myhitchersfrom != null)
-                                    {
-                                        reply_key = "HITCHHIKERS_DIFFERENT_BACK_FORTH";
-                                        reply_vars.push(hitchersto);
-                                        reply_vars.push(hitchersfrom);
-                                    }
-                                    else if (doc.myhitchersto != null)
-                                    {
-                                        reply_key = "HITCHHIKERS_FORTH";
-                                        reply_vars.push(hitchersto);
-                                    }
-                                    else
-                                    {
-                                        reply_key = "HITCHHIKERS_BACK";
-                                        reply_vars.push(hitchersfrom);
-                                    }
-                                    recast_conversation_reply = 
-                                        replies.get_recast_reply(reply_key,language,reply_vars,memory); 
+                                var reply_key = "NO_HITCHHIKERS";
+                                var reply_vars = [];
+                                if ((doc.myhitchersto == null || doc.myhitchersto.length == 0) &&
+                                    (doc.myhitchersfrom == null || doc.myhitchersfrom.length == 0))
+                                {
+                                    reply_vars.push(nowstring);
+                                }
+                                else if (JSON.stringify(doc.myhitchersto) == JSON.stringify(doc.myhitchersfrom))
+                                {
+                                    reply_key = "HITCHHIKERS_BACK_FORTH";
+                                    reply_vars.push(hitchersto);
+                                }
+                                else if (doc.myhitchersto != null && doc.myhitchersfrom != null)
+                                {
+                                    reply_key = "HITCHHIKERS_DIFFERENT_BACK_FORTH";
+                                    reply_vars.push(hitchersto);
+                                    reply_vars.push(hitchersfrom);
+                                }
+                                else if (doc.myhitchersto != null)
+                                {
+                                    reply_key = "HITCHHIKERS_FORTH";
+                                    reply_vars.push(hitchersto);
                                 }
                                 else
                                 {
-                                    if ((doc.mydriverto == null || doc.mydriverto.length == 0) &&
-                                        (doc.mydriverfrom == null || doc.mydriverfrom.length == 0))
-                                    {
-                                        recast_conversation_reply = 
-                                            replies.get_recast_reply("NO_RIDE",language,[nowstring],memory);
-                                    }
-                                    else if (JSON.stringify(doc.mydriverto) == JSON.stringify(doc.mydriverfrom))
-                                    {
-                                        recast_conversation_reply = 
-                                            replies.get_recast_reply("RIDE_BACK_FORTH",language,
-                                            [doc.mydriverto.name,
-                                            doc.mydriverto.phone,
-                                            doc.mydriverto.drivercomesfrom,
-                                            doc.mydriverto.driverreturnsto],memory);
-                                        hadexchangednumbers = true; 
-                                    }
-                                    else if (doc.mydriverto != null && doc.mydriverfrom != null)
-                                    {
-                                        recast_conversation_reply = 
-                                            replies.get_recast_reply("RIDE_DIFFERENT_BACK_FORTH",language,
-                                            [doc.mydriverto.name,
-                                            doc.mydriverto.phone,
-                                            doc.mydriverto.drivercomesfrom,
-                                            doc.mydriverto.driverreturnsto,
-                                            doc.mydriverfrom.name,
-                                            doc.mydriverfrom.phone,
-                                            doc.mydriverfrom.drivercomesfrom,
-                                            doc.mydriverfrom.driverreturnsto,
-                                            doc.mydriverto.name],memory);
-                                        hadexchangednumbers = true;
-                                    }
-                                    else if (doc.mydriverto != null)
-                                    {
-                                        recast_conversation_reply = 
-                                            replies.get_recast_reply("RIDE_FORTH",language,
-                                            [doc.mydriverto.name,
-                                            doc.mydriverto.phone,
-                                            doc.mydriverto.drivercomesfrom,
-                                            doc.mydriverto.driverreturnsto],memory);
-                                        hadexchangednumbers = true;
-                                    }
-                                    else
-                                    {
-                                        recast_conversation_reply = 
-                                            replies.get_recast_reply("RIDE_BACK",language,
-                                            [doc.mydriverfrom.name,
-                                            doc.mydriverfrom.phone,
-                                            doc.mydriverfrom.drivercomesfrom,
-                                            doc.mydriverfrom.driverreturnsto],memory);
-                                        hadexchangednumbers = true;
-                                    }
-                                    var text = "";
-
-                                    if (JSON.stringify(doc.myfriendsdriversto) == JSON.stringify(doc.myfriendsdriversfrom)) {
-                                        switch (language) {
-                                            case "he":
-                                                for (let i = 0; i < doc.myfriendsdriversto.length; i++) {
-                                                    const currdriver = doc.myfriendsdriversto[i];
-                                                    text = currdriver.hitchername + " יכול לבוא ולחזור עם " + 
-                                                        currdriver.drivername + " " + currdriver.driverphone + ". הוא מגיע מ" +
-                                                        currdriver.drivercomesfrom + " וחוזר ל" + currdriver.driverreturnsto;
-                                                }    
-                                                break;
-                                            case "en":
-                                                for (let i = 0; i < doc.myfriendsdriversto.length; i++) {
-                                                    const currdriver = doc.myfriendsdriversto[i];
-                                                    text = currdriver.hitchername + " can come and return with " + 
-                                                        currdriver.drivername + " " + currdriver.driverphone + ". He comes from " +
-                                                        currdriver.drivercomesfrom + " and returns to " + currdriver.driverreturnsto;
-                                                }
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                    }
-                                    else if (doc.myfriendsdriversto != null && doc.myfriendsdriversfrom != null) {
-                                        switch (language) {
-                                            case "he":
-                                                for (let i = 0; i < doc.myfriendsdriversto.length || i < doc.myfriendsdriversfrom.length; i++) {
-                                                    const currdriverto = doc.myfriendsdriversto[i];
-                                                    const currdriverfrom = doc.myfriendsdriversfrom[i];
-                                                    text = currdriverto.hitchername + " יכול לבוא עם " + 
-                                                        currdriverto.drivername + " " + currdriverto.driverphone + ". הוא מגיע מ" +
-                                                        currdriverto.drivercomesfrom + " וחוזר ל" + currdriverto.driverreturnsto + ".\n" +
-                                                        "ולחזור עם " + currdriverfrom.drivername + " " + currdriverfrom.driverphone + 
-                                                        ". הוא מגיע מ" + currdriverfrom.drivercomesfrom + " וחוזר ל" + 
-                                                        currdriverfrom.driverreturnsto;
-                                                }
-                                                break;
-                                            case "en":
-                                                for (let i = 0; i < doc.myfriendsdriversto.length || i < doc.myfriendsdriversfrom.length; i++) {
-                                                    const currdriverto = doc.myfriendsdriversto[i];
-                                                    const currdriverfrom = doc.myfriendsdriversfrom[i];
-                                                    text = currdriverto.hitchername + " can come with " + 
-                                                        currdriverto.drivername + " " + currdriverto.driverphone + ". He comes from " +
-                                                        currdriverto.drivercomesfrom + " and returns to " + currdriverto.driverreturnsto + ".\n" +
-                                                        "And return with " + currdriverfrom.drivername + " " + currdriverfrom.driverphone + 
-                                                        ". He comes from " + currdriverfrom.drivercomesfrom + " and returns to " + 
-                                                        currdriverfrom.driverreturnsto;
-                                                }
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                    }
-                                    else if (doc.myfriendsdriversto != null) {
-                                        switch (language) {
-                                            case "he":
-                                                for (let i = 0; i < doc.myfriendsdriversto.length; i++) {
-                                                    const currdriver = doc.myfriendsdriversto[i];
-                                                    text = currdriver.hitchername + " יכול לבוא בהלוך בלבד עם " + 
-                                                        currdriver.drivername + " " + currdriver.driverphone + ". הוא מגיע מ" +
-                                                        currdriver.drivercomesfrom + " וחוזר ל" + currdriver.driverreturnsto;
-                                                }
-                                                break;
-                                            case "en":
-                                                for (let i = 0; i < doc.myfriendsdriversto.length; i++) {
-                                                    const currdriver = doc.myfriendsdriversto[i];
-                                                    text = currdriver.hitchername + " can come with " + 
-                                                        currdriver.drivername + " " + currdriver.driverphone + ". He comes from " +
-                                                        currdriver.drivercomesfrom + " and returns to " + currdriver.driverreturnsto;
-                                                }
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                    }
-                                    else 
-                                    {
-                                        switch (language) {
-                                            case "he":
-                                                for (let i = 0; i < doc.myfriendsdriversfrom.length; i++) {
-                                                    const currdriver = doc.myfriendsdriversfrom[i];
-                                                    text = currdriver.hitchername + " יכול לחזור בלבד עם " + 
-                                                        currdriver.drivername + " " + currdriver.driverphone + ". הוא מגיע מ" +
-                                                        currdriver.drivercomesfrom + " וחוזר ל" + currdriver.driverreturnsto;
-                                                }    
-                                                break;
-                                            case "en":
-                                                for (let i = 0; i < doc.myfriendsdriversfrom.length; i++) {
-                                                    const currdriver = doc.myfriendsdriversfrom[i];
-                                                    text = currdriver.hitchername + " can return with " + 
-                                                        currdriver.drivername + " " + currdriver.driverphone + ". He comes from " +
-                                                        currdriver.drivercomesfrom + " and returns to " + currdriver.driverreturnsto;
-                                                }
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                    }
-                                    recast_conversation_reply = 
-                                        replies.push_to_recast_reply(recast_conversation_reply,text);  
+                                    reply_key = "HITCHHIKERS_BACK";
+                                    reply_vars.push(hitchersfrom);
                                 }
+                                recast_conversation_reply = 
+                                    replies.get_recast_reply(reply_key,language,reply_vars,memory); 
+                            }
+                            else
+                            {
+                                if ((doc.mydriverto == null || doc.mydriverto.length == 0) &&
+                                    (doc.mydriverfrom == null || doc.mydriverfrom.length == 0))
+                                {
+                                    recast_conversation_reply = 
+                                        replies.get_recast_reply("NO_RIDE",language,[nowstring],memory);
+                                }
+                                else if (JSON.stringify(doc.mydriverto) == JSON.stringify(doc.mydriverfrom))
+                                {
+                                    recast_conversation_reply = 
+                                        replies.get_recast_reply("RIDE_BACK_FORTH",language,
+                                        [doc.mydriverto.name,
+                                        doc.mydriverto.phone,
+                                        doc.mydriverto.drivercomesfrom,
+                                        doc.mydriverto.driverreturnsto],memory);
+                                    hadexchangednumbers = true; 
+                                }
+                                else if (doc.mydriverto != null && doc.mydriverfrom != null)
+                                {
+                                    recast_conversation_reply = 
+                                        replies.get_recast_reply("RIDE_DIFFERENT_BACK_FORTH",language,
+                                        [doc.mydriverto.name,
+                                        doc.mydriverto.phone,
+                                        doc.mydriverto.drivercomesfrom,
+                                        doc.mydriverto.driverreturnsto,
+                                        doc.mydriverfrom.name,
+                                        doc.mydriverfrom.phone,
+                                        doc.mydriverfrom.drivercomesfrom,
+                                        doc.mydriverfrom.driverreturnsto,
+                                        doc.mydriverto.name],memory);
+                                    hadexchangednumbers = true;
+                                }
+                                else if (doc.mydriverto != null)
+                                {
+                                    recast_conversation_reply = 
+                                        replies.get_recast_reply("RIDE_FORTH",language,
+                                        [doc.mydriverto.name,
+                                        doc.mydriverto.phone,
+                                        doc.mydriverto.drivercomesfrom,
+                                        doc.mydriverto.driverreturnsto],memory);
+                                    hadexchangednumbers = true;
+                                }
+                                else
+                                {
+                                    recast_conversation_reply = 
+                                        replies.get_recast_reply("RIDE_BACK",language,
+                                        [doc.mydriverfrom.name,
+                                        doc.mydriverfrom.phone,
+                                        doc.mydriverfrom.drivercomesfrom,
+                                        doc.mydriverfrom.driverreturnsto],memory);
+                                    hadexchangednumbers = true;
+                                }
+                                var text = "";
+
+                                if (JSON.stringify(doc.myfriendsdriversto) == JSON.stringify(doc.myfriendsdriversfrom)) {
+                                    switch (language) {
+                                        case "he":
+                                            for (let i = 0; i < doc.myfriendsdriversto.length; i++) {
+                                                const currdriver = doc.myfriendsdriversto[i];
+                                                text = currdriver.hitchername + " יכול לבוא ולחזור עם " + 
+                                                    currdriver.drivername + " " + currdriver.driverphone + ". הוא מגיע מ" +
+                                                    currdriver.drivercomesfrom + " וחוזר ל" + currdriver.driverreturnsto;
+                                            }    
+                                            break;
+                                        case "en":
+                                            for (let i = 0; i < doc.myfriendsdriversto.length; i++) {
+                                                const currdriver = doc.myfriendsdriversto[i];
+                                                text = currdriver.hitchername + " can come and return with " + 
+                                                    currdriver.drivername + " " + currdriver.driverphone + ". He comes from " +
+                                                    currdriver.drivercomesfrom + " and returns to " + currdriver.driverreturnsto;
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                else if (doc.myfriendsdriversto != null && doc.myfriendsdriversfrom != null) {
+                                    switch (language) {
+                                        case "he":
+                                            for (let i = 0; i < doc.myfriendsdriversto.length || i < doc.myfriendsdriversfrom.length; i++) {
+                                                const currdriverto = doc.myfriendsdriversto[i];
+                                                const currdriverfrom = doc.myfriendsdriversfrom[i];
+                                                text = currdriverto.hitchername + " יכול לבוא עם " + 
+                                                    currdriverto.drivername + " " + currdriverto.driverphone + ". הוא מגיע מ" +
+                                                    currdriverto.drivercomesfrom + " וחוזר ל" + currdriverto.driverreturnsto + ".\n" +
+                                                    "ולחזור עם " + currdriverfrom.drivername + " " + currdriverfrom.driverphone + 
+                                                    ". הוא מגיע מ" + currdriverfrom.drivercomesfrom + " וחוזר ל" + 
+                                                    currdriverfrom.driverreturnsto;
+                                            }
+                                            break;
+                                        case "en":
+                                            for (let i = 0; i < doc.myfriendsdriversto.length || i < doc.myfriendsdriversfrom.length; i++) {
+                                                const currdriverto = doc.myfriendsdriversto[i];
+                                                const currdriverfrom = doc.myfriendsdriversfrom[i];
+                                                text = currdriverto.hitchername + " can come with " + 
+                                                    currdriverto.drivername + " " + currdriverto.driverphone + ". He comes from " +
+                                                    currdriverto.drivercomesfrom + " and returns to " + currdriverto.driverreturnsto + ".\n" +
+                                                    "And return with " + currdriverfrom.drivername + " " + currdriverfrom.driverphone + 
+                                                    ". He comes from " + currdriverfrom.drivercomesfrom + " and returns to " + 
+                                                    currdriverfrom.driverreturnsto;
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                else if (doc.myfriendsdriversto != null) {
+                                    switch (language) {
+                                        case "he":
+                                            for (let i = 0; i < doc.myfriendsdriversto.length; i++) {
+                                                const currdriver = doc.myfriendsdriversto[i];
+                                                text = currdriver.hitchername + " יכול לבוא בהלוך בלבד עם " + 
+                                                    currdriver.drivername + " " + currdriver.driverphone + ". הוא מגיע מ" +
+                                                    currdriver.drivercomesfrom + " וחוזר ל" + currdriver.driverreturnsto;
+                                            }
+                                            break;
+                                        case "en":
+                                            for (let i = 0; i < doc.myfriendsdriversto.length; i++) {
+                                                const currdriver = doc.myfriendsdriversto[i];
+                                                text = currdriver.hitchername + " can come with " + 
+                                                    currdriver.drivername + " " + currdriver.driverphone + ". He comes from " +
+                                                    currdriver.drivercomesfrom + " and returns to " + currdriver.driverreturnsto;
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                else 
+                                {
+                                    switch (language) {
+                                        case "he":
+                                            for (let i = 0; i < doc.myfriendsdriversfrom.length; i++) {
+                                                const currdriver = doc.myfriendsdriversfrom[i];
+                                                text = currdriver.hitchername + " יכול לחזור בלבד עם " + 
+                                                    currdriver.drivername + " " + currdriver.driverphone + ". הוא מגיע מ" +
+                                                    currdriver.drivercomesfrom + " וחוזר ל" + currdriver.driverreturnsto;
+                                            }    
+                                            break;
+                                        case "en":
+                                            for (let i = 0; i < doc.myfriendsdriversfrom.length; i++) {
+                                                const currdriver = doc.myfriendsdriversfrom[i];
+                                                text = currdriver.hitchername + " can return with " + 
+                                                    currdriver.drivername + " " + currdriver.driverphone + ". He comes from " +
+                                                    currdriver.drivercomesfrom + " and returns to " + currdriver.driverreturnsto;
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                recast_conversation_reply = 
+                                    replies.push_to_recast_reply(recast_conversation_reply,text);  
                             }
                             if (hadexchangednumbers) {
                                 dbservices.updatehikerstatus(res, hiketodate, phonenumber, "hadexchangednumbers")

@@ -131,17 +131,6 @@
         "en": ""
     },
     {
-        "key": "password",
-        "he": "בחר סיסמא להזדהות עם רובוט הטרמפים. ציין את המילה סיסמא לפני כן. \nלמשל: סיסמא Aa123456",
-        "en": "Choose a password to authenticate with the chatbot. Metion the word Password before it.\nFor example: Password Aa123456",
-        "buttons_he": [ 
-            {"text":"דלג", "val": "דלג"} 
-        ],
-        "buttons_en": [ 
-            {"text":"Skip", "val": "Skip"}
-        ]
-    },
-    {
         "key": "heard of the group",
         "he": "אם עוד לא היית בטיולים, איך שמעת על הקבוצה?",
         "en": "If you didn't join us yet, how did you hear about the hiking group?",

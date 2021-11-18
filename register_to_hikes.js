@@ -97,7 +97,6 @@ function sendForm(formId, body, language, recast_reply, res, memory, edit)
                     "phone number": memory.registertohikes["phone number"],
                     "share my age": memory.registertohikes["share my age"],
                     age: memory.registertohikes.age,
-                    password: memory.registertohikes.password,
                     "i'm gay": memory.registertohikes["i'm gay"],
                     "heard of the group": memory.registertohikes["heard of the group"],
                     hikeseditforms: memory.registertohikes.hikeseditforms,
@@ -146,7 +145,6 @@ function sendForm(formId, body, language, recast_reply, res, memory, edit)
                     "phone number": memory.registertohikes["phone number"],
                     "share my age": memory.registertohikes["share my age"],
                     age: memory.registertohikes.age,
-                    password: memory.registertohikes.password,
                     "i'm gay": memory.registertohikes["i'm gay"],
                     "heard of the group": memory.registertohikes["heard of the group"],
                     hikeseditforms: memory.registertohikes.hikeseditforms,
@@ -342,7 +340,6 @@ function updatePostDataParams(form_post_data, draft_response, params) {
     else {
         draft_response = draft_response.replace("VAR_EDIT_LINK", null);
     }
-    draft_response = draft_response.replace("VAR_CHATBOT_PASSWORD", params.VAR_CHATBOT_PASSWORD);
     draft_response = draft_response.replace("VAR_ARE_YOU_GAY", params.VAR_ARE_YOU_GAY);
     draft_response = draft_response.replace("VAR_BEEN_IN_HIKES", params.VAR_BEEN_IN_HIKES);
     draft_response = draft_response.replace("VAR_PLAYSON", params.VAR_PLAYSON);
@@ -372,7 +369,6 @@ function updatePostDataParams(form_post_data, draft_response, params) {
     form_post_data = form_post_data.replace("VAR_FRIEND4_SAVE_THE_DATE", encodeURIComponent(params.VAR_FRIEND4_SAVE_THE_DATE));
     form_post_data = form_post_data.replace("VAR_ARE_YOU_GAY", encodeURIComponent(params.VAR_ARE_YOU_GAY));
     form_post_data = form_post_data.replace("VAR_BEEN_IN_HIKES", encodeURIComponent(params.VAR_BEEN_IN_HIKES));
-    form_post_data = form_post_data.replace("VAR_CHATBOT_PASSWORD", encodeURIComponent(params.VAR_CHATBOT_PASSWORD));        
     form_post_data = form_post_data.replace("VAR_PLAYSON", encodeURIComponent(params.VAR_PLAYSON));
     form_post_data = form_post_data.replace("VAR_ORGANIZE", encodeURIComponent(params.VAR_ORGANIZE));
     form_post_data = form_post_data.replace("VAR_SELF_RESPONSIBILITY", encodeURIComponent("מבין ומקבל"));

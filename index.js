@@ -71,13 +71,9 @@ app.patch("/api/areridessetuped", function(req, res) {
                 recast_conversation_reply = replies.get_recast_reply("GETRIDEDETAILS_ENTERPHONE",language,null,memory);
                 memory.stage = "getridedetails_getphone";
             }
-            else if (!memory.password) {
-                recast_conversation_reply = replies.get_recast_reply("GETRIDEDETAILS_ENTERPASSWORD",language,null,memory);    
-                memory.stage = "getridedetails_getpassword";
-            }
             else {
-                recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
-                memory.stage = "getridedetails_getpassword";
+                recast_conversation_reply = replies.get_recast_reply("CHOOSE_HIKE_TO_EDIT",language,null,memory);    
+                memory.stage = "getridedetails_choosehike";
             }
         }
         else {
@@ -116,7 +112,6 @@ app.post("/api/wanttomodify", function(req, res) {
             "share my age":"שתף את הגיל שלי",
             "age":"גיל",
             "friends joining":"חברים שמצטרפים",
-            "password":"סיסמא",
             "heard of the group":"שמעתי על הקבוצה",
             "plays on":"מנגן על",
             "i'm gay":"אני הומו",
@@ -140,10 +135,6 @@ app.post("/api/wanttomodify", function(req, res) {
                 "texts": ["I return to ", "חוזר ל", "אני חוזר ל"],
                 "variable": "returnto2"
             },
-            "password":{
-                "texts": ["Password ", "סיסמא ", "סיסמה "],
-                "variable": "password"
-            },
             "age":{
                 "texts": ["I'm ", "אני בן ", "בן "],
                 "variable": "age"
@@ -165,7 +156,6 @@ app.post("/api/wanttomodify", function(req, res) {
             "hikes": memory.emptyhikes,
             "returns to": memory.returnto2,
             "phone number": memory.phonenumber,
-            "password": memory.password,
             "comes from": memory.comefrom2,
             "email": memory.email2,
             "age": memory.age
@@ -206,10 +196,6 @@ app.post("/api/wanttomodify", function(req, res) {
             }
             memory.registertohikes["age"] = "";
             delete params["age"];
-        }
-
-        if (!memory.password) {
-            memory.password = process.env.DEFAULT_PASSWORD;
         }
 
         var hike_registration_details = "";
@@ -260,7 +246,6 @@ app.put("/api/wanttomodify", function(req, res) {
             "share my age",
             "age",
             "friends joining",
-            "password",
             "heard of the group",
             "plays on",
             "i'm gay",
@@ -281,7 +266,6 @@ app.put("/api/wanttomodify", function(req, res) {
             "share my age":"shareage",
             "age":"age",
             "friends joining":"dofriendsjoin",
-            "password":"password",
             "heard of the group":"howdidihear",
             "plays on":"playson",
             "i'm gay":"isgay",
@@ -302,7 +286,6 @@ app.put("/api/wanttomodify", function(req, res) {
             "share my age":"shareage2",
             "age":"age",
             "friends joining":"dofriendsjoin2",
-            "password":"password",
             "heard of the group":"howdidihear2",
             "plays on":"playson2",
             "i'm gay":"isgay2",
@@ -323,7 +306,6 @@ app.put("/api/wanttomodify", function(req, res) {
             "share my age":"age",
             "age":"age",
             "friends joining":"dofriendsjoin2",
-            "password":"password",
             "heard of the group":"howdidihear2",
             "plays on":"playson2",
             "i'm gay":"isgay2",
@@ -344,8 +326,7 @@ app.put("/api/wanttomodify", function(req, res) {
             "share my age":"wanttomodify_shareage",
             "age":"wanttomodify_age",
             "friends joining":"wanttomodify_friendsname",
-            "password":"wanttomodify_password",
-            "heard of the group":"wanttomodify_password",
+            "heard of the group":"wanttomodify_howdidihear",
             "plays on":"wanttomodify_playson",
             "i'm gay":"wanttomodify_isgay",
             "can organize":"wanttomodify_volunteer",
@@ -383,10 +364,6 @@ app.put("/api/wanttomodify", function(req, res) {
             params.splice(spliceindex,1);
             delete paramstodelete[paramNotRelevant];
             delete stages[paramNotRelevant];
-        }
-        
-        if (!memory.password) {
-            memory.password = process.env.DEFAULT_PASSWORD;
         }
 
         var needtosubmit = true;
@@ -628,7 +605,6 @@ app.post("/api/lastregister", function(req, res) {
             "שם וגיל של חבר שלישי שמצטרף":"friend3",
             "שם וגיל של חבר רביעי שמצטרף":"friend4",
             "האם החברים שריינו את התאריך לטיול?":"friendssavethedate",
-            "סיסמא לרובוט":"password",
             "אם עוד לא היית בטיולים, איך שמעת על הקבוצה?":"heard of the group",
             "אתה גיי נכון? (ולא נשוי לאישה)":"i'm gay",
             "תתנדב להביא כלי נגינה כלשהו או תנגן אם נביא? על מה?":"plays on",
@@ -651,7 +627,6 @@ app.post("/api/lastregister", function(req, res) {
             "Name and age of third gay friend that join the hike with you":"friend3",
             "Name and age of fourth gay friend that join the hike with you":"friend4",
             "Have the friends saved the date of the hike?":"friendssavethedate",
-            "chat bot password":"password",
             "If you didn't join us yet, how did you hear about the hiking group?":"heard of the group",
             "Your'e gay, right? (and not married to a women)":"i'm gay",
             "Will you volunteer to bring a musical instrument or play at it if we would bring it? Which?":"plays on",
@@ -730,10 +705,6 @@ app.post("/api/lastregister", function(req, res) {
             }
         }
 
-        if (formObj.password == "" || formObj.password == null) {
-            formObj.password = process.env.DEFAULT_PASSWORD;
-        }
-
         formObj["friends joining"] = tools.friendstext_from_friendsdetails(formObj.friendsdetails);
 
         dbservices.gethikes(res)
@@ -779,7 +750,6 @@ app.post("/api/lastregister", function(req, res) {
                         "phone number": formObj["phone number"],
                         "share my age": formObj["share my age"],
                         age: formObj.age,
-                        password: formObj.password,
                         "i'm gay": formObj["i'm gay"],
                         "heard of the group": formObj["heard of the group"],
                         hikeseditforms: formObj.hikeseditforms,
@@ -876,7 +846,6 @@ app.post("/api/lastregister", function(req, res) {
                         "phone number": formObj["phone number"],
                         "share my age": formObj["share my age"],
                         age: formObj.age,
-                        password: formObj.password,
                         "i'm gay": formObj["i'm gay"],
                         "heard of the group": formObj["heard of the group"],
                         hikeseditforms: formObj.hikeseditforms,
@@ -951,12 +920,6 @@ app.patch("/api/lastregister/:phone", function(req, res) {
                     replies.get_recast_reply("NO_ANSWER",language,null,memory);   
                 res.status(200).json(recast_conversation_reply);
             }
-            else if (doc.password != memory.password) {
-                delete memory.password;
-                recast_conversation_reply = 
-                    replies.get_recast_reply("PASSWORD_INCORRECT_TRYEDIT",language,null,memory);   
-                res.status(200).json(recast_conversation_reply);
-            }
             else if (typeof(doc) !== 'undefined' && doc != null) {
 
                 memory.registertohikes = doc;
@@ -974,7 +937,6 @@ app.patch("/api/lastregister/:phone", function(req, res) {
                     "i fear of":"ifearof2",
                     "share my age":"shareage2",
                     "age":"age",
-                    "password":"password",
                     "friends joining":"friendstext",
                     "heard of the group":"howdidihear2",
                     "i'm gay":"isgay2",
@@ -1070,10 +1032,7 @@ app.patch("/api/lastregister/:phone", function(req, res) {
                         var recast_conversation_reply = replies.get_recast_reply("REGISTERED_NO_HIKE",language,null,memory);
                     }
                     
-                    if (memory.stage == "whichhikesregistered_password") {
-                        delete memory.stage;
-                    }
-                    else if (memory.stage == "haslastregister_true" || memory.stage == "haslastregister") {
+                    if (memory.stage == "haslastregister_true" || memory.stage == "haslastregister") {
                         memory.stage = "wanttomodify_selecthikes";
                         recast_conversation_reply = 
                             register.setAvailableHikesReplyBut(recast_conversation_reply, docs, language, selectedHikes);
@@ -1107,14 +1066,7 @@ app.put("/api/lastregister/:phone", function(req, res) {
             var recast_conversation_reply;
             var language = tools.set_language(memory);
 
-            if (doc.password != memory.password) {
-                memory.stage = "haslastregister_true";
-                delete memory.password;
-                recast_conversation_reply = 
-                    replies.get_recast_reply("PASSWORD_INCORRECT_TRYEDIT",language,null,memory);   
-                res.status(200).json(recast_conversation_reply);
-            }
-            else if (typeof(doc) !== 'undefined' && doc != null) {
+            if (typeof(doc) !== 'undefined' && doc != null) {
                 memory.stage = "wanttomodify_hiketomodify";
                 memory.registertohikes = doc;
                 memory.emptyhikes = doc.selectedhikes.join("\n");
@@ -1137,7 +1089,6 @@ app.put("/api/lastregister/:phone", function(req, res) {
                     "i fear of":"ifearof2",
                     "share my age":"shareage2",
                     "age":"age",
-                    "password":"password",
                     "friends joining":"friendstext",
                     "heard of the group":"howdidihear2",
                     "i'm gay":"isgay2",
@@ -1301,7 +1252,7 @@ app.delete("/api/lastregister/:phone", function(req, res) {
 });
 
 /*  "/api/haslastregister/:phone"
-*    PATCH: checks whether hiker has last register details by phone number and without password
+*    PATCH: checks whether hiker has last register details by phone number
 */
 
 app.patch("/api/haslastregister/:phone", function(req, res) {
@@ -1348,7 +1299,6 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                             "friendname":"registertohikes_friendsname",
                             "friendage":"registertohikes_friendsage",
                             "friendsavesthedate":"registertohikes_friendssavedthedate",
-                            "password":"registertohikes_createpassword",
                             "howdidihear2":"registertohikes_howdidihear",
                             "playson2":"registertohikes_playson",
                             "volunteer2":"registertohikes_volunteer",
@@ -1372,7 +1322,6 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                             "registertohikes_friendsname":"REGISTERTOHIKES_FRIENDSNAME",
                             "registertohikes_friendsage":"REGISTERTOHIKES_FRIENDSAGE",
                             "registertohikes_friendssavedthedate":"REGISTERTOHIKES_FRIENDSAVEDTHEDATE",
-                            "registertohikes_createpassword":"REGISTERTOHIKES_PASSWORD",
                             "registertohikes_howdidihear":"REGISTERTOHIKES_HOWDIDIHEAR",
                             "registertohikes_playson":"REGISTERTOHIKES_PLAYSON",
                             "registertohikes_volunteer":"REGISTERTOHIKES_VOLUNTEER",
@@ -1399,7 +1348,6 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                             "registertohikes_friendsname": ["yes", "כן"],
                             "registertohikes_friendsage": ["yes", "כן"],
                             "registertohikes_friendssavedthedate": ["yes", "כן"],
-                            "registertohikes_createpassword": [],
                             "registertohikes_howdidihear": [],
                             "registertohikes_playson": [],
                             "registertohikes_volunteer": [],
@@ -1502,7 +1450,6 @@ app.post("/api/registertohikes", function(req, res) {
             "VAR_FRIEND2_SAVE_THE_DATE":"",
             "VAR_FRIEND3_SAVE_THE_DATE":"",
             "VAR_FRIEND4_SAVE_THE_DATE":"",
-            "VAR_CHATBOT_PASSWORD":"",
             "VAR_ARE_YOU_GAY":"",
             "VAR_BEEN_IN_HIKES":"",
             "VAR_PLAYSON":"",
@@ -1521,7 +1468,6 @@ app.post("/api/registertohikes", function(req, res) {
             "i fear of": "VAR_I_FEAR_OF",
             "share my age":"VAR_SHARE_MY_AGE",
             "age":"VAR_MY_AGE",
-            "password":"VAR_CHATBOT_PASSWORD",
             "heard of the group":"VAR_BEEN_IN_HIKES",
             "i'm gay":"VAR_ARE_YOU_GAY",
             "plays on":"VAR_PLAYSON",
@@ -1665,11 +1611,6 @@ app.post("/api/registertohikes", function(req, res) {
                     }
                 }
 
-                if (memory.registertohikes.password == "" || memory.registertohikes.password == null) {
-                    memory.registertohikes.password = process.env.DEFAULT_PASSWORD;
-                    registerparams["VAR_CHATBOT_PASSWORD"] = process.env.DEFAULT_PASSWORD;
-                }
-
                 var nowdate = new Date();
                 memory.registertohikes.selectedhikes = memory.selectedhikes;
                 memory.registertohikes.friendsdetails = memory.friendsdetails;
@@ -1734,7 +1675,6 @@ app.post("/api/registertohikes", function(req, res) {
             "VAR_FRIEND2_SAVE_THE_DATE":"",
             "VAR_FRIEND3_SAVE_THE_DATE":"",
             "VAR_FRIEND4_SAVE_THE_DATE":"",
-            "VAR_CHATBOT_PASSWORD":"",
             "VAR_ARE_YOU_GAY":"",
             "VAR_BEEN_IN_HIKES":"",
             "VAR_PLAYSON":"",
@@ -1747,7 +1687,6 @@ app.post("/api/registertohikes", function(req, res) {
             "phone number":"VAR_PHONENUMBER",
             "share my age":"VAR_SHARE_MY_AGE",
             "age":"VAR_MY_AGE",
-            "password":"VAR_CHATBOT_PASSWORD",
             "heard of the group":"VAR_BEEN_IN_HIKES",
             "i'm gay":"VAR_ARE_YOU_GAY",
             "friends joining":"VAR_COME_WITH_FRIENDS",
@@ -1880,11 +1819,6 @@ app.post("/api/registertohikes", function(req, res) {
                     break;
             }
 
-            if (memory.registertohikes.password == "" || memory.registertohikes.password == null) {
-                memory.registertohikes.password = process.env.DEFAULT_PASSWORD;
-                registerparams["VAR_CHATBOT_PASSWORD"] = process.env.DEFAULT_PASSWORD;
-            }
-    
             memory.registertohikes.friendsdetails = memory.friendsdetails;
             memory.registertohikes.hikeseditforms = memory.hikeseditforms;
 
@@ -2277,39 +2211,30 @@ app.patch("/api/choosehike/:phone", function(req, res) {
                         var selectedhikes = JSON.parse(JSON.stringify(doclast.selectedhikes));
                         reply_sent = true;
 
-                        if (doclast.password != memory.password) {
-                            delete memory.password;
-                            recast_conversation_reply = 
-                                replies.get_recast_reply("PASSWORD_INCORRECT_TRYEDIT",language,null,memory);   
-                                res.status(200).json(recast_conversation_reply);
+                        selectedhikes = tools.remove_past_hikes(selectedhikes);
+                        selectedhikes = tools.only_hikes_in_lang(docs, selectedhikes, language);
+                        var selectedrides = tools.remove_hikes_notinlist(selectedhikes, rides);
+                        
+                        if (selectedrides.length == 1) {
+                            memory.stage = "getridedetails";
+                            memory.selectedhike = selectedrides[0];
+                            ridesmodules.patchridedetails(req, res, replies);
                         }
-                        else    
-                        {
-                            selectedhikes = tools.remove_past_hikes(selectedhikes);
-                            selectedhikes = tools.only_hikes_in_lang(docs, selectedhikes, language);
-                            var selectedrides = tools.remove_hikes_notinlist(selectedhikes, rides);
-                            
-                            if (selectedrides.length == 1) {
-                                memory.stage = "getridedetails";
-                                memory.selectedhike = selectedrides[0];
-                                ridesmodules.patchridedetails(req, res, replies);
+                        else {
+                            if (selectedrides.length > 1) {
+                                memory.stage = "getridedetails_choosehike";
+                                delete memory.selectedhike;
+                                var recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
+                                var title = replies.get_conversation_string("CHOOSE_HIKE_TO_EDIT", language);
+                                recast_conversation_reply = 
+                                    register.setAvailableHikesReply(recast_conversation_reply, selectedrides, language, title); 
+                                res.status(200).json(recast_conversation_reply);
                             }
                             else {
-                                if (selectedrides.length > 1) {
-                                    memory.stage = "getridedetails_choosehike";
-                                    delete memory.selectedhike;
-                                    var recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
-                                    var title = replies.get_conversation_string("CHOOSE_HIKE_TO_EDIT", language);
-                                    recast_conversation_reply = 
-                                        register.setAvailableHikesReply(recast_conversation_reply, selectedrides, language, title); 
-                                    res.status(200).json(recast_conversation_reply);
-                                }
-                                else {
-                                    var recast_conversation_reply = 
-                                        replies.get_recast_reply("RIDES_NOT_ARRANGED",language,
-                                            [nowstring, selectedhikes.join("\n")],memory);  
-                                    res.status(200).json(recast_conversation_reply);
-                                }
+                                var recast_conversation_reply = 
+                                    replies.get_recast_reply("RIDES_NOT_ARRANGED",language,
+                                        [nowstring, selectedhikes.join("\n")],memory);  
+                                res.status(200).json(recast_conversation_reply);
                             }
                         }
                     })
@@ -2367,16 +2292,8 @@ app.put("/api/ridedetails/:phone", function(req, res) {
                 {
                     dbservices.getlastregisterbyphonenumber(res, phonenumber)
                     .then(doclast => {
-                        if (typeof(doclast) !== 'undefined' && doc != doclast && 
-                            typeof(doclast.password) !== 'undefined') {
-                            console.log('doc.userpassword ' + doc.userpassword + ' memory.password ' + memory.password + 
-                                ' last.password ' + doclast.password);
-                            if (doc.userpassword != memory.password && doclast.password != memory.password) {
-                                delete memory.password;
-                                recast_conversation_reply = 
-                                    replies.get_recast_reply("PASSWORD_INCORRECT_TRYEDIT",language,null,memory); 
-                            }
-                            else if (hadsetup)
+                        if (typeof(doclast) !== 'undefined' && doc != doclast) {
+                            if (hadsetup)
                             {
                                 recast_conversation_reply = 
                                     replies.get_recast_reply("GREAT_FOR_UPDATE",language,null,memory); 
