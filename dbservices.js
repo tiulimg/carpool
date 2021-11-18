@@ -614,7 +614,7 @@ function findafterhikematch(res, afterhikerform) {
     return new Promise((resolve, reject) => {
         var filter = { $and: [ { 'mymatches': { $in: afterhikerform["whoami"] } }, 
         { 'whoami': { $in: afterhikerform["mymatches"] } } ] };
-        console.log("filter", filter);
+        console.log("filter", JSON.stringify(filter));
         db.collection(AFTERHIKEMATCH_COLLECTION).find(
             { $and: [ { 'mymatches': { $in: afterhikerform["whoami"] } }, 
                       { 'whoami': { $in: afterhikerform["mymatches"] } } ] }).toArray(function(err, docs) {
