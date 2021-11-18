@@ -2835,18 +2835,15 @@ app.patch("/api/allhistory", function(req, res) {
 
 app.post("/api/afterhikematch", function(req, res) {
     if (tools.checkpwd(res, req.query.pwd)) {
-        console.log(JSON.stringify(req.body));
         afterhikerform = req.body;
         myphonenumber = afterhikerform["מה מספר הטלפון שלי?"]
         dbservices.getprevhikerbyphonenumber(res, myphonenumber)
         .then(mehikerinhikes => {
-            console.log(`mehikerinhikes: ${JSON.stringify(mehikerinhikes)}`);
             mearrivedwith = []
             for (let index = 0; index < mehikerinhikes.length; index++) {
                 const meinhike = mehikerinhikes[index];
                 var hike_date = meinhike.hikenamehebrew;
                 hike_date = hike_date.match(/[0-9\-]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}/g)[0];
-                console.log("hike_date", hike_date);
                 hiker_name = `${meinhike["name"]}, הגעתי מ${meinhike["comesfrom"]} `;
                 if (meinhike["mydriverfrom"]) {
                     hiker_name += `עם ${meinhike["mydriverfrom"]["name"]}`;
@@ -2863,7 +2860,8 @@ app.post("/api/afterhikematch", function(req, res) {
                 "whoami": mearrivedwith,
                 "mymatches": JSON.parse(afterhikerform["מי מצא חן בעיניי?"]),
             };
-    
+            console.log("afterhikerform", JSON.stringify(afterhikerform));
+
             dbservices.replaceafterhikematch(res, afterhikerform)
             .then(() => {
                 dbservices.findafterhikematch(res, afterhikerform)
