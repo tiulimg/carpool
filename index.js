@@ -2854,7 +2854,6 @@ app.post("/api/afterhikematch", function(req, res) {
                 hiker_name += "בתאריך " + hike_date;
                 mearrivedwith.push(hiker_name)
             }
-            console.log(`mearrivedwith: ${JSON.stringify(mearrivedwith)}`);
             afterhikerform = {
                 "phone": myphonenumber,
                 "whoami": mearrivedwith,
@@ -2878,7 +2877,7 @@ app.post("/api/afterhikematch", function(req, res) {
                                 if (hiker["mydriverfrom"]) {
                                     hiker_name += `עם ${hiker["mydriverfrom"]["name"]}`;
                                 }
-                                else {
+                                else if (hiker["availableplaces"]) {
                                     hiker_name += "ברכב ";
                                 }
                                 hiker_name += "בתאריך " + hike_date;
