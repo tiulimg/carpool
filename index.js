@@ -2838,7 +2838,7 @@ app.post("/api/afterhikematch", function(req, res) {
         console.log(JSON.stringify(req.body));
         afterhikerform = req.body;
         myphonenumber = afterhikerform["מה מספר הטלפון שלי?"]
-        dbservices.gethikerbyphonenumber(res, myphonenumber)
+        dbservices.getprevhikerbyphonenumber(res, myphonenumber)
         .then(mehikerinhikes => {
             console.log(`mehikerinhikes: ${JSON.stringify(mehikerinhikes)}`);
             mearrivedwith = []

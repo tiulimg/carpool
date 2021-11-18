@@ -9,7 +9,6 @@ module.exports = {
     gethikers: gethikers,
     gethikersbyhikedate: gethikersbyhikedate,
     gethikerbyhikedateandphonenumber: gethikerbyhikedateandphonenumber,
-    gethikerbyphonenumber: gethikerbyphonenumber,
     gethikerswithdrivers: gethikerswithdrivers,
     getdriversforhike: getdriversforhike,
     updatehikerstatus: updatehikerstatus,
@@ -42,6 +41,7 @@ module.exports = {
     deleteallafterhikematch: deleteallafterhikematch,
     findafterhikematch: findafterhikematch,
     getprevhikers: getprevhikers,
+    getprevhikerbyphonenumber: getprevhikerbyphonenumber,
     replaceallprevhikers: replaceallprevhikers,
 }
 
@@ -124,19 +124,6 @@ function gethikerbyhikedateandphonenumber(res, hiketodate, phonenumber) {
                 logservices.handleError(res, err.message, "Failed to get hikers.");
             } else {
                 return resolve(doc);
-            }
-        });
-    });
-}
-
-function gethikerbyphonenumber(res, phonenumber) {
-    return new Promise((resolve, reject) => {
-        db.collection(HIKERS_COLLECTION).find(
-            { $or: [ { phone: phonenumber }, { email: phonenumber } ] }, function(err, docs) {
-            if (err) {
-                logservices.handleError(res, err.message, "Failed to get hikers.");
-            } else {
-                return resolve(docs);
             }
         });
     });
@@ -642,6 +629,19 @@ function getprevhikers(res) {
             .toArray(function(err, docs) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to get prev hikers.");
+            } else {
+                return resolve(docs);
+            }
+        });
+    });
+}
+
+function getprevhikerbyphonenumber(res, phonenumber) {
+    return new Promise((resolve, reject) => {
+        db.collection(PREV_HIKERS_COLLECTION).find({ $or: [ { phone: phonenumber }, { email: phonenumber } ] })
+            .toArray(function(err, docs) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to get hikers.");
             } else {
                 return resolve(docs);
             }
