@@ -10,8 +10,8 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
     // setup e-mail data with unicode symbols
     var mailOptions = {
         from: '"קבוצת טיולים" <tiulimg@gmail.com>', // sender address
-        // to: hiker1address, // list of receivers
-        to: "tiulimg@gmail.com", // list of receivers
+        to: hiker1address, // list of receivers
+        // to: "tiulimg@gmail.com", // list of receivers
         subject: 'יש התאמה אחרי טיול ❤️', // Subject line
         //text: 'Hello world ?', // plaintext body
         html: `<h2>היי ${hiker1name}!</h2>
@@ -32,8 +32,8 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
     // setup e-mail data with unicode symbols
     var mailOptions = {
         from: '"קבוצת טיולים" <tiulimg@gmail.com>', // sender address
-        // to: hiker2address, // list of receivers
-        to: "zanzamer@gmail.com", // list of receivers
+        to: hiker2address, // list of receivers
+        // to: "zanzamer@gmail.com", // list of receivers
         subject: 'יש התאמה אחרי טיול ❤️', // Subject line
         //text: 'Hello world ?', // plaintext body
         html: `<h2>היי ${hiker2name}!</h2>
