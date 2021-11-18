@@ -2848,7 +2848,7 @@ app.post("/api/afterhikematch", function(req, res) {
                 if (meinhike["mydriverfrom"]) {
                     hiker_name += `עם ${meinhike["mydriverfrom"]["name"]}`;
                 }
-                else {
+                else if (meinhike["availableplaces"]) {
                     hiker_name += "ברכב ";
                 }
                 hiker_name += "בתאריך " + hike_date;
@@ -2859,7 +2859,6 @@ app.post("/api/afterhikematch", function(req, res) {
                 "whoami": mearrivedwith,
                 "mymatches": JSON.parse(afterhikerform["מי מצא חן בעיניי?"]),
             };
-            console.log("afterhikerform", JSON.stringify(afterhikerform));
 
             dbservices.replaceafterhikematch(res, afterhikerform)
             .then(() => {
