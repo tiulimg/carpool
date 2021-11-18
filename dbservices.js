@@ -9,6 +9,7 @@ module.exports = {
     gethikers: gethikers,
     gethikersbyhikedate: gethikersbyhikedate,
     gethikerbyhikedateandphonenumber: gethikerbyhikedateandphonenumber,
+    gethikerbyphonenumber: gethikerbyphonenumber,
     gethikerswithdrivers: gethikerswithdrivers,
     getdriversforhike: getdriversforhike,
     updatehikerstatus: updatehikerstatus,
@@ -40,6 +41,8 @@ module.exports = {
     deleteoneafterhikematch: deleteoneafterhikematch,
     deleteallafterhikematch: deleteallafterhikematch,
     findafterhikematch: findafterhikematch,
+    getprevhikers: getprevhikers,
+    replaceallprevhikers: replaceallprevhikers,
 }
 
 var ObjectID = mongodb.ObjectID;
@@ -55,6 +58,7 @@ var ROUTES_COLLECTION = "routes";
 var CONVERSATIONID_COLLECTION = "conversationid";
 var HISTORY_COLLECTION = "history";
 var AFTERHIKEMATCH_COLLECTION = "afterhikematch";
+var PREV_HIKERS_COLLECTION = "prev_hikers";
 
 function initialize(app) {
     return new Promise((resolve, reject) => {
@@ -116,6 +120,19 @@ function gethikerbyhikedateandphonenumber(res, hiketodate, phonenumber) {
             { $and: [ { $or: [ { hikenamehebrew: { $regex : ".*"+hiketodate+".*" } }, 
                                { hikenameenglish: { $regex : ".*"+hiketodate+".*" } } ] }, 
                       { $or: [ { phone: phonenumber }, { email: phonenumber } ] } ] }, function(err, doc) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to get hikers.");
+            } else {
+                return resolve(doc);
+            }
+        });
+    });
+}
+
+function gethikerbyphonenumber(res, phonenumber) {
+    return new Promise((resolve, reject) => {
+        db.collection(HIKERS_COLLECTION).findOne(
+            { $or: [ { phone: phonenumber }, { email: phonenumber } ] }, function(err, doc) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to get hikers.");
             } else {
@@ -569,7 +586,7 @@ function gethistorylength(res) {
 
 function replaceafterhikematch(res, afterhikeform) {
     return new Promise((resolve, reject) => {
-        deleteoneafterhikematch(res, afterhikeform["whoami"])
+        deleteoneafterhikematch(res, afterhikeform["phone"])
         .then(() => {
             db.collection(AFTERHIKEMATCH_COLLECTION).insertOne(afterhikeform, function(err, doc) {
                 if (err) {
@@ -583,10 +600,10 @@ function replaceafterhikematch(res, afterhikeform) {
     });
 }
 
-function deleteoneafterhikematch(res, whoami) {
+function deleteoneafterhikematch(res, phone) {
     return new Promise((resolve, reject) => {
         db.collection(AFTERHIKEMATCH_COLLECTION).deleteOne(
-            { 'whoami': whoami }, function(err, doc) {
+            { 'phone': phone }, function(err, doc) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to delete after hike match");
             }
@@ -609,12 +626,43 @@ function deleteallafterhikematch(res) {
 function findafterhikematch(res, afterhikerform) {
     return new Promise((resolve, reject) => {
         db.collection(AFTERHIKEMATCH_COLLECTION).find(
-            { $and: [ { 'mymatches': afterhikerform["whoami"] }, 
+            { $and: [ { 'mymatches': { $in: afterhikerform["whoami"] } }, 
                       { 'whoami': { $in: afterhikerform["mymatches"] } } ] }).toArray(function(err, docs) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to find after hike match");
             }
             return resolve(docs);
+        });
+    });
+}
+
+function getprevhikers(res) {
+    return new Promise((resolve, reject) => {
+        db.collection(PREV_HIKERS_COLLECTION).find({})
+            .toArray(function(err, docs) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to get prev hikers.");
+            } else {
+                return resolve(docs);
+            }
+        });
+    });
+}
+
+function replaceallprevhikers(res, prev_hikers) {
+    return new Promise((resolve, reject) => {
+        db.collection(PREV_HIKERS_COLLECTION).deleteMany({}, function(err, doc) {
+            if (err) {
+                logservices.handleError(res, err.message, "Failed to replace all prev hikers");
+            }
+            db.collection(PREV_HIKERS_COLLECTION).insertMany(prev_hikers, function(err, docs) {
+                if (err) {
+                    logservices.handleError(res, err.message, "Failed to replace all prev hikers.");
+                } else {
+                    return resolve(docs);
+                }
+            });
+            return resolve();
         });
     });
 }

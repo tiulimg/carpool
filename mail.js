@@ -10,7 +10,7 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
     // setup e-mail data with unicode symbols
     var mailOptions = {
         from: '"קבוצת טיולים" <tiulimg@gmail.com>', // sender address
-        //to: hiker1address, // list of receivers
+        // to: hiker1address, // list of receivers
         to: "tiulimg@gmail.com", // list of receivers
         subject: 'יש התאמה אחרי טיול ❤️', // Subject line
         //text: 'Hello world ?', // plaintext body
@@ -32,7 +32,7 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
     // setup e-mail data with unicode symbols
     var mailOptions = {
         from: '"קבוצת טיולים" <tiulimg@gmail.com>', // sender address
-        //to: hiker2address, // list of receivers
+        // to: hiker2address, // list of receivers
         to: "zanzamer@gmail.com", // list of receivers
         subject: 'יש התאמה אחרי טיול ❤️', // Subject line
         //text: 'Hello world ?', // plaintext body
@@ -42,6 +42,25 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
         מספר הטלפון שלו הוא ${hiker1phone}.
         
         שתהיה המון הצלחה לשניכם!` // html body
+    };
+
+    // send mail with defined transport object
+    sgMail
+    .send(mailOptions)
+    .catch((error) => {
+        console.error(error)
+    })
+
+    // setup e-mail data with unicode symbols
+    var mailOptions = {
+        from: '"קבוצת טיולים" <tiulimg@gmail.com>', // sender address
+        to: "tiulimg@gmail.com", // list of receivers
+        subject: 'יש התאמה אחרי טיול ❤️', // Subject line
+        //text: 'Hello world ?', // plaintext body
+        html: `<h2>היי!</h2>
+        
+        <strong>איזה כיף! יש התאמה בין  ${hiker1name} ל- ${hiker2name}</strong>, 
+        שיהיה להם הרבה בהצלחה!` // html body
     };
 
     // send mail with defined transport object
