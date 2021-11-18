@@ -2886,7 +2886,6 @@ app.post("/api/afterhikematch", function(req, res) {
                                         return afterhikerform['whoami'].indexOf(mymatch) != -1
                                     }).length > 0) 
                                 })
-                                console.log(`curr_match: ${JSON.stringify(curr_match)}`);
     
                                 if (curr_match.length > 0) {
                                     hiker_matches.push(hiker);
@@ -2895,15 +2894,19 @@ app.post("/api/afterhikematch", function(req, res) {
                                     mehiker = hiker;
                                 }
                             }
-    
-                            console.log(`mehiker ${JSON.stringify(mehiker)} hiker_matches: ${JSON.stringify(hiker_matches)}`)
-    
+
+                            sent = []
+        
                             if (mehiker) {
                                 for (let index = 0; index < hiker_matches.length; index++) {
                                     const hiker_match = hiker_matches[index];
-                                    mail.emailAfterHikeMatch(
-                                        mehiker["email"], hiker_match["email"], mehiker["name"], hiker_match["name"], 
-                                        mehiker["phone"], hiker_match["phone"]);
+
+                                    if (sent.indexOf(hiker_match["phone"]) == -1) {
+                                        mail.emailAfterHikeMatch(
+                                            mehiker["email"], hiker_match["email"], mehiker["name"], hiker_match["name"], 
+                                            mehiker["phone"], hiker_match["phone"]);
+                                        sent.push(hiker_match["phone"])
+                                    }
                                 }                            
                             }
                             res.status(200).json("end matches");
