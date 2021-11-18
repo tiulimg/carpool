@@ -2842,11 +2842,11 @@ app.post("/api/afterhikematch", function(req, res) {
         .then(mehikerinhikes => {
             console.log(`mehikerinhikes: ${JSON.stringify(mehikerinhikes)}`);
             mearrivedwith = []
-            var hike_date = mehikerinhikes[0].hikenamehebrew;
-            hike_date = hike_date.match(/[0-9\-]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}/g)[0];
-            console.log("hike_date", hike_date);
             for (let index = 0; index < mehikerinhikes.length; index++) {
                 const meinhike = mehikerinhikes[index];
+                var hike_date = meinhike.hikenamehebrew;
+                hike_date = hike_date.match(/[0-9\-]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}/g)[0];
+                console.log("hike_date", hike_date);
                 hiker_name = `${meinhike["name"]}, הגעתי מ${meinhike["comesfrom"]} `;
                 if (meinhike["mydriverfrom"]) {
                     hiker_name += `עם ${meinhike["mydriverfrom"]["name"]}`;
