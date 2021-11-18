@@ -2852,7 +2852,7 @@ app.post("/api/afterhikematch", function(req, res) {
                     hiker_name += `עם ${meinhike["mydriverfrom"]["name"]}`;
                 }
                 else {
-                    hiker_name += "ברכב";
+                    hiker_name += "ברכב ";
                 }
                 hiker_name += "בתאריך " + hike_date;
                 mearrivedwith.push(hiker_name)
@@ -2869,51 +2869,56 @@ app.post("/api/afterhikematch", function(req, res) {
                 dbservices.findafterhikematch(res, afterhikerform)
                 .then(matches => {
                     console.log(`matches: ${JSON.stringify(matches)}`)
-                    dbservices.getprevhikers(res)
-                    .then(hikers => {
-                        hiker_matches = [];
-                        mehiker = null;
-                        for (let index = 0; index < hikers.length; index++) {
-                            const hiker = hikers[index];
-                            hiker_name = `${hiker["name"]}, הגעתי מ${hiker["comesfrom"]} `;
-                            if (hiker["mydriverfrom"]) {
-                                hiker_name += `עם ${hiker["mydriverfrom"]["name"]}`;
+                    if (matches.length > 0) {
+                        dbservices.getprevhikers(res)
+                        .then(hikers => {
+                            hiker_matches = [];
+                            mehiker = null;
+                            for (let index = 0; index < hikers.length; index++) {
+                                const hiker = hikers[index];
+                                hiker_name = `${hiker["name"]}, הגעתי מ${hiker["comesfrom"]} `;
+                                if (hiker["mydriverfrom"]) {
+                                    hiker_name += `עם ${hiker["mydriverfrom"]["name"]}`;
+                                }
+                                else {
+                                    hiker_name += "ברכב ";
+                                }
+                                hiker_name += "בתאריך " + hike_date;
+                                curr_match = matches.filter(match => {
+                                    return (match["phone"] == hiker['phone'] && 
+                                    match["mymatches"].filter(mymatch => {
+                                        return afterhikerform['whoami'].indexOf(mymatch) != -1
+                                    }).length > 0) 
+                                })
+                                console.log(`curr_match: ${JSON.stringify(curr_match)}`);
+    
+                                if (curr_match.length > 0) {
+                                    hiker_matches.push(hiker);
+                                }
+                                if (hiker['phone'] == afterhikerform["phone"]) {
+                                    mehiker = hiker;
+                                }
                             }
-                            else {
-                                hiker_name += "ברכב";
+    
+                            console.log(`mehiker ${JSON.stringify(mehiker)} hiker_matches: ${JSON.stringify(hiker_matches)}`)
+    
+                            if (mehiker) {
+                                for (let index = 0; index < hiker_matches.length; index++) {
+                                    const hiker_match = hiker_matches[index];
+                                    mail.emailAfterHikeMatch(
+                                        mehiker["email"], hiker_match["email"], mehiker["name"], hiker_match["name"], 
+                                        mehiker["phone"], hiker_match["phone"]);
+                                }                            
                             }
-                            hiker_name += "בתאריך " + hike_date;
-                            curr_match = matches.filter(match => {
-                                return (match["phone"] == hiker['phone'] && 
-                                match["mymatches"].filter(mymatch => {
-                                    return afterhikerform['whoami'].indexOf(mymatch) != -1
-                                }).length > 0) 
-                            })
-                            console.log(`curr_match: ${JSON.stringify(curr_match)}`);
-
-                            if (curr_match.length > 0) {
-                                hiker_matches.push(hiker);
-                            }
-                            if (hiker['phone'] == afterhikerform["phone"]) {
-                                mehiker = hiker;
-                            }
-                        }
-
-                        console.log(`mehiker ${JSON.stringify(mehiker)} hiker_matches: ${JSON.stringify(hiker_matches)}`)
-
-                        if (mehiker) {
-                            for (let index = 0; index < hiker_matches.length; index++) {
-                                const hiker_match = hiker_matches[index];
-                                mail.emailAfterHikeMatch(
-                                    mehiker["email"], hiker_match["email"], mehiker["name"], hiker_match["name"], 
-                                    mehiker["phone"], hiker_match["phone"]);
-                            }                            
-                        }
-                        res.status(200).json("end matches");
-                    })
-                    .catch(rejection => {
-                        logservices.logRejection(rejection);
-                    });    
+                            res.status(200).json("end matches");
+                        })
+                        .catch(rejection => {
+                            logservices.logRejection(rejection);
+                        });                            
+                    }
+                    else {
+                        res.status(200).json("no matches");
+                    }
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
