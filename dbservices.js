@@ -131,12 +131,12 @@ function gethikerbyhikedateandphonenumber(res, hiketodate, phonenumber) {
 
 function gethikerbyphonenumber(res, phonenumber) {
     return new Promise((resolve, reject) => {
-        db.collection(HIKERS_COLLECTION).findOne(
-            { $or: [ { phone: phonenumber }, { email: phonenumber } ] }, function(err, doc) {
+        db.collection(HIKERS_COLLECTION).find(
+            { $or: [ { phone: phonenumber }, { email: phonenumber } ] }, function(err, docs) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to get hikers.");
             } else {
-                return resolve(doc);
+                return resolve(docs);
             }
         });
     });
