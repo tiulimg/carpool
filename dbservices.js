@@ -36,7 +36,7 @@ module.exports = {
     savehistorylength: savehistorylength,
     deletehistorylength: deletehistorylength,
     gethistorylength: gethistorylength,
-    replaceafterhikematch: replaceafterhikematch,
+    updateafterhikematch: updateafterhikematch,
     deleteoneafterhikematch: deleteoneafterhikematch,
     deleteallafterhikematch: deleteallafterhikematch,
     findafterhikematch: findafterhikematch,
@@ -571,19 +571,18 @@ function gethistorylength(res) {
     });
 }
 
-function replaceafterhikematch(res, afterhikeform) {
+function updateafterhikematch(res, afterhikeform) {
     return new Promise((resolve, reject) => {
-        deleteoneafterhikematch(res, afterhikeform["phone"])
-        .then(() => {
-            db.collection(AFTERHIKEMATCH_COLLECTION).insertOne(afterhikeform, function(err, doc) {
+        db.collection(AFTERHIKEMATCH_COLLECTION).updateOne(
+            { "phone": afterhikeform['phone'] },
+            { $push: { mymatches: { $each: afterhikeform['mymatches'] } } }, 
+            { upsert : true }, 
+            function(err, res) {
                 if (err) {
-                    logservices.handleError(res, err.message, "Failed to create or update after hike form.");
+                    logservices.handleError(res, err.message, "Failed to update after hike match");
                 }
-                else {
-                    return resolve();
-                }
+                return resolve();
             });
-        })
     });
 }
 
@@ -610,11 +609,11 @@ function deleteallafterhikematch(res) {
     });
 }
 
-function findafterhikematch(res, afterhikerform) {
+function findafterhikematch(res, afterhikeform) {
     return new Promise((resolve, reject) => {
         db.collection(AFTERHIKEMATCH_COLLECTION).find(
-            { $and: [ { 'mymatches': { $in: afterhikerform["whoami"] } }, 
-                      { 'whoami': { $in: afterhikerform["mymatches"] } } ] }).toArray(function(err, docs) {
+            { $and: [ { 'mymatches': { $in: afterhikeform["whoami"] } }, 
+                      { 'whoami': { $in: afterhikeform["mymatches"] } } ] }).toArray(function(err, docs) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to find after hike match");
             }

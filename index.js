@@ -2752,8 +2752,8 @@ app.patch("/api/allhistory", function(req, res) {
 
 app.post("/api/afterhikematch", function(req, res) {
     if (tools.checkpwd(res, req.query.pwd)) {
-        afterhikerform = req.body;
-        myphonenumber = afterhikerform["מה מספר הטלפון שלי?"]
+        afterhikeform = req.body;
+        myphonenumber = afterhikeform["מה מספר הטלפון שלי?"]
         dbservices.getprevhikerbyphonenumber(res, myphonenumber)
         .then(mehikerinhikes => {
             mearrivedwith = []
@@ -2771,15 +2771,15 @@ app.post("/api/afterhikematch", function(req, res) {
                 hiker_name += "בתאריך " + hike_date;
                 mearrivedwith.push(hiker_name)
             }
-            afterhikerform = {
+            afterhikeform = {
                 "phone": myphonenumber,
                 "whoami": mearrivedwith,
-                "mymatches": JSON.parse(afterhikerform["מי מצא חן בעיניי?"]),
+                "mymatches": JSON.parse(afterhikeform["מי מצא חן בעיניי?"]),
             };
 
-            dbservices.replaceafterhikematch(res, afterhikerform)
+            dbservices.updateafterhikematch(res, afterhikeform)
             .then(() => {
-                dbservices.findafterhikematch(res, afterhikerform)
+                dbservices.findafterhikematch(res, afterhikeform)
                 .then(matches => {
                     console.log(`matches: ${JSON.stringify(matches)}`)
                     if (matches.length > 0) {
@@ -2791,7 +2791,7 @@ app.post("/api/afterhikematch", function(req, res) {
                                 const hiker = hikers[index];
                                 hiker_name = `${hiker["name"]}, הגעתי מ${hiker["comesfrom"]} `;
                                 if (hiker["mydriverfrom"]) {
-                                    hiker_name += `עם ${hiker["mydriverfrom"]["name"]}`;
+                                    hiker_name += `עם ${hiker["mydriverfrom"]["name"]} `;
                                 }
                                 else if (hiker["availableplaces"]) {
                                     hiker_name += "ברכב ";
@@ -2800,14 +2800,14 @@ app.post("/api/afterhikematch", function(req, res) {
                                 curr_match = matches.filter(match => {
                                     return (match["phone"] == hiker['phone'] && 
                                     match["mymatches"].filter(mymatch => {
-                                        return afterhikerform['whoami'].indexOf(mymatch) != -1
+                                        return afterhikeform['whoami'].indexOf(mymatch) != -1
                                     }).length > 0) 
                                 })
     
                                 if (curr_match.length > 0) {
                                     hiker_matches.push(hiker);
                                 }
-                                if (hiker['phone'] == afterhikerform["phone"]) {
+                                if (hiker['phone'] == afterhikeform["phone"]) {
                                     mehiker = hiker;
                                 }
                             }
