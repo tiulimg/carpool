@@ -2778,6 +2778,7 @@ app.post("/api/afterhikematch", function(req, res) {
                     "whoami": mearrivedwith,
                     "mymatches": JSON.parse(afterhikeform["מי מצא חן בעיניי?"]),
                 };
+                console.log(`afterhikeform ${afterhikeform}`)
     
                 dbservices.updateafterhikematch(res, afterhikeform)
                 .then(() => {
