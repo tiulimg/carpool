@@ -2757,6 +2757,7 @@ app.post("/api/afterhikematch", function(req, res) {
         dbservices.getprevhikerbyphonenumber(res, myphonenumber)
         .then(mehikerinhikes => {
             if (mehikerinhikes.length > 0) {
+                console.log(`phone ${myphonenumber} ${mehikerinhikes}`)
                 mearrivedwith = []
                 for (let index = 0; index < mehikerinhikes.length; index++) {
                     const meinhike = mehikerinhikes[index];
