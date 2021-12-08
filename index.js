@@ -2757,7 +2757,7 @@ app.post("/api/afterhikematch", function(req, res) {
         dbservices.getprevhikerbyphonenumber(res, myphonenumber)
         .then(mehikerinhikes => {
             if (mehikerinhikes.length > 0) {
-                console.log(`phone ${myphonenumber} ${mehikerinhikes}`)
+                console.log(`phone ${myphonenumber} ${JSON.stringify(mehikerinhikes)}`)
                 mearrivedwith = []
                 for (let index = 0; index < mehikerinhikes.length; index++) {
                     const meinhike = mehikerinhikes[index];
@@ -2778,7 +2778,7 @@ app.post("/api/afterhikematch", function(req, res) {
                     "whoami": mearrivedwith,
                     "mymatches": JSON.parse(afterhikeform["מי מצא חן בעיניי?"]),
                 };
-                console.log(`afterhikeform ${afterhikeform}`)
+                console.log(`afterhikeform ${JSON.stringify(afterhikeform)}`)
     
                 dbservices.updateafterhikematch(res, afterhikeform)
                 .then(() => {
