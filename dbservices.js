@@ -575,7 +575,8 @@ function updateafterhikematch(res, afterhikeform) {
     return new Promise((resolve, reject) => {
         db.collection(AFTERHIKEMATCH_COLLECTION).updateOne(
             { "phone": afterhikeform['phone'] },
-            { $push: { mymatches: { $each: afterhikeform['mymatches'] } } }, 
+            { $push: { mymatches: { $each: afterhikeform['mymatches'] } } },
+            { upsert: true}, 
             function(err, res) {
                 if (err) {
                     logservices.handleError(res, err.message, "Failed to update after hike match");
