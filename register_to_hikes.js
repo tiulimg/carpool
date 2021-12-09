@@ -26,7 +26,7 @@ function register_to_hikes(language, res, params, memory)
 
             form_post_data = updatePostDataParams(form_post_data, draft_response, params);
 
-            var url = "1HFMPhQsWOqF8eFNA9cEPWGwQLkG1jQDatdOra3BynSw";
+            var url = "1HxhZ75zj44Lcb-BAIXA8iW-lZQNiPra4KJuXEJ1g6pE";
             sendForm(url, form_post_data, language, "REGISTER_TO_HIKES_SUCCESS", res, memory,"");
         });    
     });
