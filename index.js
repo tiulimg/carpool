@@ -2764,8 +2764,8 @@ app.post("/api/afterhikematch", function(req, res) {
                     var hike_date = meinhike.hikenamehebrew;
                     hike_date = hike_date.match(/[0-9\-]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}/g)[0];
                     hiker_name = `${meinhike["name"]}, הגעתי מ${meinhike["comesfrom"]} `;
-                    if (meinhike["mydriverfrom"]) {
-                        hiker_name += `עם ${meinhike["mydriverfrom"]["name"]}`;
+                    if (meinhike["mydriverto"]) {
+                        hiker_name += `עם ${meinhike["mydriverto"]["name"]}`;
                     }
                     else if (meinhike["availableplaces"]) {
                         hiker_name += "ברכב ";
@@ -2793,8 +2793,8 @@ app.post("/api/afterhikematch", function(req, res) {
                                 for (let index = 0; index < hikers.length; index++) {
                                     const hiker = hikers[index];
                                     hiker_name = `${hiker["name"]}, הגעתי מ${hiker["comesfrom"]} `;
-                                    if (hiker["mydriverfrom"]) {
-                                        hiker_name += `עם ${hiker["mydriverfrom"]["name"]} `;
+                                    if (hiker["mydriverto"]) {
+                                        hiker_name += `עם ${hiker["mydriverto"]["name"]} `;
                                     }
                                     else if (hiker["availableplaces"]) {
                                         hiker_name += "ברכב ";
