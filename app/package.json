@@ -5,7 +5,7 @@
   "dependencies": {
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
-    "react-scripts": "3.2.0"
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -28,6 +28,6 @@
       "last 1 safari version"
     ]
   },
-  "homepage" : "http://tiulimg-carpool.herokuapp.com",
+  "homepage": "http://tiulimg-carpool.herokuapp.com",
   "proxy": "http://tiulimg-carpool.herokuapp.com"
 }
