@@ -648,20 +648,25 @@ function getprevhikerbyphonenumber(res, phonenumber) {
     });
 }
 
-function replaceallprevhikers(res, prev_hikers) {
+function replaceallprevhikers(res) {
     return new Promise((resolve, reject) => {
         db.collection(PREV_HIKERS_COLLECTION).deleteMany({}, function(err, doc) {
             if (err) {
                 logservices.handleError(res, err.message, "Failed to replace all prev hikers");
             }
-            db.collection(PREV_HIKERS_COLLECTION).insertMany(prev_hikers, function(err, docs) {
+            db.collection(HIKERS_COLLECTION).find({}).toArray(function(err, prev_hikers) {
                 if (err) {
-                    logservices.handleError(res, err.message, "Failed to replace all prev hikers.");
+                    logservices.handleError(res, err.message, "Failed to get hikers.");
                 } else {
-                    return resolve(docs);
+                    db.collection(PREV_HIKERS_COLLECTION).insertMany(prev_hikers, function(err, docs) {
+                        if (err) {
+                            logservices.handleError(res, err.message, "Failed to replace all prev hikers.");
+                        } else {
+                            return resolve(docs);
+                        }
+                    });
                 }
             });
-            return resolve();
         });
     });
 }

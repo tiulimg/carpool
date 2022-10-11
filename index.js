@@ -2861,9 +2861,7 @@ app.put("/api/afterhikematch", function(req, res) {
     if (tools.checkpwd(res, req.query.pwd)) {
         dbservices.deleteallafterhikematch(res)
         .then(() => {
-            var prev_hikers = req.body.hikers;
-            console.log("HIKERS:", prev_hikers)
-            dbservices.replaceallprevhikers(res, prev_hikers)
+            dbservices.replaceallprevhikers(res)
             .then(() => {
                 res.status(200).json("deleted after hike forms");
             })
