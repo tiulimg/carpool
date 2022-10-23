@@ -114,7 +114,7 @@ function sendForm(formId, body, language, recast_reply, res, memory, edit)
                     "i approve":memory.registertohikes["iapprove"],
                 };
 
-                dbservices.replaceonelastregister(phonenumber, registerObj)
+                dbservices.replaceonelastregister(res, phonenumber, registerObj)
                 .catch(rejection => {
                     logservices.logRejection(rejection);
                 });
@@ -162,7 +162,7 @@ function sendForm(formId, body, language, recast_reply, res, memory, edit)
                     "i approve":memory.registertohikes["iapprove"],
                 };
 
-                dbservices.replaceonelastregister(phonenumber, registerObj)
+                dbservices.replaceonelastregister(res, phonenumber, registerObj)
                 .catch(rejection => {
                     logservices.logRejection(rejection);
                 });
