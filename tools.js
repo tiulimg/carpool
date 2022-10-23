@@ -7,7 +7,6 @@ module.exports = {
     checkpwd: checkpwd,
     checkspecialpwd: checkspecialpwd,
     wait: wait,
-    wakeupDyno: wakeupDyno,
     addsecondstodate: addsecondstodate,
     secondsbetweendates: secondsbetweendates,
     onlydate: onlydate,
@@ -58,20 +57,6 @@ function checkspecialpwd(res, pwd, specialpwd) {
 function wait(ms)
 {
     return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function wakeupDyno(lock) {
-    setTimeout(function() {
-        request({
-            url: "http://tiulimg-carpool.herokuapp.com/favicon.ico",
-            method: "GET",
-        }, function (error, response, body){
-            var now = new Date();
-            if (lock.stillrunning && (secondsbetweendates(lock.starttime, now) < 60 * 60)) {
-                wakeupDyno(lock);
-            }
-        });
-    }, 30 * 60 * 1000);
 }
 
 function addsecondstodate(datestring, seconds) {

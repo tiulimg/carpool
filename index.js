@@ -2630,7 +2630,6 @@ app.patch("/api/calculaterides", function(req, res) {
     if (tools.checkspecialpwd(res, req.query.pwd, req.query.specialpwd)) {
         dbservices.gethikes(res)
         .then(hikes => {
-            tools.wakeupDyno(lock);
             var nearhikes = tools.get_near_hikes(hikes);
             if (nearhikes.length > 0) {
                 ridesmodules.setcarpool(res, nearhikes)

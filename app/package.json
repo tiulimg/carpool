@@ -28,6 +28,6 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "http://tiulimg-carpool.herokuapp.com",
-  "proxy": "http://tiulimg-carpool.herokuapp.com"
+  "homepage": "https://tiulimg-carpool.onrender.com",
+  "proxy": "https://tiulimg-carpool.onrender.com"
 }
