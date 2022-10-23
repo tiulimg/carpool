@@ -97,7 +97,7 @@ function joinEmailUpdates(myname, email, phonenumber, isgay, howdidihear, langua
 
     // setup e-mail data with unicode symbols
     var mailOptions = {
-        from: '"קבוצת טיולים" <tiulimg@gmail.com>', // sender address
+        from: '"רובוט קבוצת הטיולים" <tiulimg.chatbot@gmail.com>', // sender address
         to: '"קבוצת טיולים" <tiulimg@gmail.com>', // list of receivers
         subject: subject, // Subject line
         //text: 'Hello world ?', // plaintext body
