@@ -1893,10 +1893,6 @@ app.post("/api/joinupdates", function(req, res) {
     var memory = req.body.conversation.memory;
     if (tools.checkpwd(res, req.query.pwd)) {
         var recast_conversation_reply;
-        var api_key = process.env.MAILGUN_API_KEY;
-        var DOMAIN = process.env.MAILGUN_DOMAIN;
-        var mailgun = require('mailgun-js')({apiKey: api_key, domain: DOMAIN});
-
         var language = tools.set_language(memory);
 
         if (!memory.isgay2 && memory.isgay) {
@@ -1911,36 +1907,10 @@ app.post("/api/joinupdates", function(req, res) {
         }
         memory.phonenumber = memory.phonenumber2;
 
-        var mailbody = memory.myname + ' is requesting to join hike updates.\r\n' +
-            'His email is ' + memory.email + ' and his phone number is ' + memory.phonenumber2 + "\n" +
-            "I'm gay: " + memory.isgay2 + "\n" + "Heard of hikes: " + memory.howdidihear2;
-        var subject = "Join hiking group updates";
+        mail.joinEmailUpdates(
+            memory.myname, memory.email, memory.phonenumber2, memory.isgay2, memory.howdidihear2, language);
 
         recast_conversation_reply = replies.get_recast_reply("JOINUPDATES_SUCCESS",language,null,memory);
-        switch (language) {
-            case "he":
-                mailbody = memory.myname + ' מבקש להצטרף לעדכונים על הטיולים.\r\n' +
-                'המייל שלו הוא ' + memory.email + ' ומספר הטלפון הוא ' + memory.phonenumber2 + "\n" +
-                "אני גיי: " + memory.isgay2 + "\n" + "שמעתי על הטיולים: " + memory.howdidihear2;
-                subject = "להצטרף לעדכונים";
-                break;
-            case "en":
-                break;
-            default:
-                break;
-        }
-
-        var data = {
-            from: 'Chatbot <tiulimg-carpool@samples.mailgun.org>',
-            to: 'tiulimg@gmail.com',
-            subject: subject,
-            text: mailbody,
-            };
-
-        mailgun.messages().send(data, function (error, body) {
-            console.log(body);
-            });
-
         res.status(200).json(recast_conversation_reply);
     }
   });
