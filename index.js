@@ -609,7 +609,7 @@ app.post("/api/lastregister", function(req, res) {
             "אתה גיי נכון? (ולא נשוי לאישה)":"i'm gay",
             "תתנדב להביא כלי נגינה כלשהו או תנגן אם נביא? על מה?":"plays on",
             "יש פעילות כלשהי שהיית רוצה להעביר או לארגן בשביל הקבוצה?":"can organize",
-            "האחריות על כל מה שקורה בטיול היא עליי בלבד. מצבי הרפואי תקין, ואם ארגיש לא טוב איידע את מוביל הטיול. ייתכן שרמת הקושי של הטיול תהיה קלה או קשה יותר מהצפוי ובהתאם הזמנים עשויים להתקצר או להתארך. אני יודע מה אני צריך להביא לטיול ומבין שייתכן שלא אוכל להצטרף בלי הציוד המתאים. האחריות על הציוד שלי היא שלי בלבד.":"i approve",
+            "האחריות על כל מה שקורה בטיול היא עליי בלבד. מצבי הרפואי תקין, ואם ארגיש לא טוב איידע את החבר שמוביל את הטיול. ייתכן שרמת הקושי של הטיול תהיה קלה או קשה יותר מהצפוי ובהתאם הזמנים עשויים להתקצר או להתארך. אני יודע מה אני צריך להביא לטיול ומבין שייתכן שלא אוכל להצטרף בלי הציוד המתאים. האחריות על הציוד שלי היא שלי בלבד.\nאני מודע לכך שאני מצטרף לטיול עם חברים. הטיול אינו \"טיול מאורגן\", אלא בילוי חברי ללא הדרכה או ליווי מקצועי כלשהו. חברים מהקבוצה מתנדבים להזמין את הקבוצה לטיול ללא תשלום או תמורה.":"i approve",
             "What is your name?":"name",
             "To which hike do you with to join?":"hikes",
             "Where from are you coming to the hike?":"comes from",
@@ -631,7 +631,7 @@ app.post("/api/lastregister", function(req, res) {
             "Your'e gay, right? (and not married to a women)":"i'm gay",
             "Will you volunteer to bring a musical instrument or play at it if we would bring it? Which?":"plays on",
             "Any activity you would like to transfer or organize for the group?":"can organize",
-            "The responsibility for everything that happens on the hike is solely mine. My medical condition is good and if I feel unwell I will let the hike guide know. The difficulty of the hike may be easier or harder than expected and according the times may be shortened or lengthened. I know what I need to bring on the hike and understand that I might not be able to join without the right equipment. The responsibility for my equipment is solely mine":"i approve",
+            "The responsibility for everything that happens on the hike is solely mine. My medical condition is good and if I feel unwell I will let the group member that leads that hike to know. The difficulty of the hike may be easier or harder than expected and according the times may be shortened or lengthened. I know what I need to bring on the hike and understand that I might not be able to join without the right equipment. The responsibility for my equipment is solely mine\nI am aware that I am joining a hike with friends. The hike is not an ֿ\"organized hike\", but a friend's pastime without any professional guidance or accompaniment. Members of the group volunteer to invite the group on a hike without any payment.":"i approve",
         };
 
         var formObj = {};
