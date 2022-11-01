@@ -1895,20 +1895,13 @@ app.post("/api/joinupdates", function(req, res) {
         var recast_conversation_reply;
         var language = tools.set_language(memory);
 
-        if (!memory.isgay2 && memory.isgay) {
-            memory.isgay2 = memory.isgay.raw;
-        }
-
-        if (!memory.howdidihear2 && memory.howdidihear) {
-            memory.howdidihear2 = memory.howdidihear.raw;
-        }
         if (memory.phonenumber2.indexOf("+972") != -1) {
             memory.phonenumber2 = memory.phonenumber2.replace("+972","0");
         }
         memory.phonenumber = memory.phonenumber2;
 
         mail.joinEmailUpdates(
-            memory.myname, memory.email, memory.phonenumber2, memory.isgay2, memory.howdidihear2, language);
+            memory.myname, memory.email, memory.phonenumber, memory.isgay, memory.howdidihear, language);
 
         recast_conversation_reply = replies.get_recast_reply("JOINUPDATES_SUCCESS",language,null,memory);
         res.status(200).json(recast_conversation_reply);

@@ -17,11 +17,12 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
 
     var subject = 'יש התאמה אחרי טיול ❤️'
     var mailbody = `<h2>היי ${hiker1name}!</h2>
-        
+    <br/><br/>
     <strong>גם ${hiker2name} סימן שמתאים לו להכיר אותך</strong>, 
+    <br/>
     מספר הטלפון שלו הוא ${hiker2phone}.
-    
-    שתהיה המון הצלחה לשניכם!` // html body
+    <br/><br/>
+    שתהיה המון הצלחה לשניכם!`; // html body
 
     var request = mailjet
     .post("send", {'version': 'v3.1'})
@@ -53,11 +54,12 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
     })
 
     mailbody = `<h2>היי ${hiker2name}!</h2>
-        
+    <br/><br/>
     <strong>גם ${hiker1name} סימן שמתאים לו להכיר אותך</strong>, 
+    <br/>
     מספר הטלפון שלו הוא ${hiker1phone}.
-    
-    שתהיה המון הצלחה לשניכם!` // html body
+    <br/><br/>
+    שתהיה המון הצלחה לשניכם!`; // html body
 
     request = mailjet
     .post("send", {'version': 'v3.1'})
@@ -89,9 +91,10 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
     })
 
     mailbody = `<h2>היי!</h2>
-        
+    <br/><br/>
     <strong>איזה כיף! יש התאמה בין  ${hiker1name} ל- ${hiker2name}</strong>, 
-    שיהיה להם הרבה בהצלחה!` // html body
+    <br/>
+    שיהיה להם הרבה בהצלחה!`; // html body
 
     request = mailjet
     .post("send", {'version': 'v3.1'})
@@ -136,15 +139,23 @@ function joinEmailUpdates(myname, email, phonenumber, isgay, howdidihear, langua
     );
 
     var subject = "Join hiking group updates";
-    var mailbody = myname + ' is requesting to join hike updates.\r\n' +
-        'His email is ' + email + ' and his phone number is ' + phonenumber + "\n" +
-        "I'm gay: " + isgay + "\n" + "Heard of hikes: " + howdidihear;
+    var mailbody = `${myname} is requesting to join hike updates.
+    <br/><br/>
+    His email is ${email} and his phone number is ${phonenumber}
+    <br/>
+    I'm gay: ${isgay} 
+    <br/>
+    Heard of hikes: ${howdidihear}`;
 
     switch (language) {
         case "he":
-            mailbody = myname + ' מבקש להצטרף לעדכונים על הטיולים.\r\n' +
-            'המייל שלו הוא ' + email + ' ומספר הטלפון הוא ' + phonenumber + "\n" +
-            "אני גיי: " + isgay + "\n" + "שמעתי על הטיולים: " + howdidihear;
+            var mailbody = `${myname} מבקש להצטרף לעדכונים על הטיולים.
+            <br/><br/>
+            המייל שלו הוא ${email} ומספר הטלפון הוא ${phonenumber}
+            <br/>
+            אני גיי: ${isgay} 
+            <br/>
+            שמעתי על הטיולים: ${howdidihear}`;
             subject = "להצטרף לעדכונים";
             break;
         case "en":
