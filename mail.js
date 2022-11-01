@@ -105,7 +105,7 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
 function joinEmailUpdates(myname, email, phonenumber, isgay, howdidihear, language) {
     // create reusable transporter object using the default SMTP transport
     const mailjet = require ('node-mailjet')
-    .connect('****************************1234', '****************************abcd')
+    mailjet.connect('****************************1234', '****************************abcd')
 
     // var subject = "Join hiking group updates";
     // var mailbody = myname + ' is requesting to join hike updates.\r\n' +
