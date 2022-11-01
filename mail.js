@@ -104,8 +104,15 @@ function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2nam
 
 function joinEmailUpdates(myname, email, phonenumber, isgay, howdidihear, language) {
     // create reusable transporter object using the default SMTP transport
-    const mailjet = require ('node-mailjet')
-    mailjet.connect('****************************1234', '****************************abcd')
+    var mailjet = require ('node-mailjet')
+    mailjet = mailjet.apiConnect(
+        process.env.MJ_APIKEY_PUBLIC,
+        process.env.MJ_APIKEY_PRIVATE,
+        {
+          config: {},
+          options: {}
+        } 
+    );
 
     // var subject = "Join hiking group updates";
     // var mailbody = myname + ' is requesting to join hike updates.\r\n' +
@@ -148,12 +155,12 @@ function joinEmailUpdates(myname, email, phonenumber, isgay, howdidihear, langua
         {
         "From": {
             "Email": "tiulimg@gmail.com",
-            "Name": "tiulim"
+            "Name": "tiulimg"
         },
         "To": [
             {
             "Email": "tiulimg@gmail.com",
-            "Name": "tiulim"
+            "Name": "tiulimg"
             }
         ],
         "Subject": "Greetings from Mailjet.",
