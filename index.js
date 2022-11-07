@@ -1904,7 +1904,7 @@ app.post("/api/joinupdates", function(req, res) {
         memory.phonenumber = memory.phonenumber2;
 
         mail.joinEmailUpdates(
-            memory.myname, memory.email, memory.phonenumber, memory.isgay, memory.howdidihear, language);
+            memory.myname, memory.email, memory.phonenumber, memory.isgay2, memory.howdidihear2, language);
 
         recast_conversation_reply = replies.get_recast_reply("JOINUPDATES_SUCCESS",language,null,memory);
         res.status(200).json(recast_conversation_reply);
