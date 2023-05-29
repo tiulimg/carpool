@@ -609,6 +609,7 @@ app.post("/api/lastregister", function(req, res) {
             "אתה גיי נכון? (ולא נשוי לאישה)":"i'm gay",
             "תתנדב להביא כלי נגינה כלשהו או תנגן אם נביא? על מה?":"plays on",
             "יש פעילות כלשהי שהיית רוצה להעביר או לארגן בשביל הקבוצה?":"can organize",
+            "אשמח לקבל פרטים על הטיולים":"get updates",
             "האחריות על כל מה שקורה בטיול היא עליי בלבד. מצבי הרפואי תקין, ואם ארגיש לא טוב איידע את החבר שמוביל את הטיול. ייתכן שרמת הקושי של הטיול תהיה קלה או קשה יותר מהצפוי ובהתאם הזמנים עשויים להתקצר או להתארך. אני יודע מה אני צריך להביא לטיול ומבין שייתכן שלא אוכל להצטרף בלי הציוד המתאים. האחריות על הציוד שלי היא שלי בלבד.\nאני מודע לכך שאני מצטרף לטיול עם חברים. הטיול אינו \"טיול מאורגן\", אלא בילוי חברי ללא הדרכה או ליווי מקצועי כלשהו. חברים מהקבוצה מתנדבים להזמין את הקבוצה לטיול ללא תשלום או תמורה.":"i approve",
             "What is your name?":"name",
             "To which hike do you with to join?":"hikes",
@@ -631,6 +632,7 @@ app.post("/api/lastregister", function(req, res) {
             "Your'e gay, right? (and not married to a women)":"i'm gay",
             "Will you volunteer to bring a musical instrument or play at it if we would bring it? Which?":"plays on",
             "Any activity you would like to transfer or organize for the group?":"can organize",
+            "I would love to receive updates about the hikes":"get updates",
             "The responsibility for everything that happens on the hike is solely mine. My medical condition is good and if I feel unwell I will let the group member that leads that hike to know. The difficulty of the hike may be easier or harder than expected and according the times may be shortened or lengthened. I know what I need to bring on the hike and understand that I might not be able to join without the right equipment. The responsibility for my equipment is solely mine\nI am aware that I am joining a hike with friends. The hike is not an ֿ\"organized hike\", but a friend's pastime without any professional guidance or accompaniment. Members of the group volunteer to invite the group on a hike without any payment.":"i approve",
         };
 
@@ -706,6 +708,9 @@ app.post("/api/lastregister", function(req, res) {
         }
 
         formObj["friends joining"] = tools.friendstext_from_friendsdetails(formObj.friendsdetails);
+
+        mail.joinEmailAndWhatsAppUpdates(
+            memory.myname, memory.email, memory.phonenumber, formObj["get updates"]);
 
         dbservices.gethikes(res)
         .then(docs => {
@@ -1890,6 +1895,7 @@ app.post("/api/registertohikes", function(req, res) {
 
 /*  "/api/joinupdates"
 *    POST: send email to tiulimg@gmail.com about newly signed address to add to mailing list
+*    PATCH: send email to tiulimg@gmail.com about newly signed address to add to mailing list from short form
 */
 
 app.post("/api/joinupdates", function(req, res) {
@@ -1908,6 +1914,16 @@ app.post("/api/joinupdates", function(req, res) {
 
         recast_conversation_reply = replies.get_recast_reply("JOINUPDATES_SUCCESS",language,null,memory);
         res.status(200).json(recast_conversation_reply);
+    }
+  });
+
+  app.patch("/api/joinupdates", function(req, res) {
+    var body = req.body;
+    if (tools.checkpwd(res, body.pwd)) {
+        mail.joinEmailAndWhatsAppUpdates(
+            body.myname, body.email, body.phonenumber, body.which_to_join);
+
+        res.status(200).json("SUCCESS");
     }
   });
 

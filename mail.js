@@ -1,6 +1,7 @@
 module.exports = {
     emailAfterHikeMatch: emailAfterHikeMatch,
-    joinEmailUpdates: joinEmailUpdates
+    joinEmailUpdates: joinEmailUpdates,
+    joinEmailAndWhatsAppUpdates: joinEmailAndWhatsAppUpdates
 };
 
 function emailAfterHikeMatch(hiker1address, hiker2address, hiker1name, hiker2name, hiker1phone, hiker2phone) {
@@ -163,6 +164,55 @@ function joinEmailUpdates(myname, email, phonenumber, isgay, howdidihear, langua
         default:
             break;
     }
+
+    const request = mailjet
+    .post("send", {'version': 'v3.1'})
+    .request({
+    "Messages":[
+        {
+        "From": {
+            "Email": "tiulimg@gmail.com",
+            "Name": "רובוט קבוצת הטיולים"
+        },
+        "To": [
+            {
+            "Email": "tiulimg@gmail.com",
+            "Name": "קבוצת הטיולים"
+            }
+        ],
+        "Subject": subject,
+        "HTMLPart": mailbody,
+        "CustomID": "JoinUpdates"
+        }
+    ]
+    })
+    request
+    .then((result) => {
+        console.log(result.body)
+    })
+    .catch((err) => {
+        console.log(err.statusCode)
+    })
+}
+
+function joinEmailAndWhatsAppUpdates(myname, email, phonenumber, which_to_join) {
+    // create reusable transporter object using the default SMTP transport
+    var mailjet = require ('node-mailjet')
+    mailjet = mailjet.apiConnect(
+        process.env.MJ_APIKEY_PUBLIC,
+        process.env.MJ_APIKEY_PRIVATE,
+        {
+          config: {},
+          options: {}
+        } 
+    );
+
+    var mailbody = `${myname} מבקש להצטרף לעדכונים על הטיולים.
+    <br/><br/>
+    המייל שלו הוא ${email} ומספר הטלפון הוא ${phonenumber}
+    <br/>
+    מבקש להצטרף ל-${which_to_join}`;
+    var subject = "להצטרף לעדכונים";
 
     const request = mailjet
     .post("send", {'version': 'v3.1'})
