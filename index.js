@@ -710,7 +710,7 @@ app.post("/api/lastregister", function(req, res) {
         formObj["friends joining"] = tools.friendstext_from_friendsdetails(formObj.friendsdetails);
 
         mail.joinEmailAndWhatsAppUpdates(
-            memory.myname, memory.email, memory.phonenumber, formObj["get updates"]);
+            formObj["name"], formObj["email"], formObj["phone number"], formObj["get updates"]);
 
         dbservices.gethikes(res)
         .then(docs => {
