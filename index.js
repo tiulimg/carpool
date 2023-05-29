@@ -709,8 +709,10 @@ app.post("/api/lastregister", function(req, res) {
 
         formObj["friends joining"] = tools.friendstext_from_friendsdetails(formObj.friendsdetails);
 
-        mail.joinEmailAndWhatsAppUpdates(
-            formObj["name"], formObj["email"], formObj["phone number"], formObj["get updates"]);
+        if (formObj["get updates"] !== 'undefined' && formObj["get updates"] != null) {
+            mail.joinEmailAndWhatsAppUpdates(
+                formObj["name"], formObj["email"], formObj["phone number"], formObj["get updates"]);    
+        }
 
         dbservices.gethikes(res)
         .then(docs => {
