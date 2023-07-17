@@ -47,8 +47,6 @@ dbservices.initialize(app)
 app.post("/api/debug", function(req, res) {
     console.log("req.url: " + JSON.stringify(req.url));
     console.log("req.body: " + JSON.stringify(req.body));
-    var memory = req.body.conversation.memory;
-    var language = tools.set_language(memory);
     res.status(200).json("OK");
 });
 
