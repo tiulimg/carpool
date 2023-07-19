@@ -1,29 +1,27 @@
 var fs = require('fs');
 const { last } = require('lodash');
-var replies_obj = JSON.parse(fs.readFileSync('./resources/recast_conversation_reply.json', 'utf8'));
+var replies_obj = JSON.parse(fs.readFileSync('./resources/conversation_reply.json', 'utf8'));
 
 module.exports = {
-    get_recast_reply: get_recast_reply,
-    push_to_recast_reply: push_to_recast_reply,
-    push_quick_reply_to_recast: push_quick_reply_to_recast, 
-    push_quick_reply_option_to_recast: push_quick_reply_option_to_recast, 
+    get_reply: get_reply,
+    push_to_reply: push_to_reply,
+    push_quick_reply: push_quick_reply, 
+    push_quick_reply_option: push_quick_reply_option, 
     get_conversation_string: get_conversation_string,
     get_conversation_buttons: get_conversation_buttons,
 };  
 
-function get_recast_reply(key, lang, params, memoryparams) {
-    var recast_conversation_reply;
+function get_reply(key, lang, params, memoryparams) {
+    var conversation_reply;
     if (typeof memoryparams === 'undefined' || memoryparams == null) {
-        recast_conversation_reply = {
+        conversation_reply = {
             "replies": []
         };
     }
     else {
-        recast_conversation_reply = {
+        conversation_reply = {
             "replies": [],
-            "conversation": {
-                "memory": memoryparams
-            }
+            "variables": memoryparams,
         };
     }
 
@@ -38,7 +36,7 @@ function get_recast_reply(key, lang, params, memoryparams) {
                 reply_obj = reply_obj.replace("_VAR" + index + "_", params[index]);
             }
         }
-        push_to_recast_reply(recast_conversation_reply, reply_obj);
+        push_to_reply(conversation_reply, reply_obj);
     }
     else {
         for (let index = 0; index < reply_obj.length; index++) {
@@ -48,27 +46,27 @@ function get_recast_reply(key, lang, params, memoryparams) {
                     string_to_push = string_to_push.replace("_VAR" + index2 + "_", params[index2]);
                 }
             }
-            push_to_recast_reply(recast_conversation_reply, string_to_push);
+            push_to_reply(conversation_reply, string_to_push);
         }
     }
 
     if (buttons) {
-        console.log("get_recast_reply recast_conversation_reply.replies ", recast_conversation_reply.replies);
+        console.log("get_reply conversation_reply.replies ", conversation_reply.replies);
 
-        var title = recast_conversation_reply.replies[recast_conversation_reply.replies.length - 1].content;
-        recast_conversation_reply.replies.splice(recast_conversation_reply.replies.length - 1, 1);
+        var title = conversation_reply.replies[conversation_reply.replies.length - 1].content;
+        conversation_reply.replies.splice(conversation_reply.replies.length - 1, 1);
 
-        push_quick_reply_to_recast(recast_conversation_reply, title);
+        push_quick_reply(conversation_reply, title);
 
         for (let index = 0; index < buttons.length; index++) {
             const button = buttons[index];
-            push_quick_reply_option_to_recast(recast_conversation_reply, button.text, button.val);
+            push_quick_reply_option(conversation_reply, button.text, button.val);
         }
     }
 
-    console.log("get_recast_reply: " + JSON.stringify(recast_conversation_reply));
+    console.log("get_reply: " + JSON.stringify(conversation_reply));
 
-    return recast_conversation_reply;
+    return conversation_reply;
 }
 
 function get_conversation_buttons(key, lang)
@@ -113,14 +111,14 @@ function get_conversation_string(text, lang)
     }
 }
 
-function push_to_recast_reply(recast_reply, text, buttons)
+function push_to_reply(reply, text, buttons)
 {
     if (text != null) {
         if (Array.isArray(text)) {
             console.log("44", text);
             for (let index = 0; index < text.length; index++) {
                 const currtext = text[index];
-                recast_reply.replies.push({
+                reply.replies.push({
                     "type": "text",
                     "content": currtext                                       
                 });
@@ -143,19 +141,19 @@ function push_to_recast_reply(recast_reply, text, buttons)
                 remaining_text = remaining_text.substr(last_newline + 1);
                 max_remaining_length = Math.max(MAX_LENGTH, remaining_text.length);
             }
-            console.log("push_to_recast_reply text_array ", text_array);
+            console.log("push_to_reply text_array ", text_array);
 
             if (text_array.length > 0) {
                 for (let index = 0; index < text_array.length; index++) {
                     const currtext = text_array[index];
-                    recast_reply.replies.push({
+                    reply.replies.push({
                         "type": "text",
                         "content": currtext                                       
                     });
                 } 
             }
             else {
-                recast_reply.replies.push({
+                reply.replies.push({
                     "type": "text",
                     "content": text                                       
                 });
@@ -164,25 +162,25 @@ function push_to_recast_reply(recast_reply, text, buttons)
     }
 
     if (buttons) {
-        var title = recast_reply.replies[recast_reply.replies.length - 1].content;
-        recast_reply.replies.splice(recast_reply.replies.length - 1, 1);
+        var title = reply.replies[reply.replies.length - 1].content;
+        reply.replies.splice(reply.replies.length - 1, 1);
 
-        push_quick_reply_to_recast(recast_reply, title);
+        push_quick_reply(reply, title);
 
         for (let index = 0; index < buttons.length; index++) {
             const button = buttons[index];
-            push_quick_reply_option_to_recast(recast_reply, button);
+            push_quick_reply_option(reply, button);
         }
     }
-    console.log("push_to_recast_reply: " + text);
+    console.log("push_to_reply: " + text);
 
-    return recast_reply;
+    return reply;
 }
 
-function push_quick_reply_to_recast(recast_reply, text)
+function push_quick_reply(reply, text)
 {
     if (text != null) {
-        recast_reply.replies.push({
+        reply.replies.push({
             type: 'quickReplies',
             content: {
                 title: text,
@@ -190,24 +188,24 @@ function push_quick_reply_to_recast(recast_reply, text)
              },
            });
     }
-    console.log("push_quick_reply_to_recast: " + text);
+    console.log("push_quick_reply: " + text);
 
-    return recast_reply;
+    return reply;
 }
 
-function push_quick_reply_option_to_recast(recast_reply, text, value)
+function push_quick_reply_option(reply, text, value)
 {
     if (typeof value === 'undefined') {
         value = text;
     }
     if (text != null) {
-        recast_reply.replies[recast_reply.replies.length - 1].content.buttons.push(
+        reply.replies[reply.replies.length - 1].content.buttons.push(
             { 
                 title: text, 
                 value: value 
             });
     }
-    console.log("push_quick_reply_option_to_recast: text: " + text + " value: " + value);
+    console.log("push_quick_reply_option: text: " + text + " value: " + value);
 
-    return recast_reply;
+    return reply;
 }
