@@ -55,7 +55,7 @@ app.post("/api/debug", function(req, res) {
 */
 
 app.patch("/api/areridessetuped", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     dbservices.gethikerswithdrivers(res)
     .then(docs => {
         var language = tools.set_language(memory);
@@ -91,7 +91,7 @@ app.patch("/api/areridessetuped", function(req, res) {
 */
 
 app.post("/api/wanttomodify", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, memory.pwd)) {
         console.log("memory: " + JSON.stringify(memory));
         var language = tools.set_language(memory);
@@ -225,7 +225,7 @@ app.post("/api/wanttomodify", function(req, res) {
 });
 
 app.put("/api/wanttomodify", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, memory.pwd)) {
         console.log("memory: " + JSON.stringify(memory));
         var language = tools.set_language(memory);
@@ -502,7 +502,7 @@ app.put("/api/wanttomodify", function(req, res) {
 */
 
 app.post("/api/friendsdetails", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, memory.pwd)) {
         var language = tools.set_language(memory);
         if (typeof memory.friendsdetails === 'undefined' || memory.friendsdetails == null) {
@@ -540,7 +540,7 @@ app.post("/api/friendsdetails", function(req, res) {
 });
 
 app.put("/api/friendsdetails", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, memory.pwd)) {
         var language = tools.set_language(memory);
         delete memory.friendname;
@@ -908,7 +908,7 @@ app.delete("/api/lastregister", function(req, res) {
 */
 
 app.patch("/api/lastregister/:phone", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = tools.normalize_phonenumber(phonenumber);
@@ -1063,7 +1063,7 @@ app.patch("/api/lastregister/:phone", function(req, res) {
 });
 
 app.put("/api/lastregister/:phone", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = tools.normalize_phonenumber(phonenumber);
@@ -1165,7 +1165,7 @@ app.put("/api/lastregister/:phone", function(req, res) {
 });
 
 app.post("/api/lastregister/:phone", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, req.query.pwd)) {
         var phonenumber = req.params.phone;
         phonenumber = tools.normalize_phonenumber(phonenumber);
@@ -1263,7 +1263,7 @@ app.delete("/api/lastregister/:phone", function(req, res) {
 */
 
 app.patch("/api/haslastregister/:phone", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, req.query.pwd)) {
         var phonenumber = req.params.phone;
         var language = tools.set_language(memory);
@@ -1426,7 +1426,7 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
 */
 
 app.post("/api/registertohikes", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, req.query.pwd)) {
         var language = tools.set_language(memory);
         var registertohikes_lang = "עברית";
@@ -1651,7 +1651,7 @@ app.post("/api/registertohikes", function(req, res) {
   });
 
   app.put("/api/registertohikes", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, memory.pwd)) {
         var language = tools.set_language(memory);
         var registertohikes_lang = "עברית";
@@ -1899,7 +1899,7 @@ app.post("/api/registertohikes", function(req, res) {
 */
 
 app.post("/api/joinupdates", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, req.query.pwd)) {
         var recast_conversation_reply;
         var language = tools.set_language(memory);
@@ -1933,7 +1933,7 @@ app.post("/api/joinupdates", function(req, res) {
 */
 
 app.patch("/api/selecthikes", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, memory.pwd)) {
         dbservices.gethikes(res)
         .then(docs => {
@@ -1951,7 +1951,7 @@ app.patch("/api/selecthikes", function(req, res) {
 });
 
 app.post("/api/selecthikes", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, memory.pwd)) {
         dbservices.gethikes(res)
         .then(docs => {
@@ -2098,7 +2098,7 @@ app.get("/api/hike", function(req, res) {
 });
 
 app.patch("/api/hike", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, memory.pwd)) {
         var language = tools.set_language(memory);
         dbservices.gethikes(res)
@@ -2172,7 +2172,7 @@ app.put("/api/hikers", function(req, res) {
 */
 
 app.patch("/api/choosehike/:phone", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, memory.pwd)) {
         var language = tools.set_language(memory);
         var reply_sent = false;
@@ -2249,7 +2249,7 @@ app.patch("/api/ridedetails/:phone", function(req, res) {
 });
 
 app.put("/api/ridedetails/:phone", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, memory.pwd)) {
         dbservices.gethikes(res)
         .then(docs => {
@@ -2308,7 +2308,7 @@ app.put("/api/ridedetails/:phone", function(req, res) {
 */
 
 app.post("/api/choosedriver", function(req, res) {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, memory.pwd)) {
         var phonenumber = memory.phonenumber;
         phonenumber = tools.normalize_phonenumber(phonenumber);

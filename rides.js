@@ -34,7 +34,7 @@ var stops = JSON.parse(fs.readFileSync('./stopsparser/meetingpoints.json', 'utf8
 
 function patchridedetails(req, res, replies)
 {
-    var memory = req.body.conversation.memory;
+    var memory = req.body;
     if (tools.checkpwd(res, memory.pwd)) {
         var language = tools.set_language(memory);
         dbservices.gethikes(res)
