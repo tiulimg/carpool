@@ -52,7 +52,7 @@ function edithikes(language, res, params, memory)
     });
 }
 
-function sendForm(formId, body, language, recast_reply, res, memory, edit)
+function sendForm(formId, body, language, reply, res, memory, edit)
 {
     // An object of options to indicate where to post to
     var request = require('request');
@@ -71,7 +71,7 @@ function sendForm(formId, body, language, recast_reply, res, memory, edit)
             console.log(error);
         }
 
-        switch (recast_reply) {
+        switch (reply) {
             case "REGISTER_TO_HIKES_SUCCESS":
                 var editlink = body.substr(0,body.indexOf("\">Edit your response"));
                 editlink = editlink.substr(editlink.lastIndexOf("edit2=") + 6);
@@ -119,16 +119,16 @@ function sendForm(formId, body, language, recast_reply, res, memory, edit)
                     logservices.logRejection(rejection);
                 });
 
-                var recast_conversation_reply;
+                var conversation_reply;
         
-                recast_conversation_reply = replies.get_recast_reply("REGISTER_TO_HIKES_SUCCESS",language,null,memory);
-                for (let index = 0; index < recast_conversation_reply.replies.length; index++) {
-                    recast_conversation_reply.replies[index].content = 
-                        recast_conversation_reply.replies[index].content
+                conversation_reply = replies.get_reply("REGISTER_TO_HIKES_SUCCESS",language,null,memory);
+                for (let index = 0; index < conversation_reply.replies.length; index++) {
+                    conversation_reply.replies[index].content = 
+                        conversation_reply.replies[index].content
                             .replace("TPHONE",process.env.TAL_PHONE);
                 }
         
-                res.status(200).json(recast_conversation_reply);        
+                res.status(200).json(conversation_reply);        
                 break;
             case "REGISTER_TO_HIKES_UPDATED":
                 console.log("registertohikes " + JSON.stringify(memory.registertohikes));
@@ -167,20 +167,20 @@ function sendForm(formId, body, language, recast_reply, res, memory, edit)
                     logservices.logRejection(rejection);
                 });
 
-                var recast_conversation_reply;
+                var conversation_reply;
 
                 switch (memory.operation) {
                     case "edithike":
-                        recast_conversation_reply = replies.get_recast_reply("REGISTER_TO_HIKES_UPDATED",language,null,memory);
+                        conversation_reply = replies.get_reply("REGISTER_TO_HIKES_UPDATED",language,null,memory);
                         break;
                     case "cancel":
-                        recast_conversation_reply = replies.get_recast_reply("REGISTER_TO_HIKES_CANCEL",language,null,memory);
+                        conversation_reply = replies.get_reply("REGISTER_TO_HIKES_CANCEL",language,null,memory);
                         break;
                     default:
                         break;
                 }
         
-                res.status(200).json(recast_conversation_reply);    
+                res.status(200).json(conversation_reply);    
                 break;
             default:
                 break;
@@ -188,7 +188,7 @@ function sendForm(formId, body, language, recast_reply, res, memory, edit)
     });
 }
 
-function setAvailableHikesReply(recast_conversation_reply, hikes, lang, title)
+function setAvailableHikesReply(conversation_reply, hikes, lang, title)
 {
     hikes = tools.remove_past_hikes(hikes);
     hikes = tools.sort_hikes(hikes);
@@ -196,48 +196,48 @@ function setAvailableHikesReply(recast_conversation_reply, hikes, lang, title)
     if (title == null) {
         title = replies.get_conversation_string("WHICH_HIKE_REGISTER", lang);
     }
-    recast_conversation_reply = replies.push_quick_reply_to_recast(recast_conversation_reply, title);
+    conversation_reply = replies.push_quick_reply(conversation_reply, title);
     for (let index = 0; index < hikes.length; index++) {
         const hike = hikes[index];
         
         if (hike.hasOwnProperty("hikenamehebrew")) {
             switch (lang) {
                 case "he":
-                    recast_conversation_reply = 
-                        replies.push_quick_reply_option_to_recast(recast_conversation_reply, hike.hikenamehebrew);
+                    conversation_reply = 
+                        replies.push_quick_reply_option(conversation_reply, hike.hikenamehebrew);
                     break;
                 case "en":
-                    recast_conversation_reply = 
-                        replies.push_quick_reply_option_to_recast(recast_conversation_reply, hike.hikenameenglish);
+                    conversation_reply = 
+                        replies.push_quick_reply_option(conversation_reply, hike.hikenameenglish);
                     break;
                 default:
                     break;
             }                
         }
         else {
-            recast_conversation_reply = 
-                replies.push_quick_reply_option_to_recast(recast_conversation_reply, hike);
+            conversation_reply = 
+                replies.push_quick_reply_option(conversation_reply, hike);
         }
     }
-    console.log("setAvailableHikesReply: " + JSON.stringify(recast_conversation_reply));
-    return recast_conversation_reply;
+    console.log("setAvailableHikesReply: " + JSON.stringify(conversation_reply));
+    return conversation_reply;
 }
 
-function setAvailableHikesReplyBut(recast_conversation_reply, hikes, lang, selectedHikes)
+function setAvailableHikesReplyBut(conversation_reply, hikes, lang, selectedHikes)
 {
     hikes = tools.remove_past_hikes(hikes);
     hikes = tools.sort_hikes(hikes);
 
     var title = replies.get_conversation_string("SELECT_MORE_HIKES", lang);
-    recast_conversation_reply = replies.push_quick_reply_to_recast(recast_conversation_reply, title);
+    conversation_reply = replies.push_quick_reply(conversation_reply, title);
     switch (lang) {
         case "he":
-            recast_conversation_reply = 
-                replies.push_quick_reply_option_to_recast(recast_conversation_reply, "סיים");
+            conversation_reply = 
+                replies.push_quick_reply_option(conversation_reply, "סיים");
             break;
         case "en":
-            recast_conversation_reply = 
-                replies.push_quick_reply_option_to_recast(recast_conversation_reply, "End");
+            conversation_reply = 
+                replies.push_quick_reply_option(conversation_reply, "End");
             break;
         default:
             break;
@@ -250,22 +250,22 @@ function setAvailableHikesReplyBut(recast_conversation_reply, hikes, lang, selec
                 if (selectedHikes.indexOf(hike.hikenamehebrew) != -1) {
                     continue;
                 }
-                recast_conversation_reply = 
-                    replies.push_quick_reply_option_to_recast(recast_conversation_reply, hike.hikenamehebrew);
+                conversation_reply = 
+                    replies.push_quick_reply_option(conversation_reply, hike.hikenamehebrew);
                 break;
             case "en":
                 if (selectedHikes.indexOf(hike.hikenameenglish) != -1) {
                     continue;
                 }
-                recast_conversation_reply = 
-                    replies.push_quick_reply_option_to_recast(recast_conversation_reply, hike.hikenameenglish);
+                conversation_reply = 
+                    replies.push_quick_reply_option(conversation_reply, hike.hikenameenglish);
                 break;
             default:
                 break;
         }
     }
-    console.log("setAvailableHikesReply: " + JSON.stringify(recast_conversation_reply));
-    return recast_conversation_reply;
+    console.log("setAvailableHikesReply: " + JSON.stringify(conversation_reply));
+    return conversation_reply;
 }
 
 function updateCarpool(res) {

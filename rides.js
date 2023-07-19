@@ -48,13 +48,13 @@ function patchridedetails(req, res, replies)
 
             dbservices.gethikerbyhikedateandphonenumber(res, hiketodate, phonenumber)
             .then(doc => {
-                var recast_conversation_reply;
+                var conversation_reply;
                 var hadexchangednumbers = false;
                 
                 if (typeof(doc) === 'undefined' || doc == null) {
-                    recast_conversation_reply = 
-                        replies.get_recast_reply("HIKER_NOT_REGISTERED_SPECIFIC_HIKE",language,[nowstring, selectedhike],memory);    
-                    res.status(200).json(recast_conversation_reply);
+                    conversation_reply = 
+                        replies.get_reply("HIKER_NOT_REGISTERED_SPECIFIC_HIKE",language,[nowstring, selectedhike],memory);    
+                    res.status(200).json(conversation_reply);
                 } 
                 else
                 {
@@ -94,21 +94,21 @@ function patchridedetails(req, res, replies)
                                     reply_key = "HITCHHIKERS_BACK";
                                     reply_vars.push(hitchersfrom);
                                 }
-                                recast_conversation_reply = 
-                                    replies.get_recast_reply(reply_key,language,reply_vars,memory); 
+                                conversation_reply = 
+                                    replies.get_reply(reply_key,language,reply_vars,memory); 
                             }
                             else
                             {
                                 if ((doc.mydriverto == null || doc.mydriverto.length == 0) &&
                                     (doc.mydriverfrom == null || doc.mydriverfrom.length == 0))
                                 {
-                                    recast_conversation_reply = 
-                                        replies.get_recast_reply("NO_RIDE",language,[nowstring],memory);
+                                    conversation_reply = 
+                                        replies.get_reply("NO_RIDE",language,[nowstring],memory);
                                 }
                                 else if (JSON.stringify(doc.mydriverto) == JSON.stringify(doc.mydriverfrom))
                                 {
-                                    recast_conversation_reply = 
-                                        replies.get_recast_reply("RIDE_BACK_FORTH",language,
+                                    conversation_reply = 
+                                        replies.get_reply("RIDE_BACK_FORTH",language,
                                         [doc.mydriverto.name,
                                         doc.mydriverto.phone,
                                         doc.mydriverto.drivercomesfrom,
@@ -117,8 +117,8 @@ function patchridedetails(req, res, replies)
                                 }
                                 else if (doc.mydriverto != null && doc.mydriverfrom != null)
                                 {
-                                    recast_conversation_reply = 
-                                        replies.get_recast_reply("RIDE_DIFFERENT_BACK_FORTH",language,
+                                    conversation_reply = 
+                                        replies.get_reply("RIDE_DIFFERENT_BACK_FORTH",language,
                                         [doc.mydriverto.name,
                                         doc.mydriverto.phone,
                                         doc.mydriverto.drivercomesfrom,
@@ -132,8 +132,8 @@ function patchridedetails(req, res, replies)
                                 }
                                 else if (doc.mydriverto != null)
                                 {
-                                    recast_conversation_reply = 
-                                        replies.get_recast_reply("RIDE_FORTH",language,
+                                    conversation_reply = 
+                                        replies.get_reply("RIDE_FORTH",language,
                                         [doc.mydriverto.name,
                                         doc.mydriverto.phone,
                                         doc.mydriverto.drivercomesfrom,
@@ -142,8 +142,8 @@ function patchridedetails(req, res, replies)
                                 }
                                 else
                                 {
-                                    recast_conversation_reply = 
-                                        replies.get_recast_reply("RIDE_BACK",language,
+                                    conversation_reply = 
+                                        replies.get_reply("RIDE_BACK",language,
                                         [doc.mydriverfrom.name,
                                         doc.mydriverfrom.phone,
                                         doc.mydriverfrom.drivercomesfrom,
@@ -249,8 +249,8 @@ function patchridedetails(req, res, replies)
                                             break;
                                     }
                                 }
-                                recast_conversation_reply = 
-                                    replies.push_to_recast_reply(recast_conversation_reply,text);  
+                                conversation_reply = 
+                                    replies.push_to_reply(conversation_reply,text);  
                             }
                             if (hadexchangednumbers) {
                                 dbservices.updatehikerstatus(res, hiketodate, phonenumber, "hadexchangednumbers")
@@ -260,7 +260,7 @@ function patchridedetails(req, res, replies)
                                 register.updateCarpool(res);
                             }
                         }
-                        res.status(200).json(recast_conversation_reply);
+                        res.status(200).json(conversation_reply);
                     })
                     .catch(rejection => {
                         logservices.logRejection(rejection);

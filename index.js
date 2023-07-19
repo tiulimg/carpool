@@ -66,19 +66,19 @@ app.patch("/api/areridessetuped", function(req, res) {
         memory.rideshadsetuped = setuped;
         if (setuped) {
             if (!memory.phonenumber) {
-                recast_conversation_reply = replies.get_recast_reply("GETRIDEDETAILS_ENTERPHONE",language,null,memory);
+                conversation_reply = replies.get_reply("GETRIDEDETAILS_ENTERPHONE",language,null,memory);
                 memory.stage = "getridedetails_getphone";
             }
             else {
-                recast_conversation_reply = replies.get_recast_reply("CHOOSE_HIKE_TO_EDIT",language,null,memory);    
+                conversation_reply = replies.get_reply("CHOOSE_HIKE_TO_EDIT",language,null,memory);    
                 memory.stage = "getridedetails_choosehike";
             }
         }
         else {
-            recast_conversation_reply = replies.get_recast_reply("RIDES_ARENT_SETUPED",language,null,memory);
+            conversation_reply = replies.get_reply("RIDES_ARENT_SETUPED",language,null,memory);
             delete memory.stage;
         }
-        res.status(200).json(recast_conversation_reply);
+        res.status(200).json(conversation_reply);
     })
     .catch(rejection => {
         logservices.logRejection(rejection);
@@ -215,12 +215,12 @@ app.post("/api/wanttomodify", function(req, res) {
             }
         }
 
-        var recast_conversation_reply = 
-            replies.get_recast_reply("REGISTER_TO_HIKES_DETAILS",language,[hike_registration_details],memory); 
+        var conversation_reply = 
+            replies.get_reply("REGISTER_TO_HIKES_DETAILS",language,[hike_registration_details],memory); 
         var title = replies.get_conversation_string("REGISTER_TO_HIKES_MODIFY", language);
-        recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, title);
+        conversation_reply = replies.push_to_reply(conversation_reply, title);
        
-        res.status(200).json(recast_conversation_reply);        
+        res.status(200).json(conversation_reply);        
     }
 });
 
@@ -368,8 +368,8 @@ app.put("/api/wanttomodify", function(req, res) {
         console.log("params " + JSON.stringify(params));
         console.log("fix_field " + fix_field + " params.length " + params.length);
         if (fix_field + 1 > params.length) {
-            recast_conversation_reply =
-                replies.get_recast_reply("CHOOSED_INCORRECT_OPTION",language,null,memory);
+            conversation_reply =
+                replies.get_reply("CHOOSED_INCORRECT_OPTION",language,null,memory);
         }
         else {
             fix_field = params[fix_field];
@@ -377,8 +377,8 @@ app.put("/api/wanttomodify", function(req, res) {
 
             memory.stage = stages[fix_field];
             console.log("memory.stage " + memory.stage);
-            var recast_conversation_reply = 
-                replies.get_recast_reply("NO_ANSWER",language,null,memory);
+            var conversation_reply = 
+                replies.get_reply("NO_ANSWER",language,null,memory);
             var reply_wanttomodify_obj = wanttomodify_obj.find(function(element) {
                 var result = false;
                 if (element.key && element.key == fix_field) {
@@ -404,74 +404,74 @@ app.put("/api/wanttomodify", function(req, res) {
                     needtosubmit = false;
                     var hikes = JSON.parse(JSON.stringify(memory.selectedhikes));
 
-                    recast_conversation_reply =
-                        replies.get_recast_reply("HIKES_SELECTED",language,[memory.selectedhikes.join("\n")],memory);
+                    conversation_reply =
+                        replies.get_reply("HIKES_SELECTED",language,[memory.selectedhikes.join("\n")],memory);
 
                     dbservices.gethikes(res)
                     .then(docs => {
                         docs = tools.sort_hikes(docs);
 
-                        recast_conversation_reply = 
-                            register.setAvailableHikesReplyBut(recast_conversation_reply, docs, language, hikes);
-                        res.status(200).json(recast_conversation_reply);
+                        conversation_reply = 
+                            register.setAvailableHikesReplyBut(conversation_reply, docs, language, hikes);
+                        res.status(200).json(conversation_reply);
                     })
                     .catch(rejection => {
                         logservices.logRejection(rejection);
                     });
                     break;
                 case "friends joining":
-                    recast_conversation_reply =
-                        replies.get_recast_reply("REGISTER_TO_HIKES_ADD_FRIEND",language,[memory.friendstext],memory);    
+                    conversation_reply =
+                        replies.get_reply("REGISTER_TO_HIKES_ADD_FRIEND",language,[memory.friendstext],memory);    
                     break;
                 case "car/ride":
                 case "saved the date":
                 case "share my age":
                     if (typeof reply_obj === 'string') {
-                        recast_conversation_reply = replies.push_quick_reply_to_recast(recast_conversation_reply, reply_obj);
+                        conversation_reply = replies.push_quick_reply(conversation_reply, reply_obj);
                     }
                     else {
                         for (let index = 0; index < reply_obj.length - 1; index++) {
                             const element = reply_obj[index];
-                            recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, element);
+                            conversation_reply = replies.push_to_reply(conversation_reply, element);
                         }
-                        recast_conversation_reply = 
-                            replies.push_quick_reply_to_recast(recast_conversation_reply, reply_obj[reply_obj.length - 1]);
+                        conversation_reply = 
+                            replies.push_quick_reply(conversation_reply, reply_obj[reply_obj.length - 1]);
                     }
                     var buttons = reply_wanttomodify_obj["buttons_" + language];
                     for (let index = 0; index < buttons.length; index++) {
                         const button = buttons[index];
-                        recast_conversation_reply = 
-                            replies.push_quick_reply_option_to_recast(recast_conversation_reply, button.text, button.val);
+                        conversation_reply = 
+                            replies.push_quick_reply_option(conversation_reply, button.text, button.val);
                     }
                     break;
                 default:
                     var buttons = reply_wanttomodify_obj["buttons_" + language];
                     if (buttons) {
                         if (typeof reply_obj === 'string') {
-                            recast_conversation_reply = replies.push_quick_reply_to_recast(recast_conversation_reply, reply_obj);
+                            conversation_reply = replies.push_quick_reply(conversation_reply, reply_obj);
                         }
                         else {
                             for (let index = 0; index < reply_obj.length - 1; index++) {
                                 const element = reply_obj[index];
-                                recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, element);
+                                conversation_reply = replies.push_to_reply(conversation_reply, element);
                             }
-                            recast_conversation_reply = 
-                                replies.push_quick_reply_to_recast(recast_conversation_reply, reply_obj[reply_obj.length - 1]);
+                            conversation_reply = 
+                                replies.push_quick_reply(conversation_reply, reply_obj[reply_obj.length - 1]);
                         }
                         for (let index = 0; index < buttons.length; index++) {
                             const button = buttons[index];
-                            recast_conversation_reply = 
-                                replies.push_quick_reply_option_to_recast(recast_conversation_reply, button.text, button.val);
+                            conversation_reply = 
+                                replies.push_quick_reply_option(conversation_reply, button.text, button.val);
                         }
                     }
                     else {
                         if (typeof reply_obj === 'string') {
-                            recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, reply_obj);
+                            conversation_reply = replies.push_to_reply(conversation_reply, reply_obj);
                         }
                         else {
                             for (let index = 0; index < reply_obj.length; index++) {
                                 const element = reply_obj[index];
-                                recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, element);
+                                conversation_reply = replies.push_to_reply(conversation_reply, element);
                             }
                         }
                     }
@@ -491,7 +491,7 @@ app.put("/api/wanttomodify", function(req, res) {
         }
 
         if (needtosubmit) {
-            res.status(200).json(recast_conversation_reply);        
+            res.status(200).json(conversation_reply);        
         }
     }
 });
@@ -533,9 +533,9 @@ app.post("/api/friendsdetails", function(req, res) {
         delete memory.friendsavesthedate;
         delete memory.friendsavesthedate2;
         memory.friendstext = tools.friendstext_from_friendsdetails(memory.friendsdetails);
-        var recast_conversation_reply = 
-        replies.get_recast_reply("REGISTER_TO_HIKES_ADD_FRIEND",language,[memory.friendstext],memory);    
-        res.status(200).json(recast_conversation_reply);
+        var conversation_reply = 
+        replies.get_reply("REGISTER_TO_HIKES_ADD_FRIEND",language,[memory.friendstext],memory);    
+        res.status(200).json(conversation_reply);
     } 
 });
 
@@ -554,9 +554,9 @@ app.put("/api/friendsdetails", function(req, res) {
             memory.friendsdetails.splice(removeindex - 1, 1);
         }
         memory.friendstext = tools.friendstext_from_friendsdetails(memory.friendsdetails);
-        var recast_conversation_reply = 
-            replies.get_recast_reply("REGISTER_TO_HIKES_ADD_FRIEND",language,[memory.friendstext],memory);    
-        res.status(200).json(recast_conversation_reply);
+        var conversation_reply = 
+            replies.get_reply("REGISTER_TO_HIKES_ADD_FRIEND",language,[memory.friendstext],memory);    
+        res.status(200).json(conversation_reply);
     } 
 });
 
@@ -916,14 +916,14 @@ app.patch("/api/lastregister/:phone", function(req, res) {
         dbservices.getlastregisterbyphonenumber(res, phonenumber)
         .then(doc => {
 
-            var recast_conversation_reply;
+            var conversation_reply;
             var language = tools.set_language(memory);
 
             if (!doc) {
                 memory.stage = "haslastregister";
-                recast_conversation_reply = 
-                    replies.get_recast_reply("NO_ANSWER",language,null,memory);   
-                res.status(200).json(recast_conversation_reply);
+                conversation_reply = 
+                    replies.get_reply("NO_ANSWER",language,null,memory);   
+                res.status(200).json(conversation_reply);
             }
             else if (typeof(doc) !== 'undefined' && doc != null) {
 
@@ -1030,26 +1030,26 @@ app.patch("/api/lastregister/:phone", function(req, res) {
                     memory.selectedhikes = selectedHikes;
 
                     if (selectedHikes.length > 0) {
-                        var recast_conversation_reply = replies.get_recast_reply("HIKES_SELECTED_INITIAL",language,
+                        var conversation_reply = replies.get_reply("HIKES_SELECTED_INITIAL",language,
                             [selectedHikes.join("\n")],memory);
                     }
                     else {
-                        var recast_conversation_reply = replies.get_recast_reply("REGISTERED_NO_HIKE",language,null,memory);
+                        var conversation_reply = replies.get_reply("REGISTERED_NO_HIKE",language,null,memory);
                     }
                     
                     if (memory.stage == "haslastregister_true" || memory.stage == "haslastregister") {
                         memory.stage = "wanttomodify_selecthikes";
-                        recast_conversation_reply = 
-                            register.setAvailableHikesReplyBut(recast_conversation_reply, docs, language, selectedHikes);
+                        conversation_reply = 
+                            register.setAvailableHikesReplyBut(conversation_reply, docs, language, selectedHikes);
                     }
                     // sapchatbot.getconversations(res, req.body.conversation.id, phonenumber)
                     // .then(() => {
-                    //     res.status(200).json(recast_conversation_reply);
+                    //     res.status(200).json(conversation_reply);
                     // })
                     // .catch(rejection => {
                     //     logservices.logRejection(rejection);
                     // });
-                    res.status(200).json(recast_conversation_reply);
+                    res.status(200).json(conversation_reply);
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
@@ -1069,7 +1069,7 @@ app.put("/api/lastregister/:phone", function(req, res) {
         phonenumber = tools.normalize_phonenumber(phonenumber);
         dbservices.getlastregisterbyphonenumber(res, phonenumber)
         .then(doc => {
-            var recast_conversation_reply;
+            var conversation_reply;
             var language = tools.set_language(memory);
 
             if (typeof(doc) !== 'undefined' && doc != null) {
@@ -1124,37 +1124,37 @@ app.put("/api/lastregister/:phone", function(req, res) {
                     memory.selectedhikes = selectedHikes;
 
                     if (selectedHikes.length > 1) {
-                        recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory); 
+                        conversation_reply = replies.get_reply("NO_ANSWER",language,null,memory); 
                         var title = replies.get_conversation_string("CHOOSE_HIKE_TO_EDIT", language);
-                        recast_conversation_reply = 
-                            register.setAvailableHikesReply(recast_conversation_reply, selectedHikes, language, title);
+                        conversation_reply = 
+                            register.setAvailableHikesReply(conversation_reply, selectedHikes, language, title);
                     }
                     else if (selectedHikes.length == 1) {
                         if (memory.operation == "cancel") {
                             memory.stage = "wanttomodify_cancelhike";
                             memory.hiketoeditcancel2 = selectedHikes[0];
-                            recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory); 
+                            conversation_reply = replies.get_reply("NO_ANSWER",language,null,memory); 
                         }
                         else if (memory.operation == "edithike") {
                             memory.stage = "registertohikes_affectedhikes";
                             memory.hiketoeditcancel2 = selectedHikes[0];
-                            recast_conversation_reply = 
-                                replies.get_recast_reply("REGISTERTOHIKES_EDITINGHIKE",language,[selectedHikes[0]],memory); 
+                            conversation_reply = 
+                                replies.get_reply("REGISTERTOHIKES_EDITINGHIKE",language,[selectedHikes[0]],memory); 
                         }
                     }
                     else {
                         delete memory.stage;
                         delete memory.operation;
-                        recast_conversation_reply = replies.get_recast_reply("REGISTERED_NO_HIKE_SUGGEST",language,null,memory);
+                        conversation_reply = replies.get_reply("REGISTERED_NO_HIKE_SUGGEST",language,null,memory);
                     }
                     // sapchatbot.getconversations(res, req.body.conversation.id, phonenumber)
                     // .then(() => {
-                    //     res.status(200).json(recast_conversation_reply);
+                    //     res.status(200).json(conversation_reply);
                     // })
                     // .catch(rejection => {
                     //     logservices.logRejection(rejection);
                     // });
-                    res.status(200).json(recast_conversation_reply);
+                    res.status(200).json(conversation_reply);
                 })
             }
         })
@@ -1171,7 +1171,7 @@ app.post("/api/lastregister/:phone", function(req, res) {
         phonenumber = tools.normalize_phonenumber(phonenumber);
         dbservices.getlastregisterbyphonenumber(res, phonenumber)
         .then(doc => {
-            var recast_conversation_reply;
+            var conversation_reply;
             var language = tools.set_language(memory);
 
             if (typeof(doc) !== 'undefined' && doc != null) {
@@ -1227,14 +1227,14 @@ app.post("/api/lastregister/:phone", function(req, res) {
                     memory.emptyhikes = selectedHikes.join("\n");
                     memory.selectedhikes = selectedHikes;
                     if (affectedhikes == "") {
-                        recast_conversation_reply = 
-                            replies.get_recast_reply("NO_ANSWER",language,null,memory);    
+                        conversation_reply = 
+                            replies.get_reply("NO_ANSWER",language,null,memory);    
                     }
                     else {
-                        recast_conversation_reply = 
-                            replies.get_recast_reply("AFFECTED_HIKES",language,[hiketoeditcancel,affectedhikes],memory);    
+                        conversation_reply = 
+                            replies.get_reply("AFFECTED_HIKES",language,[hiketoeditcancel,affectedhikes],memory);    
                     }
-                    res.status(200).json(recast_conversation_reply);
+                    res.status(200).json(conversation_reply);
                 })
             }
         })
@@ -1273,19 +1273,19 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
 
         dbservices.getlastregisterbyphonenumber(res, phonenumber)
         .then(doc => {
-            var recast_conversation_reply = 
-            replies.get_recast_reply("NO_ANSWER",language,null,memory);
+            var conversation_reply = 
+            replies.get_reply("NO_ANSWER",language,null,memory);
 
             if (typeof(doc) !== 'undefined' && doc != null) {
                 memory.stage = "haslastregister_true";
-                res.status(200).json(recast_conversation_reply);
+                res.status(200).json(conversation_reply);
             }
             else {
                 dbservices.gethikes(res)
                 .then(hikedocs => {
                     if (memory.operation && memory.operation != "newhike") {
-                        recast_conversation_reply = 
-                        replies.get_recast_reply("ROBOT_CONFUSED_EDITHIKE_NOT_REGISTERED_TO_HIKES",language,null,memory);
+                        conversation_reply = 
+                        replies.get_reply("ROBOT_CONFUSED_EDITHIKE_NOT_REGISTERED_TO_HIKES",language,null,memory);
                     }
 
                     if (memory.stage != "whichhikesregistered_phone") {
@@ -1382,13 +1382,13 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                                 memory.stage = stages[memory_variable];
                                 var buttons = replies.get_conversation_buttons(keys[memory.stage], language);
                                 var reply_string = replies.get_conversation_string(keys[memory.stage],language);
-                                recast_conversation_reply = replies.push_to_recast_reply(recast_conversation_reply, reply_string, buttons);
+                                conversation_reply = replies.push_to_reply(conversation_reply, reply_string, buttons);
                                 break;
                             }
                             else if (JSON.stringify(memory[memory_variable]) == "[]") {
                                 memory.stage = stages[memory_variable];
-                                recast_conversation_reply = 
-                                    register.setAvailableHikesReplyBut(recast_conversation_reply, hikedocs, language, memory["selectedhikes"]);
+                                conversation_reply = 
+                                    register.setAvailableHikesReplyBut(conversation_reply, hikedocs, language, memory["selectedhikes"]);
                                 break;
                             }
                             prevvariable = memory_variable;
@@ -1402,12 +1402,12 @@ app.patch("/api/haslastregister/:phone", function(req, res) {
                     console.log("memory.stage " + JSON.stringify(memory.stage));
                     // sapchatbot.getconversations(res, req.body.conversation.id, phonenumber)
                     // .then(() => {
-                    //     res.status(200).json(recast_conversation_reply);
+                    //     res.status(200).json(conversation_reply);
                     // })
                     // .catch(rejection => {
                     //     logservices.logRejection(rejection);
                     // });
-                    res.status(200).json(recast_conversation_reply);
+                    res.status(200).json(conversation_reply);
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
@@ -1635,9 +1635,9 @@ app.post("/api/registertohikes", function(req, res) {
                     register.register_to_hikes(language, res, registerparams, memory);
                 }
                 else {
-                    var recast_conversation_reply = 
-                        replies.get_recast_reply("REGISTERED_TO_ALL_HIKES_CHOSEN",language,null,memory);
-                    res.status(200).json(recast_conversation_reply);
+                    var conversation_reply = 
+                        replies.get_reply("REGISTERED_TO_ALL_HIKES_CHOSEN",language,null,memory);
+                    res.status(200).json(conversation_reply);
                 }
             })
             .catch(rejection => {
@@ -1886,9 +1886,9 @@ app.post("/api/registertohikes", function(req, res) {
             });
         }
         else {
-            var recast_conversation_reply = 
-                replies.get_recast_reply("ROBOT_CONFUSED_EDITHIKE_NOT_SELECTED_HIKE",language,null,memory);
-            res.status(200).json(recast_conversation_reply);
+            var conversation_reply = 
+                replies.get_reply("ROBOT_CONFUSED_EDITHIKE_NOT_SELECTED_HIKE",language,null,memory);
+            res.status(200).json(conversation_reply);
         }
     }
   });
@@ -1901,7 +1901,7 @@ app.post("/api/registertohikes", function(req, res) {
 app.post("/api/joinupdates", function(req, res) {
     var memory = req.body;
     if (tools.checkpwd(res, req.query.pwd)) {
-        var recast_conversation_reply;
+        var conversation_reply;
         var language = tools.set_language(memory);
 
         if (memory.phonenumber2.indexOf("+972") != -1) {
@@ -1912,8 +1912,8 @@ app.post("/api/joinupdates", function(req, res) {
         mail.joinEmailUpdates(
             memory.myname, memory.email, memory.phonenumber, memory.isgay2, memory.howdidihear2, language);
 
-        recast_conversation_reply = replies.get_recast_reply("JOINUPDATES_SUCCESS",language,null,memory);
-        res.status(200).json(recast_conversation_reply);
+        conversation_reply = replies.get_reply("JOINUPDATES_SUCCESS",language,null,memory);
+        res.status(200).json(conversation_reply);
     }
   });
 
@@ -1928,8 +1928,8 @@ app.post("/api/joinupdates", function(req, res) {
   });
 
 /*  "/api/selecthikes"
-*    PATCH: responds with recast quick replies of all available hikes
-*    POST: responds with recast quick replies of all available hikes but the hikes user already selected
+*    PATCH: responds with quick replies of all available hikes
+*    POST: responds with quick replies of all available hikes but the hikes user already selected
 */
 
 app.patch("/api/selecthikes", function(req, res) {
@@ -1940,9 +1940,9 @@ app.patch("/api/selecthikes", function(req, res) {
             var language = tools.set_language(memory);
             docs = tools.remove_past_hikes(docs);
             docs = tools.sort_hikes(docs);
-            var recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,null);    
-            recast_conversation_reply = register.setAvailableHikesReply(recast_conversation_reply, docs, language, null);
-            res.status(200).json(recast_conversation_reply);
+            var conversation_reply = replies.get_reply("NO_ANSWER",language,null,null);    
+            conversation_reply = register.setAvailableHikesReply(conversation_reply, docs, language, null);
+            res.status(200).json(conversation_reply);
         })
         .catch(rejection => {
             logservices.logRejection(rejection);
@@ -2051,27 +2051,27 @@ app.post("/api/selecthikes", function(req, res) {
                 memory.emptyhikes = selectedHikes.join("\n");
             }
             memory.selectedhikes = selectedHikes;
-            var recast_conversation_reply;
+            var conversation_reply;
             if (isbeyondlasthike) {
-                recast_conversation_reply = replies.get_recast_reply("RESIGTRATION_YET_OPEN",language,
+                conversation_reply = replies.get_reply("RESIGTRATION_YET_OPEN",language,
                     [selectedHikes.join("\n")],memory);
             }
             else if (typeof selectHike === 'undefined' || selectHike == null || selectHike == "") {
-                recast_conversation_reply = replies.get_recast_reply("DIDNT_RECOGNIZE_THE_REQUESTED_HIKE",language,
+                conversation_reply = replies.get_reply("DIDNT_RECOGNIZE_THE_REQUESTED_HIKE",language,
                     [selectedHikes.join("\n")],memory);                        
             }
             else {
                 if (selectedHikes.length > 0) {
-                    recast_conversation_reply = replies.get_recast_reply("HIKES_SELECTED",language,
+                    conversation_reply = replies.get_reply("HIKES_SELECTED",language,
                         [selectedHikes.join("\n")],memory);
                 }
                 else {
-                    recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);
+                    conversation_reply = replies.get_reply("NO_ANSWER",language,null,memory);
                 }
             }
-            recast_conversation_reply = 
-                register.setAvailableHikesReplyBut(recast_conversation_reply, docs, language, selectedHikes);
-            res.status(200).json(recast_conversation_reply);
+            conversation_reply = 
+                register.setAvailableHikesReplyBut(conversation_reply, docs, language, selectedHikes);
+            res.status(200).json(conversation_reply);
         })
         .catch(rejection => {
             logservices.logRejection(rejection);
@@ -2105,18 +2105,18 @@ app.patch("/api/hike", function(req, res) {
         .then(docs => {
             docs = tools.remove_past_hikes(docs);
             docs = tools.sort_hikes(docs);
-            var recast_conversation_reply;
+            var conversation_reply;
             if (docs.length > 0) {
-                recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
+                conversation_reply = replies.get_reply("NO_ANSWER",language,null,memory);    
                 if (memory.phonenumber) {
                     memory.stage = "haslastregister";
                 }
             }
             else {
-                recast_conversation_reply = replies.get_recast_reply("NO_HIKES_PLANNED",language,null,memory);                        
+                conversation_reply = replies.get_reply("NO_HIKES_PLANNED",language,null,memory);                        
                 delete memory.stage;
             }
-            res.status(200).json(recast_conversation_reply);
+            res.status(200).json(conversation_reply);
         })
         .catch(rejection => {
             logservices.logRejection(rejection);
@@ -2206,17 +2206,17 @@ app.patch("/api/choosehike/:phone", function(req, res) {
                             if (selectedrides.length > 1) {
                                 memory.stage = "getridedetails_choosehike";
                                 delete memory.selectedhike;
-                                var recast_conversation_reply = replies.get_recast_reply("NO_ANSWER",language,null,memory);    
+                                var conversation_reply = replies.get_reply("NO_ANSWER",language,null,memory);    
                                 var title = replies.get_conversation_string("CHOOSE_HIKE_TO_EDIT", language);
-                                recast_conversation_reply = 
-                                    register.setAvailableHikesReply(recast_conversation_reply, selectedrides, language, title); 
-                                res.status(200).json(recast_conversation_reply);
+                                conversation_reply = 
+                                    register.setAvailableHikesReply(conversation_reply, selectedrides, language, title); 
+                                res.status(200).json(conversation_reply);
                             }
                             else {
-                                var recast_conversation_reply = 
-                                    replies.get_recast_reply("RIDES_NOT_ARRANGED",language,
+                                var conversation_reply = 
+                                    replies.get_reply("RIDES_NOT_ARRANGED",language,
                                         [nowstring, selectedhikes.join("\n")],memory);  
-                                res.status(200).json(recast_conversation_reply);
+                                res.status(200).json(conversation_reply);
                             }
                         }
                     })
@@ -2225,8 +2225,8 @@ app.patch("/api/choosehike/:phone", function(req, res) {
                     });
                 }
                 else {
-                    recast_conversation_reply = replies.get_recast_reply("REGISTERED_NO_HIKE_SUGGEST",language,null,memory);
-                    res.status(200).json(recast_conversation_reply);
+                    conversation_reply = replies.get_reply("REGISTERED_NO_HIKE_SUGGEST",language,null,memory);
+                    res.status(200).json(conversation_reply);
                 }
             })
             .catch(rejection => {
@@ -2261,14 +2261,14 @@ app.put("/api/ridedetails/:phone", function(req, res) {
 
             dbservices.gethikerbyhikedateandphonenumber(res, hiketodate, phonenumber)
             .then(doc => {
-                var recast_conversation_reply;
+                var conversation_reply;
                 var hadsetup = memory.hadsetup;
                 var language = tools.set_language(memory);
 
                 if (typeof(doc) === 'undefined' || doc == null) {
-                    recast_conversation_reply = 
-                        replies.get_recast_reply("HIKER_NOT_REGISTERED_SPECIFIC_HIKE",language,[nowstring, selectedhike],memory);    
-                        res.status(200).json(recast_conversation_reply);
+                    conversation_reply = 
+                        replies.get_reply("HIKER_NOT_REGISTERED_SPECIFIC_HIKE",language,[nowstring, selectedhike],memory);    
+                        res.status(200).json(conversation_reply);
                 } 
                 else
                 {
@@ -2277,8 +2277,8 @@ app.put("/api/ridedetails/:phone", function(req, res) {
                         if (typeof(doclast) !== 'undefined' && doc != doclast) {
                             if (hadsetup)
                             {
-                                recast_conversation_reply = 
-                                    replies.get_recast_reply("GREAT_FOR_UPDATE",language,null,memory); 
+                                conversation_reply = 
+                                    replies.get_reply("GREAT_FOR_UPDATE",language,null,memory); 
                                 dbservices.updatehikerstatus(res, hiketodate, phonenumber, "hadsetup")
                                 .catch(rejection => {
                                     logservices.logRejection(rejection);
@@ -2286,7 +2286,7 @@ app.put("/api/ridedetails/:phone", function(req, res) {
                                 register.updateCarpool(res);
                             }
                         }
-                        res.status(200).json(recast_conversation_reply);
+                        res.status(200).json(conversation_reply);
                     })
                     .catch(rejection => {
                         logservices.logRejection(rejection);
@@ -2318,7 +2318,7 @@ app.post("/api/choosedriver", function(req, res) {
 
         dbservices.gethikerbyhikedateandphonenumber(res, hiketodate, phonenumber)
         .then(docme => {
-            var recast_conversation_reply;
+            var conversation_reply;
             var language = tools.set_language(memory);
 
             if (typeof(docme) !== 'undefined' || docme != null) {
@@ -2449,10 +2449,10 @@ app.post("/api/choosedriver", function(req, res) {
                         default:
                             break;
                     }
-                    recast_conversation_reply = 
-                        replies.get_recast_reply("CHOOSE_ADRIVER",language,
+                    conversation_reply = 
+                        replies.get_reply("CHOOSE_ADRIVER",language,
                             [selecteddriverstostring,selecteddriversfromstring,driversstring],memory);
-                    res.status(200).json(recast_conversation_reply);
+                    res.status(200).json(conversation_reply);
                 })
                 .catch(rejection => {
                     logservices.logRejection(rejection);
